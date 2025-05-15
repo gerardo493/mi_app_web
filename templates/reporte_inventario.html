@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Inventario{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Reporte de Inventario</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Inventario
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-2"></i>Imprimir Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Encabezado del Reporte -->
+    <div class="card mb-4" id="encabezado-reporte">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px;">
+                </div>
+                <div class="col-md-8 text-center">
+                    <h3 class="mb-1">{{ empresa.nombre }}</h3>
+                    <p class="mb-1">RIF: {{ empresa.rif }}</p>
+                    <p class="mb-1">{{ empresa.direccion }}</p>
+                    <p class="mb-0">Teléfono: {{ empresa.telefono }}</p>
+                </div>
+                <div class="col-md-2 text-end">
+                    <p class="mb-1"><strong>Fecha:</strong> {{ fecha_actual.strftime('%d/%m/%Y') }}</p>
+                    <p class="mb-0"><strong>Tasa BCV:</strong> {{ tasa_bcv }} Bs/USD</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen General -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Productos</h5>
+                    <h2 class="display-4">{{ total_productos|es_number(0) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Stock</h5>
+                    <h2 class="display-4">{{ total_stock|es_number(0) }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Valor Total USD</h5>
+                    <h2 class="display-4">${{ valor_total|es_number }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Valor Total Bs</h5>
+                    <h2 class="display-4">{{ (valor_total * tasa_bcv)|es_number }} Bs</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos por Categoría -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Productos por Categoría</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 18%">Categoría</th>
+                            <th style="width: 10%">Total Productos</th>
+                            <th style="width: 10%">Stock Total</th>
+                            <th style="width: 12%">Valor Total USD</th>
+                            <th style="width: 12%">Valor Total Bs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categoria, datos in productos_por_categoria.items() %}
+                        <tr>
+                            <td>{{ categoria }}</td>
+                            <td class="text-end">{{ datos.productos|length }}</td>
+                            <td class="text-end">{{ datos.cantidad|es_number(0) }}</td>
+                            <td class="text-end">${{ datos.valor|es_number }}</td>
+                            <td class="text-end">{{ (datos.valor * tasa_bcv)|es_number }} Bs</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos con Bajo Stock -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Productos con Bajo Stock</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 10%">ID</th>
+                            <th style="width: 25%">Nombre</th>
+                            <th style="width: 15%">Categoría</th>
+                            <th style="width: 10%">Stock</th>
+                            <th style="width: 10%">Precio USD</th>
+                            <th style="width: 10%">Precio Bs</th>
+                            <th style="width: 10%">Valor USD</th>
+                            <th style="width: 10%">Valor Bs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, producto in productos_bajo_stock.items() %}
+                        <tr>
+                            <td>{{ id }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria }}</td>
+                            <td class="text-end">
+                                <span class="badge bg-danger">{{ producto.cantidad|es_number(0) }}</span>
+                            </td>
+                            <td class="text-end">${{ producto.precio|es_number }}</td>
+                            <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
+                            <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
+                            <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista Completa de Productos -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Lista Completa de Productos</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 8%">ID</th>
+                            <th style="width: 22%" class="text-start">Nombre</th>
+                            <th style="width: 13%">Categoría</th>
+                            <th style="width: 8%">Stock</th>
+                            <th style="width: 10%">Precio USD</th>
+                            <th style="width: 10%">Precio Bs</th>
+                            <th style="width: 10%">Valor USD</th>
+                            <th style="width: 10%">Valor Bs</th>
+                            <th style="width: 9%">Última Entrada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, producto in inventario.items() %}
+                        <tr>
+                            <td>{{ id }}</td>
+                            <td class="text-start">{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria }}</td>
+                            <td class="text-end">
+                                <span class="badge {% if producto.cantidad > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ producto.cantidad|es_number(0) }}
+                                </span>
+                            </td>
+                            <td class="text-end">${{ producto.precio|es_number }}</td>
+                            <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
+                            <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
+                            <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
+                            <td class="text-center">
+                                {% if producto.ultima_entrada %}
+                                    {{ producto.ultima_entrada|string|replace('T', ' ')|datetimeformat('%d/%m/%Y') }}
+                                {% else %}N/A{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn-group, .navbar {
+        display: none !important;
+    }
+    .card {
+        break-inside: avoid;
+        border: none !important;
+    }
+    .card-header {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+        border-bottom: 2px solid #dee2e6 !important;
+    }
+    .table {
+        font-size: 12px;
+    }
+    .table th {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    .badge {
+        border: 1px solid #000;
+    }
+    #encabezado-reporte {
+        border: none !important;
+    }
+    .container-fluid {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    .row {
+        margin: 0 !important;
+    }
+    .col-md-3 {
+        padding: 0 10px !important;
+    }
+    .display-4 {
+        font-size: 2rem !important;
+    }
+}
+/* Ajuste de espacios y padding para tablas en pantalla */
+.table th, .table td {
+    padding-top: 0.22rem !important;
+    padding-bottom: 0.22rem !important;
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+    vertical-align: middle !important;
+    font-size: 1em;
+}
+.table {
+    font-size: 1em;
+    margin-bottom: 0;
+    border-collapse: collapse !important;
+    table-layout: fixed;
+}
+.table th, .table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-body {
+    padding: 0.7rem 0.7rem 0.7rem 0.7rem;
+}
+</style>
+{% endblock %} 

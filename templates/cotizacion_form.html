@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Cotización{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Nueva Cotización</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('nueva_cotizacion') }}" id="cotizacionForm">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="numero" class="form-label">Número de Cotización</label>
+                            <input type="text" class="form-control" id="numero" name="numero" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validez" class="form-label">Válido hasta</label>
+                            <input type="date" class="form-control" id="validez" name="validez" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            <option value="">Seleccione un cliente</option>
+                            {% for id, cliente in clientes.items() %}
+                            <option value="{{ id }}">{{ cliente.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Productos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="productos-container">
+                                <div class="row mb-3 producto-item">
+                                    <div class="col-md-5">
+                                        <select class="form-select producto-select" name="productos[]" required>
+                                            <option value="">Seleccione un producto</option>
+                                            {% for id, producto in inventario.items() %}
+                                            <option value="{{ id }}" data-precio="{{ producto.precio }}">
+                                                {{ producto.nombre }} - ${{ producto.precio }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" class="form-control cantidad-input" 
+                                               name="cantidades[]" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control subtotal" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger btn-sm remove-producto">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success" id="agregar-producto">
+                                <i class="fas fa-plus me-2"></i>Agregar Producto
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">Total</span>
+                                <input type="text" class="form-control" id="total" name="total" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Cotización
+                        </button>
+                        <a href="{{ url_for('mostrar_cotizaciones') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productosContainer = document.getElementById('productos-container');
+    const agregarProductoBtn = document.getElementById('agregar-producto');
+    const cotizacionForm = document.getElementById('cotizacionForm');
+
+    // Función para calcular subtotales y total
+    function calcularTotales() {
+        let total = 0;
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const precio = parseFloat(item.querySelector('.producto-select option:checked').dataset.precio || 0);
+            const cantidad = parseInt(item.querySelector('.cantidad-input').value || 0);
+            const subtotal = precio * cantidad;
+            item.querySelector('.subtotal').value = `$${subtotal.toFixed(2)}`;
+            total += subtotal;
+        });
+        document.getElementById('total').value = `$${total.toFixed(2)}`;
+    }
+
+    // Agregar producto
+    agregarProductoBtn.addEventListener('click', function() {
+        const template = productosContainer.querySelector('.producto-item').cloneNode(true);
+        template.querySelector('.producto-select').value = '';
+        template.querySelector('.cantidad-input').value = '1';
+        template.querySelector('.subtotal').value = '';
+        productosContainer.appendChild(template);
+        setupEventListeners(template);
+    });
+
+    // Configurar event listeners para un item de producto
+    function setupEventListeners(item) {
+        item.querySelector('.producto-select').addEventListener('change', calcularTotales);
+        item.querySelector('.cantidad-input').addEventListener('input', calcularTotales);
+        item.querySelector('.remove-producto').addEventListener('click', function() {
+            if (document.querySelectorAll('.producto-item').length > 1) {
+                item.remove();
+                calcularTotales();
+            }
+        });
+    }
+
+    // Configurar event listeners iniciales
+    document.querySelectorAll('.producto-item').forEach(setupEventListeners);
+
+    // Validar formulario antes de enviar
+    cotizacionForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const total = parseFloat(document.getElementById('total').value.replace('$', ''));
+        if (total <= 0) {
+            alert('La cotización debe tener al menos un producto con cantidad mayor a 0');
+            return;
+        }
+        this.submit();
+    });
+});
+</script>
+{% endblock %} 

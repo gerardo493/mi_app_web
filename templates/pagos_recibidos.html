@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Pagos Recibidos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Pagos Recibidos</h2>
+        <div class="btn-group">
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+            </a>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Pagos Recibidos (USD)</h5>
+                    <h2 class="display-4">${{ total_usd|float|es_number }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Pagos Recibidos (Bs)</h5>
+                    <h2 class="display-4">{{ total_bs|float|es_number }} Bs</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Detalle de Pagos Recibidos</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Factura</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Método</th>
+                            <th>Monto (USD)</th>
+                            <th>Monto (Bs)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pago in pagos %}
+                        <tr>
+                            <td><a href="/facturas/{{ pago.factura_id }}">#{{ pago.factura_id }}</a></td>
+                            <td>{{ pago.fecha }}</td>
+                            <td>
+                                {% if pago.cliente_id in clientes %}
+                                    <a href="/clientes/{{ pago.cliente_id }}">{{ clientes[pago.cliente_id].nombre }}</a>
+                                {% else %}
+                                    {{ pago.cliente_id }}
+                                {% endif %}
+                            </td>
+                            <td>{{ pago.metodo.replace('_', ' ').title() }}</td>
+                            <td>$ {{ pago.monto|float|es_number }}</td>
+                            <td>{{ (pago.monto|float * pago.tasa_bcv)|es_number }} Bs</td>
+                        </tr>
+                        {% endfor %}
+                        {% if pagos|length == 0 %}
+                        <tr>
+                            <td colspan="6">No hay pagos registrados.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

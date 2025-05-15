@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Detalle del Producto</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al inventario
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID:</dt>
+            <dd class="col-sm-9">{{ id }}</dd>
+            <dt class="col-sm-3">Nombre:</dt>
+            <dd class="col-sm-9">{{ producto.nombre }}</dd>
+            <dt class="col-sm-3">Categoría:</dt>
+            <dd class="col-sm-9">{{ producto.categoria }}</dd>
+            <dt class="col-sm-3">Precio:</dt>
+            <dd class="col-sm-9">${{ producto.precio }}</dd>
+            <dt class="col-sm-3">Stock:</dt>
+            <dd class="col-sm-9">{{ producto.cantidad }}</dd>
+            <dt class="col-sm-3">Última Entrada:</dt>
+            <dd class="col-sm-9">{{ producto.ultima_entrada or 'N/A' }}</dd>
+            <dt class="col-sm-3">Última Salida:</dt>
+            <dd class="col-sm-9">{{ producto.ultima_salida or 'N/A' }}</dd>
+        </dl>
+        <div class="mt-4">
+            <a href="{{ url_for('editar_producto', id=id) }}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Editar Producto
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

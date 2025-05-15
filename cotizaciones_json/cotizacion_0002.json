@@ -1,0 +1,33 @@
+{
+    "numero_cotizacion": "0002",
+    "fecha": "2025-05-10T21:44:31.342134",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "",
+        "nombre": "FERRE AGROINDUSTRIAL LINO",
+        "direccion": "AV ANTONIO DE BERRIOS LOCAL EL ROBLE SAN FELIX -EDO BOLIVAR",
+        "telefono": ""
+    },
+    "items": [
+        {
+            "id": "11",
+            "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 2850.0,
+    "iva_bs": 0.0,
+    "total_bs": 2850.0,
+    "subtotal_usd": 30.0,
+    "iva_usd": 0.0,
+    "total_usd": 30.0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0,
+    "validez_dias": 7
+}

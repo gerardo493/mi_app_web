@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Facturas{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Facturas</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('nueva_factura') }}" class="btn btn-primary">
+            <i class="fas fa-file-invoice me-2"></i>Nueva Factura
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Condición</th>
+                        <th>Total (USD)</th>
+                        <th>Total (Bs)</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for id, factura in facturas.items()|sort(attribute='1.fecha', reverse=true) %}
+                    <tr>
+                        <td>{{ factura.numero }}</td>
+                        <td>{{ factura.fecha }} {{ factura.hora or '' }}</td>
+                        <td>
+                            {% if factura.cliente_id in clientes %}
+                                {{ clientes[factura.cliente_id].nombre }}
+                                <small class="text-muted d-block">{{ factura.cliente_id }}</small>
+                            {% else %}
+                                {{ factura.cliente_id }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if factura.condicion_pago == 'credito' %}
+                                <span class="badge bg-info">Crédito</span>
+                                {% if factura.fecha_vencimiento %}
+                                    <small class="d-block text-muted">Vence: {{ factura.fecha_vencimiento }}</small>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Contado</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">${{ (factura.total_usd or 0)|es_number }}</td>
+                        <td class="text-end">{{ (factura.total_bs or 0)|es_number }} Bs</td>
+                        <td>
+                            {% if factura.estado == 'pagada' %}
+                            <span class="badge bg-success">Pagada</span>
+                            {% else %}
+                            <span class="badge bg-warning">Pendiente</span>
+                            {% endif %}
+                            {% if factura.condicion_pago == 'credito' %}
+                                <div style="font-size:0.95em;">
+                                    Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
+                                    Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('ver_factura', id=id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('editar_factura', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('descargar_factura_pdf', id=id) }}" class="btn btn-sm btn-success" title="Descargar PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <a href="{{ url_for('imprimir_factura', id=id) }}" class="btn btn-sm btn-secondary" title="Imprimir" target="_blank">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
+                                        onclick="confirmarEliminar('{{ id }}', '{{ factura.numero }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar la factura #<span id="facturaNumero"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmarEliminar(id, numero) {
+    document.getElementById('facturaNumero').textContent = numero;
+    document.getElementById('formEliminar').action = "{{ url_for('eliminar_factura', id='__ID__') }}".replace('__ID__', id);
+    new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+}
+</script>
+{% endblock %} 

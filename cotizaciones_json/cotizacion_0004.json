@@ -1,0 +1,42 @@
+{
+    "numero_cotizacion": "0004",
+    "fecha": "2025-05-10T21:52:03.145701",
+    "tasa_cambio": 93.0,
+    "cliente": {
+        "rif": "V-7240529",
+        "nombre": "LUIS ARIAS",
+        "direccion": "AV. 106, NRO 48 BARRIO LA COROMOTO, LOS TACARIGUA, MARACAY ESTADO ARAGUA.",
+        "telefono": "04243389609"
+    },
+    "items": [
+        {
+            "id": "3",
+            "nombre": "ANTITUMORAL X 60 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.0,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "41",
+            "nombre": "SABILA X 60 CAP",
+            "cantidad": 30,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.0,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 11160.0,
+    "iva_bs": 0.0,
+    "total_bs": 11160.0,
+    "subtotal_usd": 120.0,
+    "iva_usd": 0.0,
+    "total_usd": 120.0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0,
+    "validez_dias": 1
+}

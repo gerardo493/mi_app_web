@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Factura #{{ factura.numero }}{% endblock %}
+
+{% block content %}
+<div class="container my-4" id="factura">
+    <div class="text-center mb-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="max-height: 100px;">
+        <h4 class="mt-2 mb-0">{{ empresa.nombre }}</h4>
+        <div>RIF: {{ empresa.rif }}</div>
+        <div>{{ empresa.direccion }}</div>
+        <div>Teléfono: {{ empresa.telefono }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-6">
+            <strong>Nro. Factura:</strong> {{ factura.numero }}<br>
+            <strong>Fecha Emisión:</strong> {{ factura.fecha }} {{ factura.hora or '' }}<br>
+            <strong>Condición:</strong> {{ 'CRÉDITO' if factura.condicion_pago == 'credito' else 'CONTADO' }}{% if factura.condicion_pago == 'credito' and factura.fecha_vencimiento %} (Vence: {{ factura.fecha_vencimiento }}){% endif %}<br>
+            <strong>Fecha a Pagar:</strong> {{ factura.fecha_vencimiento if factura.condicion_pago == 'credito' else factura.fecha }}
+        </div>
+        <div class="col-md-6">
+            <strong>Cliente RIF:</strong> {{ clientes[factura.cliente_id].id if factura.cliente_id in clientes else factura.cliente_id }}<br>
+            <strong>Nombre:</strong> {{ clientes[factura.cliente_id].nombre if factura.cliente_id in clientes else '' }}<br>
+            <strong>Dirección:</strong> {{ clientes[factura.cliente_id].direccion if factura.cliente_id in clientes else '' }}<br>
+            <strong>Teléfono:</strong> {{ clientes[factura.cliente_id].telefono if factura.cliente_id in clientes else '' }}
+        </div>
+    </div>
+    <h5 class="text-center my-3">FACTURA</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">Precio Unit. (USD)</th>
+                    <th class="text-end">Precio Unit. (Bs)</th>
+                    <th class="text-end">Total (USD)</th>
+                    <th class="text-end">Total (Bs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
+                <tr>
+                    <td>{{ inventario[prod_id].nombre }}</td>
+                    <td class="text-end">{{ cantidad }}</td>
+                    <td class="text-end">${{ inventario[prod_id].precio|es_number }}</td>
+                    <td class="text-end">{{ (inventario[prod_id].precio * factura.tasa_bcv|float)|es_number }} Bs</td>
+                    <td class="text-end">${{ (inventario[prod_id].precio * cantidad|int)|es_number }}</td>
+                    <td class="text-end">{{ (inventario[prod_id].precio * cantidad|int * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                    <td class="text-end">${{ factura.subtotal_usd|es_number }}</td>
+                    <td class="text-end">{{ factura.subtotal_bs|es_number }} Bs</td>
+                </tr>
+                {% if factura.descuento_total > 0 %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Descuento:</strong></td>
+                    <td class="text-end">${{ factura.descuento_total|es_number }}</td>
+                    <td class="text-end">{{ (factura.descuento_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endif %}
+                {% if factura.iva_total > 0 %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>IVA ({{ factura.iva }}%):</strong></td>
+                    <td class="text-end">${{ factura.iva_total|es_number }}</td>
+                    <td class="text-end">{{ (factura.iva_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                    <td class="text-end">${{ factura.total_usd|es_number }}</td>
+                    <td class="text-end">{{ factura.total_bs|es_number }} Bs</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-6"></div>
+        <div class="col-md-6 text-end">
+            <strong>Tasa BCV utilizada:</strong> {{ factura.tasa_bcv|es_number }} Bs/USD
+        </div>
+    </div>
+    <div class="alert alert-info mt-3" style="font-size: 0.95em;">
+        <strong>Nota:</strong> El documento es calculado a la tasa de cambio BCV vigente a la fecha de emisión en Bolívares. Si la factura no es pagada de contado, deberá ser cancelada al valor de la tasa bancaria publicada por el BCV para la fecha de pago de la factura, siempre referido por su fecha de emisión.
+    </div>
+    <div class="text-end mt-3">
+        <a href="{{ url_for('imprimir_factura', id=factura.id) }}" class="btn btn-primary" target="_blank">
+            <i class="fas fa-print me-2"></i>Imprimir / PDF
+        </a>
+        <a href="{{ url_for('mostrar_facturas') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Facturas
+        </a>
+    </div>
+</div>
+<style>
+@media print {
+    .btn, .navbar, .text-end.mt-3 { display: none !important; }
+    #factura { margin: 0 !important; }
+    .container { width: 100% !important; }
+}
+.table th {
+    background: #dff6ff;
+    color: #154360;
+    font-size: 1em;
+}
+.card-header, .alert-info {
+    background: #dff6ff;
+    color: #154360;
+}
+</style>
+{% endblock %}

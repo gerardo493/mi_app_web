@@ -1,0 +1,121 @@
+{
+    "numero_factura": "0605",
+    "fecha": "2025-05-05T19:06:15.140774",
+    "tasa_cambio": 88.64,
+    "cliente": {
+        "rif": "N/A",
+        "nombre": "T/N CASA VERDE",
+        "direccion": "Calle Gran Demócrata, 18 sector centro I, Palo Negro 2117, Aragua",
+        "telefono": "0243-2673767"
+    },
+    "items": [
+        {
+            "id": "49",
+            "nombre": "FIVERPLANT",
+            "cantidad": 24,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "17",
+            "nombre": "CURCUMA C/ PIIMIENTA NEGRA X 60 CAP",
+            "cantidad": 12,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Anti-inflamatorio",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "9",
+            "nombre": "CARDO MARIANO X 60 CAP",
+            "cantidad": 12,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 12,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "48",
+            "nombre": "CITRATO DE MAGNESIO",
+            "cantidad": 10,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 372.288,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "2",
+            "nombre": "ADELGALAX  X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "3",
+            "nombre": "ANTITUMORAL X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "30",
+            "nombre": "OMEGA 3 X 30 UND",
+            "cantidad": 6,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 372.288,
+            "categoria": "Cardiovascular",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "36",
+            "nombre": "VENA CLEASNER X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "37",
+            "nombre": "VITAMINA E C/SELENIUM X 50 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 372.288,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "14",
+            "nombre": "CLORURO DE MAGNESIO X 33 GR",
+            "cantidad": 36,
+            "precio_unitario_usd": 1.0,
+            "precio_unitario_bs": 88.64,
+            "categoria": "Regenerador osio",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 32123.136,
+    "iva_bs": 0.0,
+    "total_bs": 32123.136,
+    "subtotal_usd": 362.4,
+    "iva_usd": 0.0,
+    "total_usd": 362.4,
+    "condicion_pago": "Credito",
+    "dias_credito": 15,
+    "tasa_iva_aplicada": 0.0
+}

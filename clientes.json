@@ -1,0 +1,23 @@
+{
+    "V-12345678": {
+        "id": "V-12345678",
+        "nombre": "Juan Pérez",
+        "email": "gerardojaime72@gmail.com",
+        "telefono": "+5804121447869",
+        "direccion": "caña de azucar sector 2 vereda 64 casa 1-a"
+    },
+    "V-9339073": {
+        "id": "V-9339073",
+        "nombre": "angel jaimes",
+        "email": "angelrobertojaimes50@gmail.com",
+        "telefono": "+5804247286225",
+        "direccion": "Caña De Azúcar Sector 2\r\nCasa 1_A"
+    },
+    "J-2626262103": {
+        "id": "J-2626262103",
+        "nombre": "sdsd",
+        "email": "angelodominick1801@gmail.com",
+        "telefono": "+14456454",
+        "direccion": "asasas"
+    }
+}

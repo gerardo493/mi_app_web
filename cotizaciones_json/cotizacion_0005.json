@@ -1,0 +1,51 @@
+{
+    "numero_cotizacion": "0005",
+    "fecha": "2025-05-10T22:01:40.328485",
+    "tasa_cambio": 93.0,
+    "cliente": {
+        "rif": "J-503178573",
+        "nombre": "SALUD DIETETICA M& J 2023",
+        "direccion": "CALLE LIBERTAD LOCAL 126C MARACAY",
+        "telefono": "0424-345-2738"
+    },
+    "items": [
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.0,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "30",
+            "nombre": "OMEGA 3 X 30 UND",
+            "cantidad": 5,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 390.6,
+            "categoria": "Cardiovascular",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "33",
+            "nombre": "SABILAX-6 X 12 SOBRES X 12 UNDS",
+            "cantidad": 60,
+            "precio_unitario_usd": 8.5,
+            "precio_unitario_bs": 790.5,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 52173.0,
+    "iva_bs": 0.0,
+    "total_bs": 52173.0,
+    "subtotal_usd": 561.0,
+    "iva_usd": 0.0,
+    "total_usd": 561.0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0,
+    "validez_dias": 5
+}

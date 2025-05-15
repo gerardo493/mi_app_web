@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Inventario</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('reporte_inventario') }}" class="btn btn-info">
+                <i class="fas fa-chart-bar me-2"></i>Ver Reporte
+            </a>
+            <a href="{{ url_for('cargar_productos_csv') }}" class="btn btn-success">
+                <i class="fas fa-file-import me-2"></i>Cargar CSV
+            </a>
+            <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Producto
+            </a>
+            <a href="{{ url_for('ajustar_stock') }}" class="btn btn-warning">
+                <i class="fas fa-boxes me-2"></i>Ajustar Stock
+            </a>
+            <button type="button" class="btn btn-danger" id="btnEliminarSeleccionados" style="display: none;">
+                <i class="fas fa-trash me-2"></i>Eliminar Seleccionados
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, producto in inventario.items() %}
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input producto-check" type="checkbox" value="{{ id }}">
+                                </div>
+                            </td>
+                            <td>{{ id }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria }}</td>
+                            <td>${{ "%.2f"|format(producto.precio) }}</td>
+                            <td>
+                                <span class="badge {% if producto.cantidad > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ producto.cantidad }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('ver_producto', id=id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_producto', id=id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            onclick="confirmarEliminacion('{{ id }}', '{{ producto.nombre }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarEliminacion" tabindex="-1" aria-labelledby="confirmarEliminacionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarEliminacionLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar el producto <strong id="nombreProducto"></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación múltiple -->
+<div class="modal fade" id="confirmarEliminacionMultiple" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación Múltiple</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar los <span id="cantidadProductos"></span> productos seleccionados?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminarMultiple" method="POST" action="{{ url_for('eliminar_productos_multiples') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="productos" id="productosSeleccionados">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar Seleccionados
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar todos los modales de Bootstrap
+    var modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+        new bootstrap.Modal(modal);
+    });
+
+    // Manejar selección de todos los productos
+    const selectAll = document.getElementById('selectAll');
+    const productoChecks = document.querySelectorAll('.producto-check');
+    const btnEliminarSeleccionados = document.getElementById('btnEliminarSeleccionados');
+
+    selectAll.addEventListener('change', function() {
+        productoChecks.forEach(check => {
+            check.checked = this.checked;
+        });
+        actualizarBotonEliminar();
+    });
+
+    productoChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            actualizarBotonEliminar();
+            // Actualizar el estado del checkbox "Seleccionar todos"
+            selectAll.checked = Array.from(productoChecks).every(c => c.checked);
+        });
+    });
+
+    function actualizarBotonEliminar() {
+        const seleccionados = document.querySelectorAll('.producto-check:checked');
+        btnEliminarSeleccionados.style.display = seleccionados.length > 0 ? 'inline-block' : 'none';
+    }
+
+    // Manejar eliminación múltiple
+    btnEliminarSeleccionados.addEventListener('click', function() {
+        const seleccionados = Array.from(document.querySelectorAll('.producto-check:checked')).map(cb => cb.value);
+        document.getElementById('cantidadProductos').textContent = seleccionados.length;
+        document.getElementById('productosSeleccionados').value = JSON.stringify(seleccionados);
+        new bootstrap.Modal(document.getElementById('confirmarEliminacionMultiple')).show();
+    });
+});
+
+function confirmarEliminacion(id, nombre) {
+    // Actualizar el nombre del producto en el modal
+    document.getElementById('nombreProducto').textContent = nombre;
+    
+    // Actualizar la acción del formulario
+    var form = document.getElementById('formEliminar');
+    form.action = "{{ url_for('eliminar_producto', id=0) }}".replace('0', id);
+    
+    // Mostrar el modal
+    var modal = new bootstrap.Modal(document.getElementById('confirmarEliminacion'));
+    modal.show();
+}
+</script>
+{% endblock %}

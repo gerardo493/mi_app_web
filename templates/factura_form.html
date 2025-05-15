@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Factura' if editar else 'Nueva Factura' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ 'Editar Factura' if editar else 'Nueva Factura' }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% if editar %}{{ url_for('editar_factura', id=factura.id) }}{% else %}{{ url_for('nueva_factura') }}{% endif %}" id="facturaForm" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="numero" class="form-label">Número de Factura</label>
+                            <input type="text" class="form-control" id="numero" name="numero" value="{{ factura.numero if editar else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" value="{{ factura.fecha if editar else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="hora" name="hora" value="{{ factura.hora if editar and factura.hora else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="condicion_pago" class="form-label">Condición de Pago</label>
+                            <select class="form-select" id="condicion_pago" name="condicion_pago" required>
+                                <option value="contado" {% if editar and factura.condicion_pago == 'contado' %}selected{% endif %}>Contado</option>
+                                <option value="credito" {% if editar and factura.condicion_pago == 'credito' %}selected{% endif %}>Crédito</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="vencimiento_group" style="display:none;">
+                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" value="{{ factura.fecha_vencimiento if editar and factura.fecha_vencimiento else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tasa_bcv" class="form-label">Tasa BCV (Bs/USD)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control" id="tasa_bcv" name="tasa_bcv" value="{{ factura.tasa_bcv if editar and factura.tasa_bcv else '' }}" required>
+                                <button type="button" class="btn btn-outline-secondary" id="obtenerTasa">Obtener BCV</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            <option value="">Seleccione un cliente</option>
+                            {% for id, cliente in clientes.items() %}
+                            <option value="{{ id }}" {% if editar and factura.cliente_id == id %}selected{% endif %}>{{ cliente.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Productos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="productos-container">
+                                {% if editar and factura.productos and factura.cantidades %}
+                                    {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
+                                    <div class="row mb-3 producto-item">
+                                        <div class="col-md-5">
+                                            <select class="form-select producto-select" name="productos[]" required>
+                                                <option value="">Seleccione un producto</option>
+                                                {% for id, producto in inventario.items() %}
+                                                <option value="{{ id }}" data-precio="{{ producto.precio }}" {% if id == prod_id %}selected{% endif %}>
+                                                    {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="{{ cantidad }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control subtotal" readonly>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="row mb-3 producto-item">
+                                        <div class="col-md-5">
+                                            <select class="form-select producto-select" name="productos[]" required>
+                                                <option value="">Seleccione un producto</option>
+                                                {% for id, producto in inventario.items() %}
+                                                <option value="{{ id }}" data-precio="{{ producto.precio }}">
+                                                    {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="1" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control subtotal" readonly>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-success" id="agregar-producto"><i class="fas fa-plus me-2"></i>Agregar Producto</button>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="descuento" class="form-label">Descuento</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="descuento" name="descuento" min="0" value="{{ factura.descuento if editar and factura.descuento else '0' }}">
+                                <select class="form-select" id="tipo_descuento" name="tipo_descuento">
+                                    <option value="bs" {% if editar and factura.tipo_descuento == 'bs' %}selected{% endif %}>Bs</option>
+                                    <option value="porc" {% if editar and factura.tipo_descuento == 'porc' %}selected{% endif %}>%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="iva" class="form-label">IVA (%)</label>
+                            <input type="number" class="form-control" id="iva" name="iva" min="0" max="100" value="{{ factura.iva if editar and factura.iva else '16' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Totales</label>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Subtotal USD</span>
+                                <input type="text" class="form-control" id="subtotal_usd" name="subtotal_usd" readonly>
+                                <span class="input-group-text">Subtotal Bs</span>
+                                <input type="text" class="form-control" id="subtotal_bs" name="subtotal_bs" readonly>
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Descuento</span>
+                                <input type="text" class="form-control" id="descuento_total" name="descuento_total" readonly>
+                                <span class="input-group-text">IVA</span>
+                                <input type="text" class="form-control" id="iva_total" name="iva_total" readonly>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">Total USD</span>
+                                <input type="text" class="form-control" id="total_usd" name="total_usd" readonly>
+                                <span class="input-group-text">Total Bs</span>
+                                <input type="text" class="form-control" id="total_bs" name="total_bs" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Pagos / Abonos</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if editar and factura.estado == 'pagada' %}
+                                <div class="alert alert-success mb-3">
+                                    Esta factura ya está <strong>pagada</strong>. No se pueden agregar ni editar pagos.
+                                </div>
+                            {% else %}
+                            <div class="row mb-2">
+                                <div class="col-md-3">
+                                    <label for="pago_monto" class="form-label">Monto</label>
+                                    <input type="number" class="form-control" id="pago_monto" step="0.01" min="0">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="pago_metodo" class="form-label">Método</label>
+                                    <select class="form-select" id="pago_metodo">
+                                        <option value="efectivo_bs">Efectivo Bs</option>
+                                        <option value="efectivo_usd">Efectivo USD</option>
+                                        <option value="pago_movil">Pago Móvil</option>
+                                        <option value="transferencia">Transferencia</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="pago_referencia" class="form-label">Referencia (opcional)</label>
+                                    <input type="text" class="form-control" id="pago_referencia">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-success w-100" id="agregar_pago">
+                                        <i class="fas fa-plus me-2"></i>Agregar
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="table-responsive mt-3">
+                                <table class="table table-bordered" id="tabla_pagos">
+                                    <thead>
+                                        <tr>
+                                            <th>Monto</th>
+                                            <th>Moneda</th>
+                                            <th>Método</th>
+                                            <th>Referencia</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Pagos agregados dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input type="hidden" name="pagos_json" id="pagos_json">
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ 'Actualizar Factura' if editar else 'Guardar Factura' }}
+                        </button>
+                        <a href="{{ url_for('mostrar_facturas') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let pagos = {% if factura and factura.pagos %}{{ factura.pagos|tojson|safe }}{% else %}[] {% endif %};
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar campo de vencimiento si es crédito
+    const condicionPago = document.getElementById('condicion_pago');
+    const vencimientoGroup = document.getElementById('vencimiento_group');
+    function toggleVencimiento() {
+        if (condicionPago.value === 'credito') {
+            vencimientoGroup.style.display = '';
+        } else {
+            vencimientoGroup.style.display = 'none';
+        }
+    }
+    condicionPago.addEventListener('change', toggleVencimiento);
+    toggleVencimiento();
+
+    // Productos y totales
+    const productosContainer = document.getElementById('productos-container');
+    const agregarProductoBtn = document.getElementById('agregar-producto');
+    function calcularTotales() {
+        let subtotal = 0;
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const precio = parseFloat(item.querySelector('.producto-select option:checked').dataset.precio || 0);
+            const cantidad = parseInt(item.querySelector('.cantidad-input').value || 0);
+            const subtotalItem = precio * cantidad;
+            item.querySelector('.subtotal').value = `$${subtotalItem.toFixed(2)}`;
+            subtotal += subtotalItem;
+        });
+        document.getElementById('subtotal_usd').value = `$${subtotal.toFixed(2)}`;
+        const tasa = parseFloat(document.getElementById('tasa_bcv').value || 0);
+        document.getElementById('subtotal_bs').value = tasa ? `${(subtotal * tasa).toFixed(2)} Bs` : '';
+        // Descuento
+        const descuento = parseFloat(document.getElementById('descuento').value || 0);
+        const tipoDescuento = document.getElementById('tipo_descuento').value;
+        let descuentoTotal = 0;
+        if (tipoDescuento === 'porc') {
+            descuentoTotal = subtotal * (descuento / 100);
+        } else {
+            descuentoTotal = tasa ? (descuento / tasa) : 0;
+        }
+        document.getElementById('descuento_total').value = `$${descuentoTotal.toFixed(2)}`;
+        // IVA
+        const iva = parseFloat(document.getElementById('iva').value || 0);
+        const ivaTotal = ((subtotal - descuentoTotal) * iva / 100);
+        document.getElementById('iva_total').value = `$${ivaTotal.toFixed(2)}`;
+        // Totales
+        const totalUSD = subtotal - descuentoTotal + ivaTotal;
+        document.getElementById('total_usd').value = `$${totalUSD.toFixed(2)}`;
+        document.getElementById('total_bs').value = tasa ? `${(totalUSD * tasa).toFixed(2)} Bs` : '';
+    }
+    productosContainer.addEventListener('change', calcularTotales);
+    productosContainer.addEventListener('input', calcularTotales);
+    document.getElementById('descuento').addEventListener('input', calcularTotales);
+    document.getElementById('tipo_descuento').addEventListener('change', calcularTotales);
+    document.getElementById('iva').addEventListener('input', calcularTotales);
+    document.getElementById('tasa_bcv').addEventListener('input', calcularTotales);
+    // Validar que no se agregue producto sin stock
+    function productoSinStock(select) {
+        const option = select.options[select.selectedIndex];
+        if (option && option.textContent.includes('(Stock: 0)')) {
+            alert('No puedes agregar un producto sin stock disponible.');
+            select.value = '';
+            return true;
+        }
+        return false;
+    }
+    document.querySelectorAll('.producto-select').forEach(sel => {
+        sel.addEventListener('change', function() {
+            productoSinStock(this);
+        });
+    });
+    // Al agregar producto, también validar
+    agregarProductoBtn.addEventListener('click', function() {
+        const template = productosContainer.querySelector('.producto-item').cloneNode(true);
+        template.querySelector('.producto-select').value = '';
+        template.querySelector('.cantidad-input').value = '1';
+        template.querySelector('.subtotal').value = '';
+        productosContainer.appendChild(template);
+        setupEventListeners(template);
+        // Validar stock al cambiar
+        template.querySelector('.producto-select').addEventListener('change', function() {
+            productoSinStock(this);
+        });
+    });
+    // Obtener tasa BCV automáticamente
+    document.getElementById('obtenerTasa').addEventListener('click', function() {
+        const button = this;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo...';
+
+        // Obtener la tasa desde nuestra API
+        fetch('/api/tasa-bcv')
+            .then(response => response.json())
+            .then(data => {
+                if (data.tasa) {
+                    document.getElementById('tasa_bcv').value = parseFloat(data.tasa).toFixed(2);
+                    calcularTotales();
+                } else {
+                    throw new Error('No se pudo obtener la tasa');
+                }
+            })
+            .catch(() => {
+                // Si falla, usar valor por defecto
+                document.getElementById('tasa_bcv').value = '36.00';
+                calcularTotales();
+                alert('No se pudo obtener la tasa BCV automáticamente. Se usará un valor por defecto de 36.00 Bs/USD');
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.innerHTML = 'Obtener BCV';
+            });
+    });
+    // Inicializar totales
+    calcularTotales();
+
+    function renderPagos() {
+        const tbody = document.querySelector('#tabla_pagos tbody');
+        tbody.innerHTML = '';
+        pagos.forEach(function(pago, idx) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>$${parseFloat(pago.monto).toFixed(2)}</td>
+                <td>${(pago.moneda || (pago.metodo === 'efectivo_usd' ? 'USD' : 'Bs')).toUpperCase()}</td>
+                <td>${pago.metodo.replace('_',' ').toUpperCase()}</td>
+                <td>${pago.referencia || ''}</td>
+                <td><button type='button' class='btn btn-danger btn-sm' data-idx='${idx}'><i class='fas fa-trash'></i></button></td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('pagos_json').value = JSON.stringify(pagos);
+        // Asignar eventos de eliminar
+        tbody.querySelectorAll('button[data-idx]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const idx = parseInt(this.getAttribute('data-idx'));
+                pagos.splice(idx, 1);
+                renderPagos();
+            });
+        });
+    }
+    document.getElementById('agregar_pago').addEventListener('click', function() {
+        const montoInput = parseFloat(document.getElementById('pago_monto').value);
+        const metodo = document.getElementById('pago_metodo').value;
+        const referencia = document.getElementById('pago_referencia').value;
+        let moneda = 'USD';
+        let montoUSD = montoInput;
+        if (metodo === 'efectivo_bs' || metodo === 'pago_movil' || metodo === 'transferencia') {
+            moneda = 'Bs';
+            const tasa = parseFloat(document.getElementById('tasa_bcv').value);
+            if (!tasa || tasa <= 0) {
+                alert('Debe ingresar una tasa BCV válida para convertir Bs a USD');
+                return;
+            }
+            montoUSD = montoInput / tasa;
+        }
+        if (!montoInput || montoInput <= 0) {
+            alert('Ingrese un monto válido');
+            return;
+        }
+        // Validar que no supere el total de la factura
+        let totalFactura = parseFloat(document.getElementById('total_usd').value.replace('$','')) || 0;
+        let totalAbonado = pagos.reduce((acc, pago) => acc + parseFloat(pago.monto || 0), 0);
+        if ((totalAbonado + montoUSD) > totalFactura) {
+            alert('El total de pagos supera el monto total de la factura. No se puede agregar este pago.');
+            return;
+        }
+        pagos.push({
+            monto: montoUSD,
+            moneda: moneda,
+            monto_original: montoInput,
+            referencia: referencia,
+            metodo: metodo
+        });
+        renderPagos();
+        document.getElementById('pago_monto').value = '';
+        document.getElementById('pago_referencia').value = '';
+    });
+    renderPagos();
+});
+</script>
+{% if editar and factura.estado == 'pagada' %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('pago_monto').disabled = true;
+    document.getElementById('pago_metodo').disabled = true;
+    document.getElementById('pago_referencia').disabled = true;
+    document.getElementById('agregar_pago').disabled = true;
+});
+</script>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-header {
+        background: #154360;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+    .btn-primary {
+        background: #27ae60;
+        border-color: #27ae60;
+    }
+    .btn-primary:hover {
+        background: #219150;
+        border-color: #219150;
+    }
+    .table th {
+        background: #dff6ff;
+        color: #154360;
+        font-size: 1em;
+    }
+    .producto-item {
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e1e1e1;
+    }
+    .form-label {
+        color: #154360;
+        font-weight: 500;
+    }
+    .input-group-text {
+        background: #27ae60;
+        color: #fff;
+        border: none;
+    }
+    .card {
+        box-shadow: 0 2px 8px rgba(21,67,96,0.07);
+        border-radius: 12px;
+        border: 1px solid #e1e1e1;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        font-size: 1.05em;
+        min-height: 2.2em;
+    }
+    .input-group {
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %} 

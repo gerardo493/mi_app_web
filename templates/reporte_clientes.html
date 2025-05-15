@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Clientes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Reporte de Clientes</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-2"></i>Imprimir Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Resumen General -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clientes</h5>
+                    <h2 class="display-4">{{ total_clientes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Facturas</h5>
+                    <h2 class="display-4">{{ total_facturas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total por Cobrar</h5>
+                    <h2 class="display-4">${{ "%.2f"|format(total_cobrar) }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 10 Mejores Clientes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Top 10 Mejores Clientes</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Total Facturas</th>
+                            <th>Total Compras</th>
+                            <th>Última Compra</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, stats in top_clientes %}
+                        <tr>
+                            <td>{{ stats.nombre }}</td>
+                            <td>{{ stats.total_facturas }}</td>
+                            <td>${{ "%.2f"|format(stats.total_compras) }}</td>
+                            <td>{{ stats.ultima_compra }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('historial_cliente', id=id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                    {% if stats.email %}
+                                    <a href="mailto:{{ stats.email }}" class="btn btn-sm btn-success" title="Enviar email">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if stats.telefono %}
+                                    <a href="https://wa.me/{{ stats.telefono }}" target="_blank" class="btn btn-sm btn-success" title="Enviar WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 5 Peores Clientes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Top 5 Clientes con Mayor Cuenta por Cobrar</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Total Facturas</th>
+                            <th>Total Compras</th>
+                            <th>Cuenta por Cobrar</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, stats in peores_clientes %}
+                        <tr>
+                            <td>{{ stats.nombre }}</td>
+                            <td>{{ stats.total_facturas }}</td>
+                            <td>${{ "%.2f"|format(stats.total_compras) }}</td>
+                            <td class="text-danger">${{ "%.2f"|format(stats.cuenta_por_cobrar) }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('historial_cliente', id=id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                    {% if stats.email %}
+                                    <a href="mailto:{{ stats.email }}" class="btn btn-sm btn-success" title="Enviar email">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if stats.telefono %}
+                                    <a href="https://wa.me/{{ stats.telefono }}" target="_blank" class="btn btn-sm btn-success" title="Enviar WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 10 Productos Más Comprados -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Top 10 Productos Más Comprados</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad Total</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, stats in top_productos %}
+                        <tr>
+                            <td>{{ stats.nombre }}</td>
+                            <td>{{ stats.cantidad }}</td>
+                            <td>${{ "%.2f"|format(stats.valor) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn-group, .navbar {
+        display: none !important;
+    }
+    .card {
+        break-inside: avoid;
+    }
+}
+</style>
+{% endblock %} 

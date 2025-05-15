@@ -1,0 +1,40 @@
+{
+    "numero_factura": "0058",
+    "fecha": "2025-05-10T00:09:53.134357",
+    "tasa_cambio": 92.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "3",
+            "nombre": "ANTITUMORAL X 60 CAP",
+            "cantidad": 55,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 276.0,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "55",
+            "nombre": "SABILAX-6 X 30 CAP",
+            "cantidad": 8,
+            "precio_unitario_usd": 1.5,
+            "precio_unitario_bs": 138.0,
+            "categoria": "LAXANTE",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 16284.0,
+    "iva_bs": 0.0,
+    "total_bs": 16284.0,
+    "subtotal_usd": 177.0,
+    "iva_usd": 0.0,
+    "total_usd": 177.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}

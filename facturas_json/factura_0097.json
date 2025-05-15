@@ -1,0 +1,52 @@
+{
+    "numero_factura": "0097",
+    "fecha": "2025-05-10T20:50:14.948501",
+    "tasa_cambio": 93.0495,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.1485,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "34",
+            "nombre": "SAW PALMETO X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.1485,
+            "categoria": "hiperplasia prostatica",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "26",
+            "nombre": "LOCHITA X 60 CAP",
+            "cantidad": 300,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.1485,
+            "categoria": "Oxigenate Cerebral",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 85698.5895,
+    "iva_bs": 0.0,
+    "total_bs": 85698.5895,
+    "subtotal_usd": 921.0,
+    "iva_usd": 0.0,
+    "total_usd": 921.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}

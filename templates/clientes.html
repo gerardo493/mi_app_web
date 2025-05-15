@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Clientes</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('reporte_clientes') }}" class="btn btn-info">
+                <i class="fas fa-chart-bar me-2"></i>Ver Reporte
+            </a>
+            <a href="{{ url_for('cargar_clientes_csv') }}" class="btn btn-success">
+                <i class="fas fa-file-import me-2"></i>Cargar CSV
+            </a>
+            <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Cliente
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, cliente in clientes.items() %}
+                        <tr>
+                            <td>{{ id }}</td>
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.email or 'No disponible' }}</td>
+                            <td>{{ cliente.telefono or 'No disponible' }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('historial_cliente', id=id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_cliente', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
+                                            onclick="confirmarEliminacion('{{ id }}', '{{ cliente.nombre }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar al cliente <span id="nombreCliente"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id, nombre) {
+    document.getElementById('nombreCliente').textContent = nombre;
+    document.getElementById('formEliminar').action = "{{ url_for('eliminar_cliente', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('modalConfirmacion')).show();
+}
+</script>
+{% endblock %}

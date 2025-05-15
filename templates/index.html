@@ -1,0 +1,152 @@
+    {% extends "base.html" %}
+
+    {% block title %}Inicio - Sistema de Facturación{% endblock %}
+
+    {% block content %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Bienvenido al Sistema de Facturación</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Quick Stats -->
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Total Clientes</h5>
+                    <h2 class="display-4">{{ total_clientes }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-box fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">Productos en Inventario</h5>
+                    <h2 class="display-4">{{ total_productos }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-invoice fa-3x mb-3 text-warning"></i>
+                    <h5 class="card-title">Facturas del Mes</h5>
+                    <h2 class="display-4">{{ facturas_mes }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <a href="/cuentas-por-cobrar" style="text-decoration:none;color:inherit;">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-money-bill-wave fa-3x mb-3 text-danger"></i>
+                        <h5 class="card-title">Cuentas por Cobrar</h5>
+                        <h2 class="display-4">${{ total_cobrar_usd|float|es_number }}</h2>
+                        <div style="font-size:1.1em; color:#888; margin-top:-8px;">{{ total_cobrar_bs|float|es_number }} Bs</div>
+                        <div style="font-size:0.95em; color:#888;">Tasa BCV: {{ tasa_bcv|float|es_number }} Bs/USD</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="/pagos-recibidos" style="text-decoration:none;color:inherit;">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-cash-register fa-3x mb-3 text-success"></i>
+                        <h5 class="card-title">Pagos Recibidos</h5>
+                        <h2 class="display-4">${{ total_pagos_recibidos_usd|float|es_number }}</h2>
+                        <div style="font-size:1.1em; color:#888; margin-top:-8px;">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/clientes/nuevo" class="btn btn-primary w-100">
+                                <i class="fas fa-user-plus me-2"></i>Nuevo Cliente
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/inventario/nuevo" class="btn btn-success w-100">
+                                <i class="fas fa-box-open me-2"></i>Nuevo Producto
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/facturas/nueva" class="btn btn-warning w-100">
+                                <i class="fas fa-file-invoice me-2"></i>Nueva Factura
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/cotizaciones/nueva" class="btn btn-info w-100">
+                                <i class="fas fa-file-alt me-2"></i>Nueva Cotización
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Últimas Facturas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for factura in ultimas_facturas %}
+                        <a href="/facturas/{{ factura.id }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Factura #{{ factura.numero }}</h6>
+                                <small>{{ factura.fecha }}</small>
+                            </div>
+                            <p class="mb-1">{{ factura.cliente }}</p>
+                            <small class="text-muted">${{ factura.total }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos con Bajo Stock</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for producto in productos_bajo_stock %}
+                        <a href="{{ url_for('ver_producto', id=producto.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ producto.nombre }}</h6>
+                                <small class="text-danger">Stock: {{ producto.stock or producto.cantidad }}</small>
+                            </div>
+                            <p class="mb-1">{{ producto.categoria }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %} 

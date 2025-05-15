@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Factura #{{ factura.numero }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+        .logo {
+            max-height: 80px;
+            max-width: 200px;
+        }
+        .company-details {
+            text-align: right;
+        }
+        .company-details h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        .company-details p {
+            margin: 5px 0;
+        }
+        .factura-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            width: 48%;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .text-end {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid #000;
+            padding-top: 20px;
+            font-size: 10px;
+        }
+        .signature-box {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #000;
+            margin: 50px auto 10px;
+        }
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="Logo Empresa">
+        <div class="company-details">
+            <h2>{{ empresa.nombre }}</h2>
+            <p><strong>RIF:</strong> {{ empresa.rif }}</p>
+            <p><strong>Teléfono:</strong> {{ empresa.telefono }}</p>
+            <p>{{ empresa.direccion|replace('\n', '<br>')|safe }}</p>
+        </div>
+    </div>
+
+    <div class="factura-title">FACTURA</div>
+
+    <div class="info-row">
+        <div class="info-box">
+            <p><strong>Cliente RIF:</strong> {{ factura.cliente_id }}</p>
+            <p><strong>Nombre:</strong> {{ clientes[factura.cliente_id].nombre }}</p>
+            <p><strong>Dirección:</strong> {{ clientes[factura.cliente_id].direccion }}</p>
+            <p><strong>Teléfono:</strong> {{ clientes[factura.cliente_id].telefono or '' }}</p>
+        </div>
+        <div class="info-box">
+            <p><strong>No. Factura:</strong> {{ factura.numero }}</p>
+            <p><strong>Fecha Emisión:</strong> {{ factura.fecha }} {{ factura.hora }}</p>
+            <p><strong>Condición:</strong> {{ factura.condicion_pago|upper }}{% if factura.condicion_pago == 'credito' and factura.fecha_vencimiento %} (Vence: {{ factura.fecha_vencimiento }}){% endif %}</p>
+            {% if factura.fecha_vencimiento %}<p><strong>Fecha a Pagar:</strong> {{ factura.fecha_vencimiento }}</p>{% endif %}
+            <p><strong>Tasa BCV:</strong> {{ factura.tasa_bcv|es_number }} Bs/USD</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="text-end">Cantidad</th>
+                <th class="text-end">Precio Unit. (USD)</th>
+                <th class="text-end">Precio Unit. (Bs)</th>
+                <th class="text-end">Total (USD)</th>
+                <th class="text-end">Total (Bs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
+            <tr>
+                <td>{{ inventario[prod_id].nombre }}</td>
+                <td class="text-end">{{ cantidad }}</td>
+                <td class="text-end">${{ inventario[prod_id].precio|es_number }}</td>
+                <td class="text-end">{{ (inventario[prod_id].precio * factura.tasa_bcv|float)|es_number }} Bs</td>
+                <td class="text-end">${{ (inventario[prod_id].precio * cantidad|int)|es_number }}</td>
+                <td class="text-end">{{ (inventario[prod_id].precio * cantidad|int * factura.tasa_bcv|float)|es_number }} Bs</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                <td class="text-end">${{ factura.subtotal_usd|es_number }}</td>
+                <td class="text-end">{{ factura.subtotal_bs|es_number }} Bs</td>
+            </tr>
+            {% if factura.descuento_total > 0 %}
+            <tr>
+                <td colspan="4" class="text-end"><strong>Descuento:</strong></td>
+                <td class="text-end">${{ factura.descuento_total|es_number }}</td>
+                <td class="text-end">{{ (factura.descuento_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+            </tr>
+            {% endif %}
+            {% if factura.iva_total > 0 %}
+            <tr>
+                <td colspan="4" class="text-end"><strong>IVA ({{ factura.iva }}%):</strong></td>
+                <td class="text-end">${{ factura.iva_total|es_number }}</td>
+                <td class="text-end">{{ (factura.iva_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+            </tr>
+            {% endif %}
+            <tr class="total-row">
+                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                <td class="text-end">${{ factura.total_usd|es_number }}</td>
+                <td class="text-end">{{ factura.total_bs|es_number }} Bs</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div style="text-align:right; margin-bottom:10px;">
+        <strong>Tasa BCV utilizada:</strong> {{ factura.tasa_bcv|es_number }} Bs/USD
+    </div>
+    <div style="background:#dff6ff; color:#154360; padding:8px 12px; border-radius:6px; font-size:0.95em; margin-bottom:20px;">
+        <strong>Nota:</strong> El documento es calculado a la tasa de cambio BCV vigente a la fecha de emisión en Bolívares. Si la factura no es pagada de contado, deberá ser cancelada al valor de la tasa bancaria publicada por el BCV para la fecha de pago de la factura, siempre referido por su fecha de emisión.
+    </div>
+    <div class="signature-box">
+        <div class="signature-line"></div>
+        <p>Firma y Sello</p>
+    </div>
+    <div class="footer">
+        <p class="text-center">© 2024 Sistema de Facturación. Todos los derechos reservados.</p>
+    </div>
+</body>
+</html>

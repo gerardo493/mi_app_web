@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Cuentas por Cobrar{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Reporte de Cuentas por Cobrar</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='por_cobrar') }}" class="btn btn-outline-primary {% if filtro == 'por_cobrar' %}active{% endif %}">Por Cobrar</a>
+            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='cobrado') }}" class="btn btn-outline-success {% if filtro == 'cobrado' %}active{% endif %}">Cobrado</a>
+            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='facturado') }}" class="btn btn-outline-info {% if filtro == 'facturado' %}active{% endif %}">Facturado</a>
+            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='todas') }}" class="btn btn-outline-secondary {% if filtro == 'todas' %}active{% endif %}">Todas</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, cuenta in cuentas.items() %}
+                        <tr>
+                            <td>{{ id }}</td>
+                            <td>{{ clientes[cuenta.cliente_id].nombre if cuenta.cliente_id in clientes else cuenta.cliente_id }}</td>
+                            <td>${{ cuenta.monto|float|es_number }}</td>
+                            <td>
+                                {% if cuenta.estado == 'por_cobrar' %}
+                                    <span class="badge bg-warning text-dark">Por Cobrar</span>
+                                {% elif cuenta.estado == 'cobrado' %}
+                                    <span class="badge bg-success">Cobrado</span>
+                                {% elif cuenta.estado == 'facturado' %}
+                                    <span class="badge bg-info text-dark">Facturado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ cuenta.estado }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ cuenta.fecha }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
