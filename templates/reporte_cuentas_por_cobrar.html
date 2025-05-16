@@ -8,9 +8,88 @@
         <h2>Reporte de Cuentas por Cobrar</h2>
         <div class="btn-group">
             <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='por_cobrar') }}" class="btn btn-outline-primary {% if filtro == 'por_cobrar' %}active{% endif %}">Por Cobrar</a>
-            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='cobrado') }}" class="btn btn-outline-success {% if filtro == 'cobrado' %}active{% endif %}">Cobrado</a>
-            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='facturado') }}" class="btn btn-outline-info {% if filtro == 'facturado' %}active{% endif %}">Facturado</a>
+            <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='cobrado') }}" class="btn btn-outline-success {% if filtro == 'cobrado' %}active{% endif %}">Cobrada</a>
             <a href="{{ url_for('reporte_cuentas_por_cobrar', estado='todas') }}" class="btn btn-outline-secondary {% if filtro == 'todas' %}active{% endif %}">Todas</a>
+        </div>
+        <button onclick="window.print()" class="btn btn-primary ms-3"><i class="fas fa-print me-2"></i>Imprimir Reporte</button>
+    </div>
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Total por Cobrar (USD)</h6>
+                    <h2 class="display-6">${{ total_por_cobrar_usd|es_number }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Total por Cobrar (Bs)</h6>
+                    <h2 class="display-6">{{ total_por_cobrar_bs|es_number }} Bs</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Facturas Pendientes</h6>
+                    <h2 class="display-6">{{ cantidad_facturas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Clientes Deudores</h6>
+                    <h2 class="display-6">{{ cantidad_clientes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Promedio por Factura</h6>
+                    <h2 class="display-6">${{ promedio_por_factura|es_number }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Top Deudores -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Top 5 Clientes Deudores</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th class="text-end">Monto Pendiente (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in top_deudores %}
+                            <tr>
+                                <td>{{ d.cliente }}</td>
+                                <td class="text-end">${{ d.monto|es_number }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Tasa BCV Actual</h6>
+                    <h2 class="display-6">{{ tasa_bcv|es_number }} Bs/USD</h2>
+                </div>
+            </div>
         </div>
     </div>
     <div class="card">
@@ -20,30 +99,40 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Número Factura</th>
                             <th>Cliente</th>
-                            <th>Monto</th>
+                            <th>Total (USD)</th>
+                            <th>Abonado (USD)</th>
+                            <th>Saldo Pendiente (USD)</th>
                             <th>Estado</th>
                             <th>Fecha</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for id, cuenta in cuentas.items() %}
                         <tr>
                             <td>{{ id }}</td>
-                            <td>{{ clientes[cuenta.cliente_id].nombre if cuenta.cliente_id in clientes else cuenta.cliente_id }}</td>
-                            <td>${{ cuenta.monto|float|es_number }}</td>
+                            <td>{{ cuenta.numero }}</td>
+                            <td>{{ cuenta.cliente_nombre }}</td>
+                            <td>${{ cuenta.total_usd|es_number }}</td>
+                            <td>${{ cuenta.abonado_usd|es_number }}</td>
+                            <td>${{ cuenta.saldo_pendiente|es_number }}</td>
                             <td>
                                 {% if cuenta.estado == 'por_cobrar' %}
                                     <span class="badge bg-warning text-dark">Por Cobrar</span>
                                 {% elif cuenta.estado == 'cobrado' %}
-                                    <span class="badge bg-success">Cobrado</span>
-                                {% elif cuenta.estado == 'facturado' %}
-                                    <span class="badge bg-info text-dark">Facturado</span>
+                                    <span class="badge bg-success">Cobrada</span>
                                 {% else %}
                                     <span class="badge bg-secondary">{{ cuenta.estado }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ cuenta.fecha }}</td>
+                            <td>
+                                <a href="{{ url_for('ver_factura', id=cuenta.factura_id) }}" class="btn btn-sm btn-info" title="Ver Factura">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

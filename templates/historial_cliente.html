@@ -16,14 +16,39 @@
         </div>
     </div>
 
+    <!-- Filtro por año y mes -->
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <select name="anio" class="form-select" id="filtroAnio">
+                {% for anio in anios_disponibles %}
+                <option value="{{ anio }}" {% if anio == filtro_anio %}selected{% endif %}>{{ anio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="mes" class="form-select" id="filtroMes">
+                <option value="">Todos los meses</option>
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if m == filtro_mes|int %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-auto align-self-center">
+            <span class="text-muted">Mes actual: {{ now.strftime('%B %Y') }}</span>
+        </div>
+    </form>
+
     <!-- Resumen de Facturación del Cliente -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h6 class="card-title mb-1">Total Facturado (General)</h6>
-                    <div><strong>${{ total_facturado_usd|es_number }}</strong></div>
-                    <div><strong>{{ total_facturado_bs|es_number }} Bs</strong></div>
+                    <h6 class="card-title mb-1">Total Facturado (Filtrado)</h6>
+                    <div><strong>${{ total_compras|es_number }}</strong></div>
+                    <div><strong>{{ total_bs|es_number }} Bs</strong></div>
                 </div>
             </div>
         </div>
@@ -165,6 +190,14 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('filtroAnio').focus();
+});
+</script>
+{% endblock %}
 
 <style>
 @media print {

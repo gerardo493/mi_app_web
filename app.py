@@ -162,20 +162,17 @@ def obtener_estadisticas():
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
     facturas = cargar_datos(ARCHIVO_FACTURAS)
-    cuentas = cargar_datos(ARCHIVO_CUENTAS)
+    # cuentas = cargar_datos(ARCHIVO_CUENTAS)  # Ya no se usa
     mes_actual = datetime.now().month
     total_clientes = len(clientes)
     total_productos = len(inventario)
     facturas_mes = sum(1 for f in facturas.values() if datetime.strptime(f['fecha'], '%Y-%m-%d').month == mes_actual)
-    # Total cuentas por cobrar (sumar solo montos pendientes > 0)
+    # Total cuentas por cobrar (sumar solo montos pendientes > 0 de facturas)
     total_cobrar_usd = 0
-    for cuenta in cuentas.values():
-        try:
-            monto = float(cuenta.get('monto', 0))
-            if monto > 0:
-                total_cobrar_usd += monto
-        except (ValueError, TypeError):
-            continue
+    for f in facturas.values():
+        saldo = float(f.get('saldo_pendiente', 0))
+        if saldo > 0:
+            total_cobrar_usd += saldo
     tasa_bcv = obtener_tasa_bcv() or 1.0
     total_cobrar_bs = total_cobrar_usd * tasa_bcv
     ultimas_facturas = sorted(facturas.values(), key=lambda x: datetime.strptime(x['fecha'], '%Y-%m-%d'), reverse=True)[:5]
@@ -897,18 +894,17 @@ def ajustar_stock():
                     else:
                         flash(f'No hay suficiente stock para {producto["nombre"]}', 'warning')
                         continue
-                
+
                 # Registrar el ajuste en el historial
                 if 'historial_ajustes' not in producto:
                     producto['historial_ajustes'] = []
-                
+
                 producto['historial_ajustes'].append({
                     'fecha': fecha_actual,
                     'tipo': tipo_ajuste,
                     'cantidad': cantidad,
                     'motivo': motivo
                 })
-        
         guardar_datos(ARCHIVO_INVENTARIO, inventario)
         flash(f'Ajuste de stock realizado para {len(productos)} producto(s)', 'success')
         return redirect(url_for('mostrar_inventario'))
@@ -921,18 +917,14 @@ def reporte_inventario():
     try:
         inventario = cargar_datos('inventario.json')
         empresa = cargar_datos('empresa.json')
-        
         # Obtener la tasa BCV actual
         tasa_bcv = obtener_tasa_bcv()
-        
         # Obtener la fecha actual
         fecha_actual = datetime.now()
-        
         # Calcular estadísticas
         total_productos = len(inventario)
         total_stock = sum(producto['cantidad'] for producto in inventario.values())
         valor_total = sum(producto['cantidad'] * producto['precio'] for producto in inventario.values())
-        
         # Productos por categoría
         productos_por_categoria = {}
         for producto in inventario.values():
@@ -946,13 +938,11 @@ def reporte_inventario():
             productos_por_categoria[categoria]['productos'].append(producto)
             productos_por_categoria[categoria]['cantidad'] += producto['cantidad']
             productos_por_categoria[categoria]['valor'] += producto['cantidad'] * producto['precio']
-        
         # Productos con bajo stock (menos de 10 unidades)
         productos_bajo_stock = {
             id: producto for id, producto in inventario.items() 
             if producto['cantidad'] < 10
         }
-        
         return render_template('reporte_inventario.html',
                              inventario=inventario,
                              total_productos=total_productos,
@@ -1071,7 +1061,6 @@ def reporte_clientes():
 
 @app.route('/clientes/<path:id>/historial')
 def historial_cliente(id):
-    """Muestra el historial detallado de un cliente."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     facturas = cargar_datos(ARCHIVO_FACTURAS)
     cuentas = cargar_datos(ARCHIVO_CUENTAS)
@@ -1082,62 +1071,37 @@ def historial_cliente(id):
         return redirect(url_for('mostrar_clientes'))
     
     cliente = clientes[id]
-    facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id]
-    cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id), None)
-    
-    # Estadísticas del cliente
-    total_compras = sum(
-        float(f.get('total', 0).replace('$', '').replace(',', '')) if isinstance(f.get('total', 0), str) else float(f.get('total', 0))
-        for f in facturas_cliente
-    )
-    # Calcular totales por periodo
     now = datetime.now()
-    total_anual = 0
-    total_mensual = 0
-    total_bs = 0
-    total_anual_bs = 0
-    total_mensual_bs = 0
+    filtro_anio = int(request.args.get('anio', now.year))
+    filtro_mes = request.args.get('mes', '')
+
+    # Filtrar facturas por cliente, año y mes
+    facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id]
+    facturas_filtradas = []
     for f in facturas_cliente:
         fecha = f.get('fecha', '')
         try:
             fecha_dt = datetime.strptime(fecha, '%Y-%m-%d')
         except Exception:
             continue
-        monto_usd = float(f.get('total_usd', f.get('total', 0)).replace('$', '').replace(',', '')) if isinstance(f.get('total_usd', f.get('total', 0)), str) else float(f.get('total_usd', f.get('total', 0)))
-        bs_raw = f.get('total_bs', 0)
-        if isinstance(bs_raw, str):
-            bs_raw = bs_raw.replace('Bs', '').replace(' ', '').replace(',', '')
-        monto_bs = float(bs_raw) if bs_raw else monto_usd * float(f.get('tasa_bcv', 0) or 0)
-        total_bs += monto_bs
-        if fecha_dt.year == now.year:
-            total_anual += monto_usd
-            total_anual_bs += monto_bs
-            if fecha_dt.month == now.month:
-                total_mensual += monto_usd
-                total_mensual_bs += monto_bs
-    productos_comprados = {}
+        if fecha_dt.year == filtro_anio and (not filtro_mes or fecha_dt.month == int(filtro_mes)):
+            facturas_filtradas.append(f)
+    cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id), None)
     
-    for factura in facturas_cliente:
-        # Calcular total abonado
-        total_abonado = 0
-        if 'pagos' in factura and factura['pagos']:
-            for pago in factura['pagos']:
-                try:
-                    total_abonado += float(str(pago.get('monto', 0)).replace('$', '').replace(',', ''))
-                except Exception:
-                    continue
-        # Determinar total de la factura
-        total_factura = factura.get('total_usd') or factura.get('total') or 0
-        if isinstance(total_factura, str):
-            total_factura = float(total_factura.replace('$', '').replace(',', ''))
-        # Estado automático
-        if total_abonado >= total_factura and total_factura > 0:
-            factura['estado'] = 'pagada'
-        else:
-            factura['estado'] = 'pendiente'
-        factura['total_abonado'] = total_abonado
-        factura['saldo_pendiente'] = max(total_factura - total_abonado, 0)
-
+    # Totales filtrados
+    total_compras = sum(
+        float(f.get('total_usd', f.get('total', 0)).replace('$', '').replace(',', '')) if isinstance(f.get('total_usd', f.get('total', 0)), str) else float(f.get('total_usd', f.get('total', 0)))
+        for f in facturas_filtradas
+    )
+    total_bs = sum(
+        float(f.get('total_bs', 0)) if f.get('total_bs', 0) else (
+            float(f.get('total_usd', f.get('total', 0))) * float(f.get('tasa_bcv', 0) or 0)
+        )
+        for f in facturas_filtradas
+    )
+    # Productos comprados filtrados
+    productos_comprados = {}
+    for factura in facturas_filtradas:
         for prod_id, cantidad in zip(factura.get('productos', []), factura.get('cantidades', [])):
             if prod_id in inventario:
                 if prod_id not in productos_comprados:
@@ -1148,19 +1112,21 @@ def historial_cliente(id):
                     }
                 productos_comprados[prod_id]['cantidad'] += int(cantidad)
                 productos_comprados[prod_id]['valor'] += int(cantidad) * float(inventario[prod_id]['precio'])
-    
-    return render_template('historial_cliente.html',
+    # Para el formulario de filtro
+    anios_disponibles = sorted({datetime.strptime(f.get('fecha', ''), '%Y-%m-%d').year for f in facturas_cliente if f.get('fecha', '')})
+    return render_template(
+        'historial_cliente.html',
                          cliente=cliente,
-                         facturas=facturas_cliente,
+        facturas=facturas_filtradas,
                          cuenta=cuenta,
                          total_compras=total_compras,
-                         productos_comprados=productos_comprados,
-                         total_facturado_usd=total_compras,
-                         total_facturado_bs=total_bs,
-                         total_anual_usd=total_anual,
-                         total_anual_bs=total_anual_bs,
-                         total_mensual_usd=total_mensual,
-                         total_mensual_bs=total_mensual_bs)
+        total_bs=total_bs,
+        productos_comprados=productos_comprados,
+        filtro_anio=filtro_anio,
+        filtro_mes=filtro_mes,
+        anios_disponibles=anios_disponibles,
+        now=now
+    )
 
 def actualizar_facturas_antiguas():
     """Agrega campos nuevos por defecto a todas las facturas antiguas."""
@@ -1199,46 +1165,6 @@ def actualizar_campos_facturas():
     n = actualizar_facturas_antiguas()
     flash(f'Se actualizaron {n} facturas antiguas con los campos nuevos.', 'success' if n else 'info')
     return redirect(url_for('mostrar_facturas'))
-
-@app.route('/clientes/cargar-csv', methods=['GET', 'POST'])
-def cargar_clientes_csv():
-    """Formulario para cargar clientes desde CSV."""
-    if request.method == 'POST':
-        if 'archivo' not in request.files:
-            flash('No se seleccionó ningún archivo', 'danger')
-            return redirect(request.url)
-        
-        archivo = request.files['archivo']
-        if archivo.filename == '':
-            flash('No se seleccionó ningún archivo', 'danger')
-            return redirect(request.url)
-        
-        if archivo and allowed_file(archivo.filename):
-            try:
-                filename = secure_filename(archivo.filename)
-                ruta_archivo = os.path.join(UPLOAD_FOLDER, filename)
-                archivo.save(ruta_archivo)
-                
-                if cargar_clientes_desde_csv(ruta_archivo):
-                    flash('Clientes cargados exitosamente', 'success')
-                else:
-                    flash('Error al cargar los clientes', 'danger')
-                
-                # Limpiar archivo después de procesarlo
-                try:
-                    os.remove(ruta_archivo)
-                except:
-                    pass
-                    
-                return redirect(url_for('mostrar_clientes'))
-            except Exception as e:
-                flash(f'Error al procesar el archivo: {str(e)}', 'danger')
-                return redirect(request.url)
-        
-        flash('Tipo de archivo no permitido', 'danger')
-        return redirect(request.url)
-    
-    return render_template('cargar_csv.html', tipo='clientes')
 
 @app.route('/inventario/cargar-csv', methods=['GET', 'POST'])
 def cargar_productos_csv():
@@ -1353,15 +1279,66 @@ def es_number(value, decimales=2):
 
 @app.route('/cuentas-por-cobrar')
 def reporte_cuentas_por_cobrar():
-    cuentas = cargar_datos(ARCHIVO_CUENTAS)
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     filtro = request.args.get('estado', 'por_cobrar')
     cuentas_filtradas = {}
-    for id, cuenta in cuentas.items():
-        estado = cuenta.get('estado', 'por_cobrar')
-        if filtro == 'todas' or estado == filtro:
-            cuentas_filtradas[id] = cuenta
-    return render_template('reporte_cuentas_por_cobrar.html', cuentas=cuentas_filtradas, clientes=clientes, filtro=filtro)
+    total_por_cobrar_usd = 0
+    total_por_cobrar_bs = 0
+    tasa_bcv = obtener_tasa_bcv() or 1.0
+    clientes_deudores = set()
+    for id, factura in facturas.items():
+        saldo_pendiente = float(factura.get('saldo_pendiente', 0))
+        estado = 'por_cobrar'
+        if factura.get('estado', '').lower() == 'pagada' or saldo_pendiente <= 0:
+            estado = 'cobrado'
+        elif factura.get('condicion_pago', '') == 'credito' or saldo_pendiente > 0:
+            estado = 'por_cobrar'
+        if filtro == 'todas' or \
+           (filtro == 'por_cobrar' and estado == 'por_cobrar') or \
+           (filtro == 'cobrado' and estado == 'cobrado'):
+            cuentas_filtradas[id] = {
+                'factura_id': id,
+                'numero': factura.get('numero', id),
+                'cliente_id': factura.get('cliente_id'),
+                'cliente_nombre': clientes.get(factura.get('cliente_id'), {}).get('nombre', factura.get('cliente_id')),
+                'total_usd': float(factura.get('total_usd', 0)),
+                'abonado_usd': float(factura.get('total_abonado', 0)),
+                'saldo_pendiente': saldo_pendiente,
+                'estado': estado,
+                'fecha': factura.get('fecha'),
+                'condicion_pago': factura.get('condicion_pago', ''),
+            }
+            if estado == 'por_cobrar' and saldo_pendiente > 0:
+                total_por_cobrar_usd += saldo_pendiente
+                clientes_deudores.add(factura.get('cliente_id'))
+    total_por_cobrar_bs = total_por_cobrar_usd * tasa_bcv
+    cantidad_facturas = len([c for c in cuentas_filtradas.values() if c['estado'] == 'por_cobrar'])
+    cantidad_clientes = len(clientes_deudores)
+    promedio_por_factura = total_por_cobrar_usd / cantidad_facturas if cantidad_facturas > 0 else 0
+    # Top 5 deudores
+    deudores = {}
+    for c in cuentas_filtradas.values():
+        if c['estado'] == 'por_cobrar' and c['saldo_pendiente'] > 0:
+            cid = c['cliente_id']
+            deudores[cid] = deudores.get(cid, 0) + c['saldo_pendiente']
+    top_deudores = sorted(deudores.items(), key=lambda x: x[1], reverse=True)[:5]
+    top_deudores = [
+        {'cliente': clientes.get(cid, {}).get('nombre', cid), 'monto': monto}
+        for cid, monto in top_deudores
+    ]
+    return render_template('reporte_cuentas_por_cobrar.html',
+        cuentas=cuentas_filtradas,
+        clientes=clientes,
+        filtro=filtro,
+        total_por_cobrar_usd=total_por_cobrar_usd,
+        total_por_cobrar_bs=total_por_cobrar_bs,
+        tasa_bcv=tasa_bcv,
+        cantidad_facturas=cantidad_facturas,
+        cantidad_clientes=cantidad_clientes,
+        promedio_por_factura=promedio_por_factura,
+        top_deudores=top_deudores
+    )
 
 @app.route('/pagos-recibidos')
 def pagos_recibidos():
@@ -1385,6 +1362,102 @@ def pagos_recibidos():
                 total_usd += float(pago.get('monto', 0))
                 total_bs += float(pago.get('monto', 0)) * float(f.get('tasa_bcv', tasa_bcv))
     return render_template('pagos_recibidos.html', pagos=pagos, clientes=clientes, total_usd=total_usd, total_bs=total_bs, tasa_bcv=tasa_bcv)
+
+@app.template_filter('split')
+def split_filter(value, delimiter=' '):
+    """Filtro personalizado para dividir strings"""
+    return value.split(delimiter)
+
+@app.route('/reporte/facturas')
+def reporte_facturas():
+    """Muestra un reporte general de facturas con filtros y estadísticas"""
+    # Cargar datos necesarios
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
+    clientes = cargar_datos(ARCHIVO_CLIENTES)
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    # Obtener parámetros de filtro
+    filtro_anio = request.args.get('anio', '')
+    filtro_mes = request.args.get('mes', '')
+    filtro_cliente = request.args.get('cliente', '')
+    
+    # Filtrar facturas
+    facturas_filtradas = []
+    for factura in facturas.values():
+        fecha = factura['fecha'].split('-')
+        anio_factura = fecha[0]
+        mes_factura = fecha[1]
+        
+        # Aplicar filtros
+        if filtro_anio and anio_factura != filtro_anio:
+            continue
+        if filtro_mes and mes_factura != filtro_mes.zfill(2):
+            continue
+        if filtro_cliente and str(factura['cliente_id']) != filtro_cliente:
+            continue
+        facturas_filtradas.append(factura)
+    
+    # Calcular totales
+    total_usd = sum(float(f.get('total_usd', 0)) for f in facturas_filtradas)
+    total_bs = sum(float(f.get('total_bs', 0)) for f in facturas_filtradas)
+    
+    # Calcular top clientes
+    clientes_totales = {}
+    for factura in facturas_filtradas:
+        cliente_id = factura['cliente_id']
+        if cliente_id not in clientes_totales:
+            clientes_totales[cliente_id] = 0
+        clientes_totales[cliente_id] += float(factura.get('total_usd', 0))
+    
+    top_clientes = [
+        {'nombre': clientes[cid]['nombre'], 'total': total}
+        for cid, total in sorted(clientes_totales.items(), key=lambda x: x[1], reverse=True)[:5]
+    ]
+    
+    # Calcular top productos
+    productos_totales = {}
+    productos_cantidades = {}
+    for factura in facturas_filtradas:
+        # Compatibilidad: puede ser 'items' o ('productos' y 'cantidades')
+        if 'items' in factura:
+            for item in factura['items']:
+                pid = item['producto_id']
+                if pid not in productos_totales:
+                    productos_totales[pid] = 0
+                    productos_cantidades[pid] = 0
+                productos_totales[pid] += float(item.get('subtotal', 0))
+                productos_cantidades[pid] += int(item.get('cantidad', 0))
+        else:
+            for prod_id, cantidad in zip(factura.get('productos', []), factura.get('cantidades', [])):
+                if prod_id not in productos_totales:
+                    productos_totales[prod_id] = 0
+                    productos_cantidades[prod_id] = 0
+                precio = float(inventario.get(prod_id, {}).get('precio', 0))
+                productos_totales[prod_id] += precio * int(cantidad)
+                productos_cantidades[prod_id] += int(cantidad)
+    
+    top_productos = [
+        {
+            'nombre': inventario[pid]['nombre'] if pid in inventario else pid,
+            'cantidad': productos_cantidades[pid],
+            'total': total
+        }
+        for pid, total in sorted(productos_totales.items(), key=lambda x: x[1], reverse=True)[:5]
+    ]
+    
+    return render_template('reporte_facturas.html',
+                         facturas=facturas_filtradas,
+                         clientes=clientes,
+                         total_usd=total_usd,
+                         total_bs=total_bs,
+                         top_clientes=top_clientes,
+                         top_productos=top_productos,
+                         filtro_anio=filtro_anio,
+                         filtro_mes=filtro_mes,
+                         filtro_cliente=filtro_cliente)
+
+@app.route('/inventario/')
+def inventario_slash_redirect():
+    return redirect(url_for('mostrar_inventario'))
 
 # --- Bloque para Ejecutar la Aplicación ---
 if __name__ == '__main__':
