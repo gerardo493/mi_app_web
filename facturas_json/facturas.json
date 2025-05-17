@@ -1,1 +1,34 @@
-{}
+{
+    "2": {
+        "id": "2",
+        "numero": "000622",
+        "fecha": "2025-05-17",
+        "hora": "13:19",
+        "condicion_pago": "credito",
+        "fecha_vencimiento": "2025-05-31",
+        "tasa_bcv": "94.32",
+        "cliente_id": "J-500845600",
+        "productos": [
+            "24",
+            "55",
+            "23"
+        ],
+        "cantidades": [
+            "12",
+            "12",
+            "12"
+        ],
+        "descuento": "0",
+        "tipo_descuento": "bs",
+        "iva": "0",
+        "subtotal_usd": 64.8,
+        "subtotal_bs": 6111.94,
+        "descuento_total": 0.0,
+        "iva_total": 0.0,
+        "total_usd": 64.8,
+        "total_bs": 6111.94,
+        "pagos": [],
+        "total_abonado": 0,
+        "saldo_pendiente": 64.8
+    }
+}

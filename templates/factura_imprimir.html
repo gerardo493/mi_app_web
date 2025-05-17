@@ -155,7 +155,7 @@
                 PRODUCTOS NATURALES KISVIC 1045, C.A.<br>
                 RIF: J-404373818<br>
                 Teléfono: 0424-728-6225<br>
-                Centro Comercial Caña de Azúcar (Antiguo Mercalum), Nave A, Locales 154-156<br>
+                Centro Comercial Caña de Azúcar (Antiguo Merbumar), Nave A, Locales 154-156<br>
                 Maracay-Edo. Aragua
             </div>
         </div>
@@ -179,22 +179,22 @@
         <table>
             <thead>
                 <tr style="background: #e6ffe6; border-top: 2px solid #bfa43a; border-bottom: 2px solid #27ae60;">
-                    <th style="border: 2px solid #27ae60; color: #154360;">Cant.</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Cant.</th>
                     <th style="border: 2px solid #bfa43a; color: #154360;">Descripción</th>
                     <th style="border: 2px solid #bfa43a; color: #154360;">P. Unit USD</th>
-                    <th style="border: 2px solid #27ae60; color: #154360;">P. Unit Bs</th>
-                    <th style="border: 2px solid #27ae60; color: #154360;">Subtotal Bs.</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">P. Unit Bs</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Subtotal Bs.</th>
                     <th style="border: 2px solid #bfa43a; color: #154360;">Subtotal USD</th>
                 </tr>
             </thead>
             <tbody>
                 {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
                 <tr>
-                    <td style="border: 2px solid #27ae60; text-align: right;">{{ cantidad }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ cantidad }}</td>
                     <td style="border: 2px solid #bfa43a;">{{ inventario[prod_id].nombre }}</td>
                     <td style="border: 2px solid #bfa43a; text-align: right;">{{ inventario[prod_id].precio|es_number }}</td>
-                    <td style="border: 2px solid #27ae60; text-align: right;">{{ (inventario[prod_id].precio * factura.tasa_bcv|float)|es_number }}</td>
-                    <td style="border: 2px solid #27ae60; text-align: right;">{{ (inventario[prod_id].precio * cantidad|int * factura.tasa_bcv|float)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * factura.tasa_bcv|float)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * cantidad|int * factura.tasa_bcv|float)|es_number }}</td>
                     <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * cantidad|int)|es_number }}</td>
                 </tr>
                 {% endfor %}

@@ -87,7 +87,8 @@
             <div class="card h-100">
                 <div class="card-body">
                     <h6 class="card-title">Tasa BCV Actual</h6>
-                    <h2 class="display-6">{{ tasa_bcv|es_number }} Bs/USD</h2>
+                    <h2 class="display-6">{{ tasa_bcv|default('Cargando...', true)|es_number }} Bs/USD</h2>
+                    <small class="text-muted">Última actualización: {{ ultima_actualizacion_bcv|default('', true) }}</small>
                 </div>
             </div>
         </div>

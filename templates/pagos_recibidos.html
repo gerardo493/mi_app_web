@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card bg-success text-white">
                 <div class="card-body">
                     <h5 class="card-title">Total Pagos Recibidos (USD)</h5>
@@ -21,11 +21,20 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card bg-info text-white">
                 <div class="card-body">
                     <h5 class="card-title">Total Pagos Recibidos (Bs)</h5>
                     <h2 class="display-4">{{ total_bs|float|es_number }} Bs</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Tasa BCV Actual</h5>
+                    <h2 class="display-4">{{ tasa_bcv|default('Cargando...', true)|es_number }} Bs/USD</h2>
+                    <small class="text-muted">Actualizado: {{ ultima_actualizacion_bcv|default('', true) }}</small>
                 </div>
             </div>
         </div>
