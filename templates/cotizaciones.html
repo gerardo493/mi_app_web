@@ -11,6 +11,9 @@
         <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary">
             <i class="fas fa-file-alt me-2"></i>Nueva Cotización
         </a>
+        <a href="{{ url_for('reporte_cotizaciones') }}" class="btn btn-secondary ms-2">
+            <i class="fas fa-chart-bar me-2"></i>Reporte de Cotizaciones
+        </a>
     </div>
 </div>
 
@@ -34,13 +37,7 @@
                     <tr>
                         <td>{{ cotizacion.numero }}</td>
                         <td>{{ cotizacion.fecha }}</td>
-                        <td>
-                            {% if cotizacion.cliente_id in clientes %}
-                                {{ clientes[cotizacion.cliente_id].nombre }}
-                            {% else %}
-                                {{ cotizacion.cliente_id }}
-                            {% endif %}
-                        </td>
+                        <td>{{ cotizacion.cliente_id }}</td>
                         <td>{{ cotizacion.total }}</td>
                         <td>{{ cotizacion.validez }}</td>
                         <td>
@@ -49,17 +46,18 @@
                             </span>
                         </td>
                         <td>
+                            {% if cotizacion.numero and cotizacion.fecha and cotizacion.cliente_id %}
                             <div class="btn-group">
-                                <a href="#" class="btn btn-sm btn-info" title="Ver detalles">
+                                <a href="#" class="btn btn-sm btn-info disabled" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ url_for('editar_cotizacion', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-success" title="Convertir a Factura">
+                                <a href="#" class="btn btn-sm btn-success disabled" title="Convertir a Factura">
                                     <i class="fas fa-file-invoice"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-primary" title="Descargar PDF">
+                                <a href="#" class="btn btn-sm btn-primary disabled" title="Descargar PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                                 <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
@@ -67,6 +65,9 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
+                            {% else %}
+                            <span class="text-danger">Cotización no válida</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -91,6 +92,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <form id="formEliminar" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger">Eliminar</button>
                 </form>
             </div>

@@ -5,7 +5,7 @@ import urllib3
 import requests
 import csv
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
@@ -22,6 +22,7 @@ ARCHIVO_INVENTARIO = 'inventario.json'
 ARCHIVO_FACTURAS = 'facturas_json/facturas.json'
 ARCHIVO_COTIZACIONES = 'cotizaciones_json/cotizaciones.json'
 ARCHIVO_CUENTAS = 'cuentas_por_cobrar.json'
+ULTIMA_TASA_BCV_FILE = 'ultima_tasa_bcv.json'
 ALLOWED_EXTENSIONS = {'csv'}
 
 # Asegurar que la carpeta de subidas existe
@@ -205,40 +206,93 @@ def obtener_estadisticas():
         'total_pagos_recibidos_bs': total_pagos_recibidos_bs
     }
 
+def limpiar_valor_monetario(valor):
+    """Limpia y convierte un valor monetario a float."""
+    if valor is None:
+        return 0.0
+    if isinstance(valor, (int, float)):
+        return float(valor)
+    try:
+        # Eliminar símbolos y espacios
+        valor = str(valor).replace('$', '').replace(',', '').replace('Bs', '').strip()
+        # Reemplazar coma decimal por punto si existe
+        if ',' in valor:
+            valor = valor.replace(',', '.')
+        return float(valor)
+    except (ValueError, TypeError):
+        return 0.0
+
+def guardar_ultima_tasa_bcv(tasa):
+    try:
+        with open(ULTIMA_TASA_BCV_FILE, 'w', encoding='utf-8') as f:
+            json.dump({'tasa': tasa}, f)
+    except Exception as e:
+        print(f"Error guardando última tasa BCV: {e}")
+
+def cargar_ultima_tasa_bcv():
+    try:
+        with open(ULTIMA_TASA_BCV_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            tasa = float(data.get('tasa', 0))
+            if tasa > 10:
+                return tasa
+            else:
+                return None
+    except Exception:
+        return None
+
 def obtener_tasa_bcv():
-    """Obtiene la tasa oficial USD/BS del BCV desde la web. Devuelve float o None si falla."""
     url = 'https://www.bcv.org.ve/glosario/cambio-oficial'
     try:
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         resp = requests.get(url, timeout=10, verify=False)
         if resp.status_code != 200:
-            return None
+            raise Exception('No se pudo obtener la tasa BCV')
         soup = BeautifulSoup(resp.text, 'html.parser')
-        # Buscar el valor de la tasa (puede cambiar el selector si la web cambia)
-        # Normalmente está en un <strong> dentro de un div con id="dolar"
         tasa = None
+        # 1. Buscar por id='dolar'
         dolar_div = soup.find('div', id='dolar')
         if dolar_div:
             strong = dolar_div.find('strong')
             if strong:
-                tasa_txt = strong.text.strip().replace('.', '').replace(',', '.')
+                txt = strong.text.strip().replace('.', '').replace(',', '.')
                 try:
-                    tasa = float(tasa_txt)
+                    posible = float(txt)
+                    if posible > 10:
+                        tasa = posible
                 except:
-                    tasa = None
-        # Fallback: buscar cualquier número grande en la página
+                    pass
+        # 2. Buscar por strong con texto que parezca una tasa
+        if not tasa:
+            for strong in soup.find_all('strong'):
+                txt = strong.text.strip().replace('.', '').replace(',', '.')
+                try:
+                    posible = float(txt)
+                    if posible > 10:
+                        tasa = posible
+                        break
+                except:
+                    continue
+        # 3. Buscar cualquier número grande en el texto plano
         if not tasa:
             import re
-            matches = re.findall(r'(\d{2,}\,\d{2})', resp.text)
-            if matches:
+            matches = re.findall(r'(\d{2,}[.,]\d{2})', resp.text)
+            for m in matches:
                 try:
-                    tasa = float(matches[0].replace('.', '').replace(',', '.'))
+                    posible = float(m.replace('.', '').replace(',', '.'))
+                    if posible > 10:
+                        tasa = posible
+                        break
                 except:
-                    tasa = None
-        return tasa
+                    continue
+        if tasa and tasa > 10:
+            guardar_ultima_tasa_bcv(tasa)
+            return tasa
+        else:
+            raise Exception('No se encontró una tasa válida en la web del BCV')
     except Exception as e:
         print(f"Error obteniendo tasa BCV: {e}")
-        return None
+        return cargar_ultima_tasa_bcv()
 
 def cargar_empresa():
     try:
@@ -442,8 +496,33 @@ def ver_producto(id):
 
 @app.route('/facturas')
 def mostrar_facturas():
-    """Muestra lista de facturas."""
+    # Reparar totales automáticamente antes de mostrar
     facturas = cargar_datos(ARCHIVO_FACTURAS)
+    actualizadas = 0
+    for id, factura in facturas.items():
+        try:
+            precios = factura.get('precios', [])
+            cantidades = factura.get('cantidades', [])
+            subtotal_usd = sum(float(precios[i]) * int(cantidades[i]) for i in range(len(precios))) if precios and cantidades else 0
+            tasa_bcv = float(factura.get('tasa_bcv', 1))
+            descuento_total = float(factura.get('descuento_total', 0))
+            iva_total = float(factura.get('iva_total', 0))
+            total_usd = subtotal_usd - descuento_total + iva_total
+            total_bs = total_usd * tasa_bcv
+            pagos = factura.get('pagos', [])
+            total_abonado = sum(float(p.get('monto', 0)) for p in pagos)
+            saldo_pendiente = max(total_usd - total_abonado, 0)
+            factura['subtotal_usd'] = subtotal_usd
+            factura['subtotal_bs'] = subtotal_bs
+            factura['total_usd'] = total_usd
+            factura['total_bs'] = total_bs
+            factura['total_abonado'] = total_abonado
+            factura['saldo_pendiente'] = saldo_pendiente
+            facturas[id] = factura
+            actualizadas += 1
+        except Exception as e:
+            print(f"Error actualizando factura {id}: {e}")
+    guardar_datos(ARCHIVO_FACTURAS, facturas)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     # Calcular estado automático para cada factura
     for factura in facturas.values():
@@ -574,15 +653,16 @@ def editar_factura(id):
         factura['tasa_bcv'] = request.form.get('tasa_bcv', '')
         factura['productos'] = request.form.getlist('productos[]')
         factura['cantidades'] = request.form.getlist('cantidades[]')
+        factura['precios'] = [float(precio) for precio in request.form.getlist('precios[]')]  # Guardar precios personalizados
         factura['descuento'] = request.form.get('descuento', '0')
         factura['tipo_descuento'] = request.form.get('tipo_descuento', 'bs')
         factura['iva'] = request.form.get('iva', '16')
-        factura['subtotal_usd'] = limpiar_monto(request.form.get('subtotal_usd', ''))
-        factura['subtotal_bs'] = limpiar_monto(request.form.get('subtotal_bs', ''))
-        factura['descuento_total'] = limpiar_monto(request.form.get('descuento_total', ''))
-        factura['iva_total'] = limpiar_monto(request.form.get('iva_total', ''))
-        factura['total_usd'] = limpiar_monto(request.form.get('total_usd', ''))
-        factura['total_bs'] = limpiar_monto(request.form.get('total_bs', ''))
+        factura['subtotal_usd'] = limpiar_valor_monetario(request.form.get('subtotal_usd', ''))
+        factura['subtotal_bs'] = limpiar_valor_monetario(request.form.get('subtotal_bs', ''))
+        factura['descuento_total'] = limpiar_valor_monetario(request.form.get('descuento_total', ''))
+        factura['iva_total'] = limpiar_valor_monetario(request.form.get('iva_total', ''))
+        factura['total_usd'] = limpiar_valor_monetario(request.form.get('total_usd', ''))
+        factura['total_bs'] = limpiar_valor_monetario(request.form.get('total_bs', ''))
         
         # Procesar pagos/abonos unificados
         import json
@@ -592,10 +672,7 @@ def editar_factura(id):
             # Validar y limpiar montos
             for pago in pagos:
                 if 'monto' in pago:
-                    try:
-                        pago['monto'] = float(str(pago['monto']).replace('$', '').replace(',', ''))
-                    except Exception:
-                        pago['monto'] = 0
+                    pago['monto'] = limpiar_valor_monetario(pago['monto'])
             factura['pagos'] = pagos
         except Exception:
             factura['pagos'] = []
@@ -619,77 +696,95 @@ def editar_factura(id):
 @app.route('/facturas/nueva', methods=['GET', 'POST'])
 def nueva_factura():
     if request.method == 'POST':
-        facturas = cargar_datos(ARCHIVO_FACTURAS)
-        inventario = cargar_datos(ARCHIVO_INVENTARIO)
-        nuevo_id = str(len(facturas) + 1)
-        productos = request.form.getlist('productos[]')
-        cantidades = request.form.getlist('cantidades[]')
-        
-        # Validar stock antes de guardar
-        for prod_id, cantidad in zip(productos, cantidades):
-            cantidad = int(cantidad)
-            if prod_id not in inventario or inventario[prod_id]['cantidad'] < cantidad:
-                flash(f'No hay suficiente stock para el producto {inventario[prod_id]["nombre"]}', 'danger')
-                clientes = cargar_datos(ARCHIVO_CLIENTES)
-                inventario_disponible = {k: v for k, v in inventario.items() if int(v.get('cantidad', 0)) > 0}
-                empresa = cargar_empresa()
-                return render_template('factura_form.html', clientes=clientes, inventario=inventario_disponible, editar=False, empresa=empresa)
-        
-        # Descontar stock
-        for prod_id, cantidad in zip(productos, cantidades):
-            inventario[prod_id]['cantidad'] -= int(cantidad)
-        guardar_datos(ARCHIVO_INVENTARIO, inventario)
-        
-        # Procesar pagos/abonos unificados
-        import json
-        pagos_json = request.form.get('pagos_json', '[]')
         try:
-            pagos = json.loads(pagos_json)
-            # Validar y limpiar montos
-            for pago in pagos:
-                if 'monto' in pago:
-                    try:
-                        pago['monto'] = float(str(pago['monto']).replace('$', '').replace(',', ''))
-                    except Exception:
-                        pago['monto'] = 0
-        except Exception:
-            pagos = []
-        
-        # Crear factura
-        factura = {
-            'id': nuevo_id,
-            'numero': request.form['numero'],
-            'fecha': request.form['fecha'],
-            'hora': request.form.get('hora', ''),
-            'condicion_pago': request.form.get('condicion_pago', 'contado'),
-            'fecha_vencimiento': request.form.get('fecha_vencimiento', ''),
-            'tasa_bcv': request.form.get('tasa_bcv', ''),
-            'cliente_id': request.form['cliente_id'],
-            'productos': productos,
-            'cantidades': cantidades,
-            'descuento': request.form.get('descuento', '0'),
-            'tipo_descuento': request.form.get('tipo_descuento', 'bs'),
-            'iva': request.form.get('iva', '5'),
-            'subtotal_usd': limpiar_monto(request.form.get('subtotal_usd', '')),
-            'subtotal_bs': limpiar_monto(request.form.get('subtotal_bs', '')),
-            'descuento_total': limpiar_monto(request.form.get('descuento_total', '')),
-            'iva_total': limpiar_monto(request.form.get('iva_total', '')),
-            'total_usd': limpiar_monto(request.form.get('total_usd', '')),
-            'total_bs': limpiar_monto(request.form.get('total_bs', '')),
-            'pagos': pagos
-        }
-        
-        # Calcular total abonado y saldo pendiente
-        total_abonado = sum(float(p['monto']) for p in pagos)
-        factura['total_abonado'] = total_abonado
-        factura['saldo_pendiente'] = max(factura['total_usd'] - total_abonado, 0)
-        
-        facturas[nuevo_id] = factura
-        if guardar_datos(ARCHIVO_FACTURAS, facturas):
-            flash('Factura creada exitosamente', 'success')
-            return redirect(url_for('mostrar_facturas'))
-        else:
-            flash('Error al guardar la factura', 'danger')
+            facturas = cargar_datos(ARCHIVO_FACTURAS)
+            inventario = cargar_datos(ARCHIVO_INVENTARIO)
+            
+            # Generar ID único
+            if not facturas:
+                nuevo_id = "1"
+            else:
+                ids_existentes = [int(id) for id in facturas.keys() if id.isdigit()]
+                nuevo_id = str(max(ids_existentes) + 1) if ids_existentes else "1"
+            
+            # Obtener productos, cantidades y precios
+            productos = request.form.getlist('productos[]')
+            cantidades = request.form.getlist('cantidades[]')
+            precios = request.form.getlist('precios[]')
+            
+            # Validar stock
+            for prod_id, cantidad in zip(productos, cantidades):
+                if prod_id in inventario:
+                    if int(cantidad) > int(inventario[prod_id]['cantidad']):
+                        flash(f'No hay suficiente stock para {inventario[prod_id]["nombre"]}', 'danger')
+                        return redirect(url_for('nueva_factura'))
+            
+            # Descontar stock
+            for prod_id, cantidad in zip(productos, cantidades):
+                inventario[prod_id]['cantidad'] -= int(cantidad)
+            
+            if not guardar_datos(ARCHIVO_INVENTARIO, inventario):
+                flash('Error al actualizar el inventario', 'danger')
+                return redirect(url_for('nueva_factura'))
+            
+            # Procesar pagos
+            pagos_json = request.form.get('pagos_json', '[]')
+            try:
+                pagos = json.loads(pagos_json)
+                for pago in pagos:
+                    if 'monto' in pago:
+                        pago['monto'] = limpiar_valor_monetario(pago['monto'])
+            except Exception:
+                pagos = []
+            
+            # Obtener y validar tasa BCV
+            tasa_bcv = limpiar_valor_monetario(request.form.get('tasa_bcv', '36.00'))
+            if tasa_bcv <= 0:
+                tasa_bcv = 36.00
+            
+            # Crear factura
+            factura = {
+                'id': nuevo_id,
+                'numero': request.form['numero'],
+                'fecha': request.form['fecha'],
+                'hora': request.form.get('hora', ''),
+                'condicion_pago': request.form.get('condicion_pago', 'contado'),
+                'fecha_vencimiento': request.form.get('fecha_vencimiento', ''),
+                'tasa_bcv': tasa_bcv,
+                'cliente_id': request.form['cliente_id'],
+                'productos': productos,
+                'cantidades': cantidades,
+                'precios': [float(precio) for precio in precios],  # Guardar precios personalizados
+                'descuento': limpiar_valor_monetario(request.form.get('descuento', '0')),
+                'tipo_descuento': request.form.get('tipo_descuento', 'bs'),
+                'iva': limpiar_valor_monetario(request.form.get('iva', '16')),
+                'subtotal_usd': limpiar_valor_monetario(request.form.get('subtotal_usd', '0')),
+                'subtotal_bs': limpiar_valor_monetario(request.form.get('subtotal_bs', '0')),
+                'descuento_total': limpiar_valor_monetario(request.form.get('descuento_total', '0')),
+                'iva_total': limpiar_valor_monetario(request.form.get('iva_total', '0')),
+                'total_usd': limpiar_valor_monetario(request.form.get('total_usd', '0')),
+                'total_bs': limpiar_valor_monetario(request.form.get('total_bs', '0')),
+                'pagos': pagos,
+                'estado': 'pendiente'
+            }
+            
+            # Calcular total abonado y saldo pendiente
+            total_abonado = sum(float(p['monto']) for p in pagos)
+            factura['total_abonado'] = total_abonado
+            factura['saldo_pendiente'] = max(float(factura['total_usd']) - total_abonado, 0)
+            
+            # Guardar factura
+            facturas[nuevo_id] = factura
+            if guardar_datos(ARCHIVO_FACTURAS, facturas):
+                flash('Factura creada exitosamente', 'success')
+                return redirect(url_for('mostrar_facturas'))
+            else:
+                flash('Error al guardar la factura', 'danger')
+                return redirect(url_for('nueva_factura'))
+                
+        except Exception as e:
+            flash(f'Error al crear la factura: {str(e)}', 'danger')
+            return redirect(url_for('nueva_factura'))
     
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
@@ -713,11 +808,43 @@ def eliminar_factura(id):
 
 @app.route('/cotizaciones')
 def mostrar_cotizaciones():
-    """Muestra lista de cotizaciones."""
-    cotizaciones = cargar_datos(ARCHIVO_COTIZACIONES)
-    clientes = cargar_datos(ARCHIVO_CLIENTES)
-    now = datetime.now().strftime('%Y-%m-%d')
-    return render_template('cotizaciones.html', cotizaciones=cotizaciones, clientes=clientes, now=now)
+    """Muestra lista de cotizaciones válidas."""
+    try:
+        cotizaciones = {}
+        cotizaciones_dir = 'cotizaciones_json'
+        if not os.path.exists(cotizaciones_dir):
+            os.makedirs(cotizaciones_dir)
+            return render_template('cotizaciones.html', cotizaciones={}, clientes={}, now=datetime.now().strftime('%Y-%m-%d'))
+        for filename in os.listdir(cotizaciones_dir):
+            if filename.endswith('.json'):
+                try:
+                    with open(os.path.join(cotizaciones_dir, filename), 'r', encoding='utf-8') as f:
+                        cot_data = json.load(f)
+                        # Validar datos mínimos
+                        if not cot_data.get('numero_cotizacion') or not cot_data.get('fecha') or not cot_data.get('cliente', {}).get('nombre'):
+                            continue
+                        cot_id = filename.split('_')[1].split('.')[0]
+                        fecha = datetime.fromisoformat(cot_data.get('fecha', '')).strftime('%Y-%m-%d')
+                        validez_dias = int(cot_data.get('validez_dias', 30))
+                        validez = (datetime.fromisoformat(cot_data.get('fecha', '')) + timedelta(days=validez_dias)).strftime('%Y-%m-%d')
+                        cotizaciones[cot_id] = {
+                            'numero': cot_data.get('numero_cotizacion', ''),
+                            'fecha': fecha,
+                            'cliente_id': cot_data.get('cliente', {}).get('nombre', 'Cliente no especificado'),
+                            'total': f"${float(cot_data.get('total_usd', 0)):.2f}",
+                            'validez': validez,
+                            'cliente': cot_data.get('cliente', {})
+                        }
+                except Exception as e:
+                    print(f"Error procesando archivo {filename}: {str(e)}")
+                    continue
+        clientes = cargar_datos(ARCHIVO_CLIENTES)
+        now = datetime.now().strftime('%Y-%m-%d')
+        return render_template('cotizaciones.html', cotizaciones=cotizaciones, clientes=clientes, now=now)
+    except Exception as e:
+        print(f"Error al cargar las cotizaciones: {str(e)}")
+        flash('Error al cargar las cotizaciones. Por favor, intente nuevamente.', 'danger')
+        return redirect(url_for('index'))
 
 @app.route('/cotizaciones/nueva', methods=['GET', 'POST'])
 def nueva_cotizacion():
@@ -973,10 +1100,16 @@ def api_clientes():
 @app.route('/api/tasa-bcv')
 def api_tasa_bcv():
     """API endpoint para obtener la tasa BCV."""
-    tasa = obtener_tasa_bcv()
-    if tasa is not None:
-        return jsonify({'tasa': tasa})
-    return jsonify({'error': 'No se pudo obtener la tasa BCV'}), 500
+    try:
+        tasa = obtener_tasa_bcv()
+        advertencia = False
+        if tasa is None:
+            advertencia = True
+            return jsonify({'tasa': '', 'advertencia': advertencia})
+        return jsonify({'tasa': f"{tasa:.2f}", 'advertencia': advertencia})
+    except Exception as e:
+        print(f"Error obteniendo tasa BCV: {str(e)}")
+        return jsonify({'tasa': '', 'advertencia': True})
 
 # --- Manejo de Errores ---
 @app.errorhandler(404)
@@ -1458,6 +1591,59 @@ def reporte_facturas():
 @app.route('/inventario/')
 def inventario_slash_redirect():
     return redirect(url_for('mostrar_inventario'))
+
+@app.route('/facturas/reparar-totales')
+def reparar_totales_facturas():
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
+    actualizadas = 0
+    for id, factura in facturas.items():
+        # Recalcular totales y pagos
+        try:
+            precios = factura.get('precios', [])
+            cantidades = factura.get('cantidades', [])
+            subtotal_usd = sum(float(precios[i]) * int(cantidades[i]) for i in range(len(precios))) if precios and cantidades else 0
+            tasa_bcv = float(factura.get('tasa_bcv', 1))
+            descuento_total = float(factura.get('descuento_total', 0))
+            iva_total = float(factura.get('iva_total', 0))
+            total_usd = subtotal_usd - descuento_total + iva_total
+            total_bs = total_usd * tasa_bcv
+            pagos = factura.get('pagos', [])
+            total_abonado = sum(float(p.get('monto', 0)) for p in pagos)
+            saldo_pendiente = max(total_usd - total_abonado, 0)
+            # Actualizar campos
+            factura['subtotal_usd'] = subtotal_usd
+            factura['subtotal_bs'] = subtotal_bs
+            factura['total_usd'] = total_usd
+            factura['total_bs'] = total_bs
+            factura['total_abonado'] = total_abonado
+            factura['saldo_pendiente'] = saldo_pendiente
+            facturas[id] = factura
+            actualizadas += 1
+        except Exception as e:
+            print(f"Error actualizando factura {id}: {e}")
+    guardar_datos(ARCHIVO_FACTURAS, facturas)
+    flash(f'Se actualizaron {actualizadas} facturas con los totales y pagos recalculados.', 'success')
+    return redirect(url_for('mostrar_facturas'))
+
+@app.route('/reporte/cotizaciones')
+def reporte_cotizaciones():
+    """Reporte básico de cotizaciones."""
+    cotizaciones = []
+    cotizaciones_dir = 'cotizaciones_json'
+    if os.path.exists(cotizaciones_dir):
+        for filename in os.listdir(cotizaciones_dir):
+            if filename.endswith('.json'):
+                try:
+                    with open(os.path.join(cotizaciones_dir, filename), 'r', encoding='utf-8') as f:
+                        cot_data = json.load(f)
+                        if not cot_data.get('numero_cotizacion') or not cot_data.get('fecha') or not cot_data.get('cliente', {}).get('nombre'):
+                            continue
+                        cotizaciones.append(cot_data)
+                except Exception:
+                    continue
+    total_cotizaciones = len(cotizaciones)
+    total_monto = sum(float(c.get('total_usd', 0)) for c in cotizaciones)
+    return render_template('reporte_cotizaciones.html', cotizaciones=cotizaciones, total_cotizaciones=total_cotizaciones, total_monto=total_monto)
 
 # --- Bloque para Ejecutar la Aplicación ---
 if __name__ == '__main__':

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Cotizaciones{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Reporte de Cotizaciones</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Cotizaciones
+        </a>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Total de Cotizaciones: <span class="badge bg-primary">{{ total_cotizaciones }}</span></h5>
+            </div>
+            <div class="col-md-6">
+                <h5>Monto Total: <span class="badge bg-success">${{ '%.2f'|format(total_monto) }}</span></h5>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Validez (días)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cot in cotizaciones %}
+                    <tr>
+                        <td>{{ cot.numero_cotizacion }}</td>
+                        <td>{{ cot.fecha }}</td>
+                        <td>{{ cot.cliente.nombre if cot.cliente and cot.cliente.nombre else 'N/A' }}</td>
+                        <td>${{ '%.2f'|format(cot.total_usd|float) }}</td>
+                        <td>{{ cot.validez_dias if cot.validez_dias else 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

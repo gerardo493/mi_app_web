@@ -127,7 +127,7 @@
                         <tr>
                             <td>{{ stats.nombre }}</td>
                             <td>{{ stats.cantidad }}</td>
-                            <td>${{ "%.2f"|format(stats.valor) }}</td>
+                            <td>${{ stats.valor|es_number }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -1,92 +1,158 @@
 {% extends "base.html" %}
 
-{% block title %}Nueva Cotización{% endblock %}
+{% block title %}{{ 'Editar Cotización' if cotizacion else 'Nueva Cotización' }}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-10 offset-md-1">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0">Nueva Cotización</h4>
+                <h4 class="mb-0">{{ 'Editar Cotización' if cotizacion else 'Nueva Cotización' }}</h4>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('nueva_cotizacion') }}" id="cotizacionForm">
+                <form method="POST" action="" id="cotizacionForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="numero" class="form-label">Número de Cotización</label>
-                            <input type="text" class="form-control" id="numero" name="numero" required>
+                            <input type="text" class="form-control" id="numero" name="numero" value="{{ cotizacion.numero if cotizacion else '' }}" required>
                         </div>
                         <div class="col-md-4">
                             <label for="fecha" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                            <input type="date" class="form-control" id="fecha" name="fecha" value="{{ cotizacion.fecha if cotizacion else '' }}" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="validez" class="form-label">Válido hasta</label>
-                            <input type="date" class="form-control" id="validez" name="validez" required>
+                            <label for="validez" class="form-label">Validez (días)</label>
+                            <input type="number" class="form-control" id="validez" name="validez" min="1" value="{{ cotizacion.validez if cotizacion else '3' }}" required>
                         </div>
                     </div>
-
                     <div class="mb-3">
                         <label for="cliente_id" class="form-label">Cliente</label>
                         <select class="form-select" id="cliente_id" name="cliente_id" required>
                             <option value="">Seleccione un cliente</option>
                             {% for id, cliente in clientes.items() %}
-                            <option value="{{ id }}">{{ cliente.nombre }}</option>
+                            <option value="{{ id }}" {% if cotizacion and cotizacion.cliente_id == id %}selected{% endif %}>{{ cliente.nombre }}</option>
                             {% endfor %}
                         </select>
                     </div>
-
                     <div class="card mb-3">
                         <div class="card-header">
                             <h5 class="mb-0">Productos</h5>
                         </div>
                         <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Producto</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Cantidad</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Precio (USD)</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Total (USD)</label>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label fw-bold">Acción</label>
+                                </div>
+                            </div>
                             <div id="productos-container">
+                                {% if cotizacion and cotizacion.productos and cotizacion.cantidades %}
+                                    {% for prod_id, cantidad in zip(cotizacion.productos, cotizacion.cantidades) %}
                                 <div class="row mb-3 producto-item">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         <select class="form-select producto-select" name="productos[]" required>
                                             <option value="">Seleccione un producto</option>
                                             {% for id, producto in inventario.items() %}
-                                            <option value="{{ id }}" data-precio="{{ producto.precio }}">
-                                                {{ producto.nombre }} - ${{ producto.precio }}
+                                            <option value="{{ id }}" data-precio="{{ producto.precio }}" {% if id == prod_id %}selected{% endif %}>
+                                                {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
                                             </option>
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <input type="number" class="form-control cantidad-input" 
-                                               name="cantidades[]" min="1" value="1" required>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="{{ cantidad }}" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" value="{{ inventario[prod_id].precio if prod_id in inventario else '' }}" required>
                                     </div>
                                     <div class="col-md-3">
                                         <input type="text" class="form-control subtotal" readonly>
                                     </div>
                                     <div class="col-md-1">
-                                        <button type="button" class="btn btn-danger btn-sm remove-producto">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
                                     </div>
                                 </div>
+                                    {% endfor %}
+                                {% else %}
+                                <div class="row mb-3 producto-item">
+                                    <div class="col-md-4">
+                                        <select class="form-select producto-select" name="productos[]" required>
+                                            <option value="">Seleccione un producto</option>
+                                            {% for id, producto in inventario.items() %}
+                                            <option value="{{ id }}" data-precio="{{ producto.precio }}">
+                                                {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control subtotal" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
-                            <button type="button" class="btn btn-success" id="agregar-producto">
-                                <i class="fas fa-plus me-2"></i>Agregar Producto
-                            </button>
+                            <button type="button" class="btn btn-success" id="agregar-producto"><i class="fas fa-plus me-2"></i>Agregar Producto</button>
                         </div>
                     </div>
-
                     <div class="row mb-3">
-                        <div class="col-md-6 offset-md-6">
+                        <div class="col-md-3">
+                            <label for="descuento" class="form-label">Descuento</label>
                             <div class="input-group">
-                                <span class="input-group-text">Total</span>
-                                <input type="text" class="form-control" id="total" name="total" readonly>
+                                <input type="number" class="form-control" id="descuento" name="descuento" min="0" value="{{ cotizacion.descuento if cotizacion and cotizacion.descuento else '0' }}">
+                                <select class="form-select" id="tipo_descuento" name="tipo_descuento">
+                                    <option value="bs" {% if cotizacion and cotizacion.tipo_descuento == 'bs' %}selected{% endif %}>Bs</option>
+                                    <option value="porc" {% if cotizacion and cotizacion.tipo_descuento == 'porc' %}selected{% endif %}>%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="iva" class="form-label">IVA (%)</label>
+                            <input type="number" class="form-control" id="iva" name="iva" min="0" max="100" value="{{ cotizacion.iva if cotizacion and cotizacion.iva else '16' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Totales</label>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Subtotal USD</span>
+                                <input type="text" class="form-control" id="subtotal_usd" name="subtotal_usd" readonly>
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Descuento</span>
+                                <input type="text" class="form-control" id="descuento_total" name="descuento_total" readonly>
+                                <span class="input-group-text">IVA</span>
+                                <input type="text" class="form-control" id="iva_total" name="iva_total" readonly>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">Total USD</span>
+                                <input type="text" class="form-control" id="total_usd" name="total_usd" readonly>
                             </div>
                         </div>
                     </div>
-
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Guardar Cotización
+                            <i class="fas fa-save me-2"></i>{{ 'Actualizar Cotización' if cotizacion else 'Guardar Cotización' }}
                         </button>
-                        <a href="{{ url_for('mostrar_cotizaciones') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
                     </div>
@@ -114,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             item.querySelector('.subtotal').value = `$${subtotal.toFixed(2)}`;
             total += subtotal;
         });
-        document.getElementById('total').value = `$${total.toFixed(2)}`;
+        document.getElementById('total_usd').value = `$${total.toFixed(2)}`;
     }
 
     // Agregar producto
@@ -145,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validar formulario antes de enviar
     cotizacionForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const total = parseFloat(document.getElementById('total').value.replace('$', ''));
+        const total = parseFloat(document.getElementById('total_usd').value.replace('$', ''));
         if (total <= 0) {
             alert('La cotización debe tener al menos un producto con cantidad mayor a 0');
             return;

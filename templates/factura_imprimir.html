@@ -192,10 +192,10 @@
                 <tr>
                     <td style="border: 2px solid #bfa43a; text-align: right;">{{ cantidad }}</td>
                     <td style="border: 2px solid #bfa43a;">{{ inventario[prod_id].nombre }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ inventario[prod_id].precio|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * factura.tasa_bcv|float)|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * cantidad|int * factura.tasa_bcv|float)|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (inventario[prod_id].precio * cantidad|int)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ factura.precios[loop.index0]|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (factura.precios[loop.index0] * factura.tasa_bcv|float)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (factura.precios[loop.index0] * cantidad|int * factura.tasa_bcv|float)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (factura.precios[loop.index0] * cantidad|int)|es_number }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -5,7 +5,7 @@
         "cantidad": 500,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
-        "ultima_entrada": "2025-05-17 12:29:57",
+        "ultima_entrada": "2025-05-18 22:47:22",
         "ultima_salida": "2025-05-14 22:24:12",
         "historial_ajustes": [
             {
@@ -43,13 +43,19 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "SDASA"
+            },
+            {
+                "fecha": "2025-05-18 22:47:22",
+                "tipo": "entrada",
+                "cantidad": 500,
+                "motivo": "qw"
             }
         ]
     },
     "2": {
         "nombre": "ANTITUMORAL X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 94,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -78,7 +84,7 @@
     "3": {
         "nombre": "ARANDANO NEGRO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 97,
         "categoria": "Protector Ocular",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -136,7 +142,7 @@
     "5": {
         "nombre": "BOLDO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Protector Hepatico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -194,7 +200,7 @@
     "8": {
         "nombre": "CARDO LECHOZO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 495,
         "categoria": "Protector Hepatico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -246,7 +252,7 @@
     "10": {
         "nombre": "CASTAÑA DE INDIA X 60  CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 495,
         "categoria": "Circulación Insuficiencia Venosa",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -269,7 +275,7 @@
     "11": {
         "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Adelgazante-Diuretico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -292,7 +298,7 @@
     "12": {
         "nombre": "CENTELLA ASIATICA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 495,
         "categoria": "Adelgazante-Diuretico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -315,7 +321,7 @@
     "13": {
         "nombre": "CHANCA PIEDRA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 97,
         "categoria": "Calculo Renal",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -350,7 +356,7 @@
     "14": {
         "nombre": "CLORURO DE MAGNESIO X 33 GR",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 478,
         "categoria": "Regenerador osio",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -379,7 +385,7 @@
     "15": {
         "nombre": "COLA DE CABALLO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 494,
         "categoria": "Calculo Renal",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -408,7 +414,7 @@
     "16": {
         "nombre": "COLON CLEANSER X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Limpieza De colon",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -446,7 +452,7 @@
         "cantidad": 500,
         "categoria": "Anti-inflamatorio",
         "ruta_imagen": "",
-        "ultima_entrada": "2025-05-17 12:29:57",
+        "ultima_entrada": "2025-05-18 22:58:08",
         "ultima_salida": "2025-05-16 00:31:20",
         "historial_ajustes": [
             {
@@ -472,6 +478,12 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "SDASA"
+            },
+            {
+                "fecha": "2025-05-18 22:58:08",
+                "tipo": "entrada",
+                "cantidad": 500,
+                "motivo": "ajuste"
             }
         ]
     },
@@ -513,7 +525,7 @@
     "19": {
         "nombre": "ESCOBA DE CARNICERO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Circulación Insuficiencia Venosa",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -542,7 +554,7 @@
     "20": {
         "nombre": "GINKGO C/ GINSENG X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 498,
         "categoria": "Oxigenante/ Energizante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -577,7 +589,7 @@
     "21": {
         "nombre": "GINKGO LOCHITA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 498,
         "categoria": "Oxigenante Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -612,7 +624,7 @@
     "22": {
         "nombre": "GINKGOBILOBA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 491,
         "categoria": "Oxigenate Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -690,7 +702,7 @@
     "26": {
         "nombre": "LOCHITA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Oxigenate Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -748,7 +760,7 @@
     "28": {
         "nombre": "MAPURITE X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 491,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -777,7 +789,7 @@
     "29": {
         "nombre": "ÑAME SALVAJE X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 491,
         "categoria": "Menopausia",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -835,7 +847,7 @@
     "31": {
         "nombre": "PIRA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 491,
         "categoria": "Oxigenante Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -864,7 +876,7 @@
     "32": {
         "nombre": "SABILA + LINAZA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 494,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -893,7 +905,7 @@
     "33": {
         "nombre": "SABILAX-6 X 12 SOBRES X 12 UNDS",
         "precio": 8.5,
-        "cantidad": 500,
+        "cantidad": 498,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -922,7 +934,7 @@
     "34": {
         "nombre": "SAW PALMETO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 485,
         "categoria": "hiperplasia prostatica",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1020,7 +1032,7 @@
     "38": {
         "nombre": "ZARZAPARRILLA X 60CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 494,
         "categoria": "Depurativo Desintoxicante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1066,7 +1078,7 @@
     "40": {
         "nombre": "SANGRE DE DRAGO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Ulcera Gastrica",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1141,7 +1153,7 @@
     "43": {
         "nombre": "GRAVIOLA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1164,7 +1176,7 @@
     "44": {
         "nombre": "ORTIGA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 497,
         "categoria": "Bactericida",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1210,7 +1222,7 @@
     "46": {
         "nombre": "DOC QUENOPODIO X 12 UND",
         "precio": 8.0,
-        "cantidad": 500,
+        "cantidad": 496,
         "categoria": "Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1279,7 +1291,7 @@
     "49": {
         "nombre": "FIVERPLANT",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 494,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -1302,7 +1314,7 @@
     "50": {
         "nombre": "MULTIVIC",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 494,
         "categoria": "Vitaminas y Minerales",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
