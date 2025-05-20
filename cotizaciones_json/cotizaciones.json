@@ -1,1 +1,46 @@
-{}
+{
+    "1": {
+        "id": "1",
+        "numero": "001",
+        "fecha": "2025-05-18",
+        "cliente_id": "J-502357718",
+        "productos": [
+            "18",
+            "19"
+        ],
+        "cantidades": [
+            "3",
+            "6"
+        ],
+        "total": "$27.00",
+        "validez": "7"
+    },
+    "2": {
+        "id": "2",
+        "numero": "021",
+        "fecha": "2025-05-18",
+        "cliente_id": "V-6479143",
+        "productos": [
+            "1"
+        ],
+        "cantidades": [
+            "20"
+        ],
+        "total": "$60.00",
+        "validez": "3"
+    },
+    "3": {
+        "id": "3",
+        "numero": "001",
+        "fecha": "2025-05-18",
+        "cliente_id": "J-502357718",
+        "productos": [
+            "1"
+        ],
+        "cantidades": [
+            "20"
+        ],
+        "total": "$60.00",
+        "validez": "3"
+    }
+}

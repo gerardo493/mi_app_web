@@ -83,6 +83,7 @@
                     <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
                     <p><strong>Email:</strong> {{ cliente.email or 'No disponible' }}</p>
                     <p><strong>Teléfono:</strong> {{ cliente.telefono or 'No disponible' }}</p>
+                    <p><strong>Dirección:</strong> <span style="white-space: normal; word-break: break-all;">{{ cliente.direccion or 'No disponible' }}</span></p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Total Compras:</strong> ${{ (total_compras or 0)|es_number }}</p>

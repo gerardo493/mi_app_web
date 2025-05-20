@@ -93,10 +93,10 @@
 
     <!-- Top Clientes -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card h-100">
                 <div class="card-header">
-                    <h4 class="mb-0">Top 5 Clientes</h4>
+                    <h4 class="mb-0">Top 10 Clientes</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -109,46 +109,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for cliente in top_clientes %}
+                                {% for cliente in top_clientes[:10] %}
                                 <tr>
                                     <td>{{ cliente.nombre }}</td>
                                     <td class="text-end">${{ cliente.total|es_number }}</td>
                                     <td class="text-end">{{ ((cliente.total / total_usd) * 100)|es_number }}%</td>
                                 </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="mb-0">Top 5 Productos</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th class="text-end">Cantidad Vendida</th>
-                                    <th class="text-end">Total Vendido</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for factura in facturas_filtradas %}
-                                    {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
-                                        <tr>
-                                            <td>{{ inventario[prod_id].nombre }}</td>
-                                            <td class="text-end">{{ cantidad }}</td>
-                                            <td class="text-end">${{ factura.precios[loop.index0]|es_number }}</td>
-                                            <td class="text-end">{{ (factura.precios[loop.index0] * factura.tasa_bcv|float)|es_number }} Bs</td>
-                                            <td class="text-end">${{ (factura.precios[loop.index0] * cantidad|int)|es_number }}</td>
-                                            <td class="text-end">{{ (factura.precios[loop.index0] * cantidad|int * factura.tasa_bcv|float)|es_number }} Bs</td>
-                                        </tr>
-                                    {% endfor %}
                                 {% endfor %}
                             </tbody>
                         </table>

@@ -6,13 +6,20 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file, session
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash
 try:
     import pdfkit
 except ImportError:
     pdfkit = None
+from functools import wraps
+
+# --- Inicializar la Aplicación Flask ---
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'  # Cambia esto por una clave secreta segura
+csrf = CSRFProtect(app)
 
 # --- Constantes ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,6 +31,7 @@ ARCHIVO_COTIZACIONES = 'cotizaciones_json/cotizaciones.json'
 ARCHIVO_CUENTAS = 'cuentas_por_cobrar.json'
 ULTIMA_TASA_BCV_FILE = 'ultima_tasa_bcv.json'
 ALLOWED_EXTENSIONS = {'csv'}
+BITACORA_FILE = 'bitacora.log'
 
 # Asegurar que la carpeta de subidas existe
 try:
@@ -226,6 +234,9 @@ def guardar_ultima_tasa_bcv(tasa):
     try:
         with open(ULTIMA_TASA_BCV_FILE, 'w', encoding='utf-8') as f:
             json.dump({'tasa': tasa}, f)
+        # Registrar en bitácora
+        usuario = session['usuario'] if 'usuario' in session else 'sistema'
+        registrar_bitacora(usuario, 'Actualizar tasa BCV', f'Tasa: {tasa}')
     except Exception as e:
         print(f"Error guardando última tasa BCV: {e}")
 
@@ -311,25 +322,62 @@ def limpiar_monto(monto):
         return 0.0
     return float(str(monto).replace('$', '').replace('Bs', '').replace(',', '').strip())
 
-# --- Inicializar la Aplicación Flask ---
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'  # Cambia esto por una clave secreta segura
-csrf = CSRFProtect(app)
+def registrar_bitacora(usuario, accion, detalles=''):
+    from datetime import datetime
+    linea = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Usuario: {usuario} | Acción: {accion} | Detalles: {detalles}\n"
+    with open(BITACORA_FILE, 'a', encoding='utf-8') as f:
+        f.write(linea)
 
-# --- Rutas ---
+# Decorador para requerir login
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- Rutas protegidas ---
 @app.route('/')
+@login_required
 def index():
-    """Página principal con dashboard."""
     stats = obtener_estadisticas()
     return render_template('index.html', **stats)
 
 @app.route('/clientes')
+@login_required
 def mostrar_clientes():
-    """Muestra lista de clientes."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
-    return render_template('clientes.html', clientes=clientes)
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
+    cuentas = cargar_datos(ARCHIVO_CUENTAS)
+    # Filtros
+    q = request.args.get('q', '').strip().lower()
+    filtro_orden = request.args.get('orden', 'nombre')
+    if q:
+        clientes = {k: v for k, v in clientes.items() if q in v.get('nombre', '').lower() or q in k.lower()}
+    if filtro_orden == 'nombre':
+        clientes = dict(sorted(clientes.items(), key=lambda item: item[1].get('nombre', '').lower()))
+    elif filtro_orden == 'rif':
+        clientes = dict(sorted(clientes.items(), key=lambda item: item[0].lower()))
+    # Calcular totales por cliente
+    clientes_totales = {}
+    for id_cliente, cliente in clientes.items():
+        # Total facturado
+        facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id_cliente]
+        total_facturado = sum(float(f.get('total_usd', 0)) for f in facturas_cliente)
+        total_abonado = sum(float(f.get('total_abonado', 0)) for f in facturas_cliente)
+        # Total por cobrar (de cuentas por cobrar)
+        cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id_cliente), None)
+        total_por_cobrar = float(cuenta.get('saldo_pendiente', 0)) if cuenta else 0
+        clientes_totales[id_cliente] = {
+            'total_facturado': total_facturado,
+            'total_abonado': total_abonado,
+            'total_por_cobrar': total_por_cobrar
+        }
+    return render_template('clientes.html', clientes=clientes, q=q, filtro_orden=filtro_orden, clientes_totales=clientes_totales)
 
 @app.route('/clientes/nuevo', methods=['GET', 'POST'])
+@login_required
 def nuevo_cliente():
     """Formulario para nuevo cliente."""
     if request.method == 'POST':
@@ -395,6 +443,7 @@ def nuevo_cliente():
             if guardar_datos(ARCHIVO_CLIENTES, clientes):
                 print("Cliente guardado exitosamente")
                 flash('Cliente agregado exitosamente', 'success')
+                registrar_bitacora(session['usuario'], 'Nuevo cliente', f"Nombre: {request.form.get('nombre','')}")
                 return redirect(url_for('mostrar_clientes'))
             else:
                 print("Error al guardar el cliente")
@@ -409,12 +458,31 @@ def nuevo_cliente():
     return render_template('cliente_form.html')
 
 @app.route('/inventario')
+@login_required
 def mostrar_inventario():
-    """Muestra lista de inventario."""
+    """Muestra lista de inventario con filtros y orden."""
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    return render_template('inventario.html', inventario=inventario)
+    # Filtros y orden
+    q = request.args.get('q', '').strip().lower()
+    filtro_categoria = request.args.get('categoria', '').strip().lower()
+    filtro_orden = request.args.get('orden', 'nombre')
+    # Filtrar por búsqueda
+    if q:
+        inventario = {k: v for k, v in inventario.items() if q in v.get('nombre', '').lower()}
+    # Filtrar por categoría
+    if filtro_categoria:
+        inventario = {k: v for k, v in inventario.items() if filtro_categoria in v.get('categoria', '').lower()}
+    # Ordenar
+    if filtro_orden == 'nombre':
+        inventario = dict(sorted(inventario.items(), key=lambda item: item[1].get('nombre', '').lower()))
+    elif filtro_orden == 'stock':
+        inventario = dict(sorted(inventario.items(), key=lambda item: int(item[1].get('cantidad', 0)), reverse=True))
+    # Lista de categorías únicas para el select
+    categorias = sorted(set(v.get('categoria', '') for v in cargar_datos(ARCHIVO_INVENTARIO).values() if v.get('categoria', '')))
+    return render_template('inventario.html', inventario=inventario, q=q, filtro_categoria=filtro_categoria, filtro_orden=filtro_orden, categorias=categorias)
 
 @app.route('/inventario/nuevo', methods=['GET', 'POST'])
+@login_required
 def nuevo_producto():
     """Formulario para nuevo producto."""
     if request.method == 'POST':
@@ -434,6 +502,7 @@ def nuevo_producto():
         inventario[nuevo_id] = producto
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
             flash('Producto agregado exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Nuevo producto', f"Nombre: {request.form.get('nombre','')}")
             return redirect(url_for('mostrar_inventario'))
         else:
             flash('Error al guardar el producto', 'danger')
@@ -441,6 +510,7 @@ def nuevo_producto():
     return render_template('producto_form.html')
 
 @app.route('/inventario/<id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_producto(id):
     """Formulario para editar un producto."""
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
@@ -462,6 +532,7 @@ def editar_producto(id):
         inventario[id] = producto
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
             flash('Producto actualizado exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Editar producto', f"ID: {id}, Nombre: {request.form.get('nombre','')}")
             return redirect(url_for('mostrar_inventario'))
         else:
             flash('Error al actualizar el producto', 'danger')
@@ -471,6 +542,7 @@ def editar_producto(id):
     return render_template('producto_form.html', producto=producto)
 
 @app.route('/inventario/<id>/eliminar', methods=['POST'])
+@login_required
 def eliminar_producto(id):
     """Elimina un producto."""
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
@@ -478,6 +550,7 @@ def eliminar_producto(id):
         del inventario[id]
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
             flash('Producto eliminado exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Eliminar producto', f"ID: {id}")
         else:
             flash('Error al eliminar el producto', 'danger')
     else:
@@ -495,6 +568,7 @@ def ver_producto(id):
     return render_template('producto_detalle.html', producto=producto, id=id)
 
 @app.route('/facturas')
+@login_required
 def mostrar_facturas():
     # Reparar totales automáticamente antes de mostrar
     facturas = cargar_datos(ARCHIVO_FACTURAS)
@@ -635,6 +709,7 @@ def imprimir_factura(id):
     return render_template('factura_imprimir.html', factura=factura, clientes=clientes, inventario=inventario, now=datetime.now, empresa=empresa, zip=zip)
 
 @app.route('/facturas/<id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_factura(id):
     facturas = cargar_datos(ARCHIVO_FACTURAS)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
@@ -685,6 +760,7 @@ def editar_factura(id):
         facturas[id] = factura
         if guardar_datos(ARCHIVO_FACTURAS, facturas):
             flash('Factura actualizada exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Editar factura', f"ID: {id}")
             return redirect(url_for('ver_factura', id=id))
         else:
             flash('Error al actualizar la factura', 'danger')
@@ -694,6 +770,7 @@ def editar_factura(id):
     return render_template('factura_form.html', factura=facturas[id], clientes=clientes, inventario=inventario_disponible, editar=True, zip=zip, empresa=empresa)
 
 @app.route('/facturas/nueva', methods=['GET', 'POST'])
+@login_required
 def nueva_factura():
     if request.method == 'POST':
         try:
@@ -777,6 +854,7 @@ def nueva_factura():
             facturas[nuevo_id] = factura
             if guardar_datos(ARCHIVO_FACTURAS, facturas):
                 flash('Factura creada exitosamente', 'success')
+                registrar_bitacora(session['usuario'], 'Nueva factura', f"Número: {request.form.get('numero','')}, Cliente: {request.form.get('cliente_id','')}")
                 return redirect(url_for('mostrar_facturas'))
             else:
                 flash('Error al guardar la factura', 'danger')
@@ -793,6 +871,7 @@ def nueva_factura():
     return render_template('factura_form.html', clientes=clientes, inventario=inventario_disponible, editar=False, empresa=empresa)
 
 @app.route('/facturas/<id>/eliminar', methods=['POST'])
+@login_required
 def eliminar_factura(id):
     """Elimina una factura."""
     facturas = cargar_datos(ARCHIVO_FACTURAS)
@@ -800,6 +879,7 @@ def eliminar_factura(id):
         del facturas[id]
         if guardar_datos(ARCHIVO_FACTURAS, facturas):
             flash('Factura eliminada exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Eliminar factura', f"ID: {id}")
         else:
             flash('Error al eliminar la factura', 'danger')
     else:
@@ -847,99 +927,145 @@ def mostrar_cotizaciones():
         return redirect(url_for('index'))
 
 @app.route('/cotizaciones/nueva', methods=['GET', 'POST'])
+@login_required
 def nueva_cotizacion():
     """Formulario para nueva cotización."""
     if request.method == 'POST':
-        cotizaciones = cargar_datos(ARCHIVO_COTIZACIONES)
-        nuevo_id = str(len(cotizaciones) + 1)
-        
-        # Obtener los productos y cantidades
+        cotizaciones_dir = 'cotizaciones_json'
+        os.makedirs(cotizaciones_dir, exist_ok=True)
+        # Generar número de cotización único
+        config = cargar_datos('config_cot.json')
+        proxima = int(config.get('proxima_cotizacion', 1))
+        numero_cotizacion = f"{proxima:04d}"
+        config['proxima_cotizacion'] = proxima + 1
+        guardar_datos('config_cot.json', config)
+        # Obtener datos del formulario
         productos = request.form.getlist('productos[]')
         cantidades = request.form.getlist('cantidades[]')
-        
-        # Calcular el total
-        total = 0
-        inventario = cargar_datos(ARCHIVO_INVENTARIO)
-        for prod_id, cantidad in zip(productos, cantidades):
-            if prod_id in inventario:
-                precio = float(inventario[prod_id]['precio'])
-                total += precio * int(cantidad)
-        
+        precios = request.form.getlist('precios[]')
+        subtotal_usd = request.form.get('subtotal_usd', '0')
+        subtotal_bs = request.form.get('subtotal_bs', '0')
+        descuento = request.form.get('descuento', '0')
+        tipo_descuento = request.form.get('tipo_descuento', 'bs')
+        descuento_total = request.form.get('descuento_total', '0')
+        iva = request.form.get('iva', '0')
+        iva_total = request.form.get('iva_total', '0')
+        total_usd = request.form.get('total_usd', '0')
+        total_bs = request.form.get('total_bs', '0')
+        tasa_bcv = request.form.get('tasa_bcv', '0')
+        validez = request.form.get('validez', '3')
+        cliente_id = request.form.get('cliente_id')
+        clientes = cargar_datos(ARCHIVO_CLIENTES)
+        cliente = clientes.get(cliente_id, {})
         cotizacion = {
-            'id': nuevo_id,
-            'numero': request.form['numero'],
+            'numero_cotizacion': numero_cotizacion,
             'fecha': request.form['fecha'],
-            'cliente_id': request.form['cliente_id'],
+            'cliente': cliente,
             'productos': productos,
             'cantidades': cantidades,
-            'total': f"${total:.2f}",
-            'validez': request.form['validez']
+            'precios': precios,
+            'subtotal_usd': subtotal_usd,
+            'subtotal_bs': subtotal_bs,
+            'descuento': descuento,
+            'tipo_descuento': tipo_descuento,
+            'descuento_total': descuento_total,
+            'iva': iva,
+            'iva_total': iva_total,
+            'total_usd': total_usd,
+            'total_bs': total_bs,
+            'tasa_bcv': tasa_bcv,
+            'validez_dias': int(validez)
         }
-        
-        cotizaciones[nuevo_id] = cotizacion
-        if guardar_datos(ARCHIVO_COTIZACIONES, cotizaciones):
-            flash('Cotización creada exitosamente', 'success')
-            return redirect(url_for('mostrar_cotizaciones'))
-        else:
-            flash('Error al guardar la cotización', 'danger')
-    
+        filename = os.path.join(cotizaciones_dir, f"cotizacion_{numero_cotizacion}.json")
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(cotizacion, f, ensure_ascii=False, indent=4)
+        flash('Cotización creada exitosamente', 'success')
+        registrar_bitacora(session['usuario'], 'Nueva cotización', f"Cliente: {request.form.get('cliente_id','')}")
+        return redirect(url_for('mostrar_cotizaciones'))
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
     return render_template('cotizacion_form.html', clientes=clientes, inventario=inventario)
 
 @app.route('/cotizaciones/<id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_cotizacion(id):
     """Formulario para editar una cotización."""
-    cotizaciones = cargar_datos(ARCHIVO_COTIZACIONES)
-    if id not in cotizaciones:
+    cotizaciones_dir = 'cotizaciones_json'
+    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
+    if not os.path.exists(filename):
         flash('Cotización no encontrada', 'danger')
         return redirect(url_for('mostrar_cotizaciones'))
-    
     if request.method == 'POST':
-        # Obtener los productos y cantidades
         productos = request.form.getlist('productos[]')
         cantidades = request.form.getlist('cantidades[]')
-        
-        # Calcular el total
-        total = 0
-        inventario = cargar_datos(ARCHIVO_INVENTARIO)
-        for prod_id, cantidad in zip(productos, cantidades):
-            if prod_id in inventario:
-                precio = float(inventario[prod_id]['precio'])
-                total += precio * int(cantidad)
-        
+        precios = request.form.getlist('precios[]')
+        subtotal_usd = request.form.get('subtotal_usd', '0')
+        subtotal_bs = request.form.get('subtotal_bs', '0')
+        descuento = request.form.get('descuento', '0')
+        tipo_descuento = request.form.get('tipo_descuento', 'bs')
+        descuento_total = request.form.get('descuento_total', '0')
+        iva = request.form.get('iva', '0')
+        iva_total = request.form.get('iva_total', '0')
+        total_usd = request.form.get('total_usd', '0')
+        total_bs = request.form.get('total_bs', '0')
+        tasa_bcv = request.form.get('tasa_bcv', '0')
+        validez = request.form.get('validez', '3')
+        cliente_id = request.form.get('cliente_id')
+        clientes = cargar_datos(ARCHIVO_CLIENTES)
+        cliente = clientes.get(cliente_id, {})
         cotizacion = {
-            'id': id,
-            'numero': request.form['numero'],
+            'numero_cotizacion': id,
             'fecha': request.form['fecha'],
-            'cliente_id': request.form['cliente_id'],
+            'cliente': cliente,
             'productos': productos,
             'cantidades': cantidades,
-            'total': f"${total:.2f}",
-            'validez': request.form['validez']
+            'precios': precios,
+            'subtotal_usd': subtotal_usd,
+            'subtotal_bs': subtotal_bs,
+            'descuento': descuento,
+            'tipo_descuento': tipo_descuento,
+            'descuento_total': descuento_total,
+            'iva': iva,
+            'iva_total': iva_total,
+            'total_usd': total_usd,
+            'total_bs': total_bs,
+            'tasa_bcv': tasa_bcv,
+            'validez_dias': int(validez)
         }
-        
-        cotizaciones[id] = cotizacion
-        if guardar_datos(ARCHIVO_COTIZACIONES, cotizaciones):
-            flash('Cotización actualizada exitosamente', 'success')
-            return redirect(url_for('mostrar_cotizaciones'))
-        else:
-            flash('Error al actualizar la cotización', 'danger')
-    
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(cotizacion, f, ensure_ascii=False, indent=4)
+        flash('Cotización actualizada exitosamente', 'success')
+        registrar_bitacora(session['usuario'], 'Editar cotización', f"ID: {id}")
+        return redirect(url_for('mostrar_cotizaciones'))
+    with open(filename, 'r', encoding='utf-8') as f:
+        cotizacion = json.load(f)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    return render_template('cotizacion_form.html', cotizacion=cotizaciones[id], clientes=clientes, inventario=inventario)
+    # --- Fix para edición: cliente_id y validez ---
+    if 'cliente' in cotizacion and 'id' in cotizacion['cliente']:
+        cotizacion['cliente_id'] = cotizacion['cliente']['id']
+    else:
+        cotizacion['cliente_id'] = ''
+    cotizacion['validez'] = cotizacion.get('validez_dias', 3)
+    if 'precios' in cotizacion:
+        cotizacion['precios'] = [float(p) for p in cotizacion['precios']]
+    # Fix para mostrar el número de cotización en el formulario
+    cotizacion['numero'] = cotizacion.get('numero_cotizacion', id)
+    return render_template('cotizacion_form.html', cotizacion=cotizacion, clientes=clientes, inventario=inventario, zip=zip)
 
 @app.route('/cotizaciones/<id>/eliminar', methods=['POST'])
+@login_required
 def eliminar_cotizacion(id):
-    """Elimina una cotización."""
-    cotizaciones = cargar_datos(ARCHIVO_COTIZACIONES)
-    if id in cotizaciones:
-        del cotizaciones[id]
-        if guardar_datos(ARCHIVO_COTIZACIONES, cotizaciones):
+    """Elimina una cotización (elimina el archivo individual)."""
+    cotizaciones_dir = 'cotizaciones_json'
+    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
+    if os.path.exists(filename):
+        try:
+            os.remove(filename)
             flash('Cotización eliminada exitosamente', 'success')
-        else:
-            flash('Error al eliminar la cotización', 'danger')
+            registrar_bitacora(session['usuario'], 'Eliminar cotización', f"ID: {id}")
+        except Exception as e:
+            flash(f'Error al eliminar la cotización: {e}', 'danger')
     else:
         flash('Cotización no encontrada', 'danger')
     return redirect(url_for('mostrar_cotizaciones'))
@@ -948,12 +1074,24 @@ def eliminar_cotizacion(id):
 def ver_cliente(id):
     """Muestra los detalles de un cliente."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
+    cuentas = cargar_datos(ARCHIVO_CUENTAS)
+    tasa_bcv = obtener_tasa_bcv() or 1.0
     if id in clientes:
-        return render_template('cliente_detalle.html', cliente=clientes[id])
+        cliente = clientes[id]
+        # Calcular totales financieros
+        facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id]
+        total_facturado = sum(float(f.get('total_usd', 0)) for f in facturas_cliente)
+        total_abonado = sum(float(f.get('total_abonado', 0)) for f in facturas_cliente)
+        cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id), None)
+        total_por_cobrar = float(cuenta.get('saldo_pendiente', 0)) if cuenta else 0
+        total_por_cobrar_bs = total_por_cobrar * tasa_bcv
+        return render_template('cliente_detalle.html', cliente=cliente, total_facturado=total_facturado, total_abonado=total_abonado, total_por_cobrar=total_por_cobrar, total_por_cobrar_bs=total_por_cobrar_bs, tasa_bcv=tasa_bcv)
     flash('Cliente no encontrado', 'danger')
     return redirect(url_for('mostrar_clientes'))
 
 @app.route('/clientes/<path:id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_cliente(id):
     """Formulario para editar un cliente."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
@@ -974,12 +1112,14 @@ def editar_cliente(id):
         clientes[id] = cliente
         if guardar_datos(ARCHIVO_CLIENTES, clientes):
             flash('Cliente actualizado exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Editar cliente', f"ID: {id}, Nombre: {request.form.get('nombre','')}")
             return redirect(url_for('mostrar_clientes'))
         else:
             flash('Error al actualizar el cliente', 'danger')
     return render_template('cliente_form.html', cliente=clientes[id])
 
 @app.route('/clientes/<path:id>/eliminar', methods=['POST'])
+@login_required
 def eliminar_cliente(id):
     """Elimina un cliente."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
@@ -987,6 +1127,7 @@ def eliminar_cliente(id):
         del clientes[id]
         if guardar_datos(ARCHIVO_CLIENTES, clientes):
             flash('Cliente eliminado exitosamente', 'success')
+            registrar_bitacora(session['usuario'], 'Eliminar cliente', f"ID: {id}")
         else:
             flash('Error al eliminar el cliente', 'danger')
     else:
@@ -1000,14 +1141,11 @@ def ajustar_stock():
         tipo_ajuste = request.form.get('tipo_ajuste')
         cantidad = int(request.form.get('cantidad'))
         motivo = request.form.get('motivo')
-        
         if not productos:
             flash('Debe seleccionar al menos un producto', 'danger')
             return redirect(url_for('ajustar_stock'))
-            
         inventario = cargar_datos(ARCHIVO_INVENTARIO)
         fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
         for id_producto in productos:
             if id_producto in inventario:
                 producto = inventario[id_producto]
@@ -1021,11 +1159,8 @@ def ajustar_stock():
                     else:
                         flash(f'No hay suficiente stock para {producto["nombre"]}', 'warning')
                         continue
-
-                # Registrar el ajuste en el historial
                 if 'historial_ajustes' not in producto:
                     producto['historial_ajustes'] = []
-
                 producto['historial_ajustes'].append({
                     'fecha': fecha_actual,
                     'tipo': tipo_ajuste,
@@ -1035,9 +1170,25 @@ def ajustar_stock():
         guardar_datos(ARCHIVO_INVENTARIO, inventario)
         flash(f'Ajuste de stock realizado para {len(productos)} producto(s)', 'success')
         return redirect(url_for('mostrar_inventario'))
-    
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    return render_template('ajustar_stock.html', inventario=inventario)
+    # Filtros y orden
+    q = request.args.get('q', '').strip().lower()
+    filtro_categoria = request.args.get('categoria', '').strip().lower()
+    filtro_orden = request.args.get('orden', 'nombre')
+    # Filtrar por búsqueda
+    if q:
+        inventario = {k: v for k, v in inventario.items() if q in v.get('nombre', '').lower()}
+    # Filtrar por categoría
+    if filtro_categoria:
+        inventario = {k: v for k, v in inventario.items() if filtro_categoria in v.get('categoria', '').lower()}
+    # Ordenar
+    if filtro_orden == 'nombre':
+        inventario = dict(sorted(inventario.items(), key=lambda item: item[1].get('nombre', '').lower()))
+    elif filtro_orden == 'stock':
+        inventario = dict(sorted(inventario.items(), key=lambda item: int(item[1].get('cantidad', 0)), reverse=True))
+    # Lista de categorías únicas para el select
+    categorias = sorted(set(v.get('categoria', '') for v in cargar_datos(ARCHIVO_INVENTARIO).values() if v.get('categoria', '')))
+    return render_template('ajustar_stock.html', inventario=inventario, q=q, filtro_categoria=filtro_categoria, filtro_orden=filtro_orden, categorias=categorias)
 
 @app.route('/inventario/reporte')
 def reporte_inventario():
@@ -1122,75 +1273,126 @@ def error_servidor(e):
 
 @app.route('/clientes/reporte')
 def reporte_clientes():
-    """Genera un reporte general de clientes y sus estadísticas."""
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     facturas = cargar_datos(ARCHIVO_FACTURAS)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
     cuentas = cargar_datos(ARCHIVO_CUENTAS)
-    
-    # Estadísticas generales
-    total_clientes = len(clientes)
-    total_facturas = len(facturas)
-    total_cobrar = sum(float(cuenta.get('monto', 0)) for cuenta in cuentas.values())
-    
-    # Productos más comprados
-    productos_comprados = {}
-    for factura in facturas.values():
-        for prod_id, cantidad in zip(factura.get('productos', []), factura.get('cantidades', [])):
-            if prod_id in inventario:
-                if prod_id not in productos_comprados:
-                    productos_comprados[prod_id] = {
-                        'nombre': inventario[prod_id]['nombre'],
-                        'cantidad': 0,
-                        'valor': 0
-                    }
-                productos_comprados[prod_id]['cantidad'] += int(cantidad)
-                productos_comprados[prod_id]['valor'] += int(cantidad) * float(inventario[prod_id]['precio'])
-    
-    top_productos = sorted(productos_comprados.items(), 
-                          key=lambda x: x[1]['cantidad'], 
-                          reverse=True)[:10]
-    
-    # Estadísticas por cliente
-    clientes_stats = {}
+    q = request.args.get('q', '').strip().lower()
+    filtro_orden = request.args.get('orden', 'nombre')
+    if q:
+        clientes = {k: v for k, v in clientes.items() if q in v.get('nombre', '').lower() or q in k.lower()}
+    if filtro_orden == 'nombre':
+        clientes = dict(sorted(clientes.items(), key=lambda item: item[1].get('nombre', '').lower()))
+    elif filtro_orden == 'rif':
+        clientes = dict(sorted(clientes.items(), key=lambda item: item[0].lower()))
+    # Calcular totales por cliente
+    clientes_totales = {}
+    tasa_bcv = obtener_tasa_bcv() or 1.0
     for id_cliente, cliente in clientes.items():
+        # Total facturado
         facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id_cliente]
-        total_compras = sum(
-            float(f.get('total', 0).replace('$', '').replace(',', '')) if isinstance(f.get('total', 0), str) else float(f.get('total', 0))
-            for f in facturas_cliente
-        )
+        total_facturado = sum(float(f.get('total_usd', 0)) for f in facturas_cliente)
+        total_abonado = sum(float(f.get('total_abonado', 0)) for f in facturas_cliente)
+        # Total por cobrar (de cuentas por cobrar)
         cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id_cliente), None)
-        
-        clientes_stats[id_cliente] = {
-            'nombre': cliente['nombre'],
-            'total_facturas': len(facturas_cliente),
-            'total_compras': total_compras,
-            'cuenta_por_cobrar': float(cuenta.get('monto', 0)) if cuenta else 0,
-            'ultima_compra': max((f.get('fecha') for f in facturas_cliente), default='N/A'),
+        total_por_cobrar = float(cuenta.get('saldo_pendiente', 0)) if cuenta else 0
+        clientes_totales[id_cliente] = {
+            'nombre': cliente.get('nombre', ''),
+            'rif': id_cliente,
             'email': cliente.get('email', ''),
-            'telefono': cliente.get('telefono', '')
+            'telefono': cliente.get('telefono', ''),
+            'total_facturado': total_facturado,
+            'total_abonado': total_abonado,
+            'total_por_cobrar': total_por_cobrar,
+            'total_por_cobrar_bs': total_por_cobrar * tasa_bcv
         }
+    # Calcular total por cobrar general (solo facturas con saldo pendiente > 0)
+    total_por_cobrar_general = sum(
+        float(f.get('saldo_pendiente', 0))
+        for f in facturas.values()
+        if float(f.get('saldo_pendiente', 0)) > 0
+    )
+    total_por_cobrar_bs = total_por_cobrar_general * tasa_bcv
+    # Top 10 mejores clientes (por total facturado)
+    top_clientes_lista = []
+    for id_cliente, stats in clientes_totales.items():
+        facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id_cliente]
+        total_facturas = len(facturas_cliente)
+        total_compras = sum(float(f.get('total_usd', 0)) for f in facturas_cliente)
+        fechas = [f.get('fecha', '') for f in facturas_cliente if f.get('fecha', '')]
+        ultima_compra = max(fechas) if fechas else ''
+        top_clientes_lista.append({
+            'id': id_cliente,
+            'nombre': stats['nombre'],
+            'email': stats['email'],
+            'telefono': stats['telefono'],
+            'direccion': clientes.get(id_cliente, {}).get('direccion', ''),
+            'total_facturas': total_facturas,
+            'total_compras': total_compras,
+            'ultima_compra': ultima_compra
+        })
+    top_clientes = sorted(top_clientes_lista, key=lambda x: x['total_compras'], reverse=True)[:10]
+    # Top 5 peores clientes (por cuentas por cobrar, solo con saldo pendiente > 0)
+    peores_clientes_lista = []
+    for id_cliente, cliente in clientes.items():
+        # Sumar saldo pendiente de todas las facturas de este cliente
+        saldo_pendiente = sum(float(f.get('saldo_pendiente', 0)) for f in facturas.values() if f.get('cliente_id') == id_cliente)
+        if saldo_pendiente > 0:
+            facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id_cliente]
+            total_facturado = sum(float(f.get('total_usd', 0)) for f in facturas_cliente)
+            total_abonado = sum(float(f.get('total_abonado', 0)) for f in facturas_cliente)
+            peores_clientes_lista.append({
+                'id': id_cliente,
+                'nombre': cliente.get('nombre', ''),
+                'email': cliente.get('email', ''),
+                'telefono': cliente.get('telefono', ''),
+                'total_facturado': total_facturado,
+                'total_abonado': total_abonado,
+                'total_por_cobrar': saldo_pendiente
+            })
+    # Ordenar y tomar los 5 con mayor saldo pendiente
+    peores_clientes = sorted(peores_clientes_lista, key=lambda x: x['total_por_cobrar'], reverse=True)[:5]
+    # Top 5 productos más vendidos
+    productos_cantidades = {}
+    productos_valor = {}
+    for f in facturas.values():
+        if 'productos' in f and 'cantidades' in f:
+            for prod_id, cantidad in zip(f.get('productos', []), f.get('cantidades', [])):
+                try:
+                    cantidad = int(cantidad)
+                    if prod_id in inventario:
+                        productos_cantidades[prod_id] = productos_cantidades.get(prod_id, 0) + cantidad
+                        precio = float(inventario[prod_id].get('precio', 0))
+                        productos_valor[prod_id] = productos_valor.get(prod_id, 0) + (cantidad * precio)
+                except (ValueError, TypeError):
+                    continue
     
-    # Top 10 mejores clientes
-    top_clientes = sorted(clientes_stats.items(), 
-                         key=lambda x: x[1]['total_compras'], 
-                         reverse=True)[:10]
+    # Ordenar productos por cantidad vendida
+    top_productos = []
+    for prod_id, cantidad in sorted(productos_cantidades.items(), key=lambda x: x[1], reverse=True)[:5]:
+        if prod_id in inventario:
+            top_productos.append({
+                'nombre': inventario[prod_id].get('nombre', prod_id),
+                'cantidad': cantidad,
+                'valor': productos_valor.get(prod_id, 0)
+            })
     
-    # Top 5 peores clientes (con cuentas por cobrar)
-    peores_clientes = sorted(
-        [(id, stats) for id, stats in clientes_stats.items() if stats['cuenta_por_cobrar'] > 0],
-        key=lambda x: x[1]['cuenta_por_cobrar'],
-        reverse=True
-    )[:5]
+    # Calcular totales generales
+    total_facturado_general = sum(stats['total_facturado'] for stats in clientes_totales.values())
+    total_abonado_general = sum(stats['total_abonado'] for stats in clientes_totales.values())
     
     return render_template('reporte_clientes.html',
-                         total_clientes=total_clientes,
-                         total_facturas=total_facturas,
-                         total_cobrar=total_cobrar,
-                         top_productos=top_productos,
+                         total_clientes=len(clientes),
+                         total_facturas=len(facturas),
+                         total_cobrar=total_por_cobrar_general,
+                         total_cobrar_bs=total_por_cobrar_bs,
+                         tasa_bcv=tasa_bcv,
+                         total_facturado_general=total_facturado_general,
+                         total_abonado_general=total_abonado_general,
                          top_clientes=top_clientes,
                          peores_clientes=peores_clientes,
-                         clientes_stats=clientes_stats)
+                         top_productos=top_productos,
+                         q=q, filtro_orden=filtro_orden)
 
 @app.route('/clientes/<path:id>/historial')
 def historial_cliente(id):
@@ -1527,6 +1729,24 @@ def reporte_facturas():
             continue
         if filtro_cliente and str(factura['cliente_id']) != filtro_cliente:
             continue
+        # Calcular estado actualizado
+        total_abonado = 0
+        if 'pagos' in factura and factura['pagos']:
+            for pago in factura['pagos']:
+                try:
+                    monto = float(str(pago.get('monto', 0)).replace('$', '').replace(',', ''))
+                    total_abonado += monto
+                except Exception:
+                    continue
+        total_factura = factura.get('total_usd') or factura.get('total') or 0
+        if isinstance(total_factura, str):
+            total_factura = float(total_factura.replace('$', '').replace(',', ''))
+        if total_abonado >= total_factura and total_factura > 0:
+            factura['estado'] = 'pagada'
+        else:
+            factura['estado'] = 'pendiente'
+        factura['total_abonado'] = total_abonado
+        factura['saldo_pendiente'] = max(total_factura - total_abonado, 0)
         facturas_filtradas.append(factura)
     
     # Calcular totales
@@ -1546,44 +1766,12 @@ def reporte_facturas():
         for cid, total in sorted(clientes_totales.items(), key=lambda x: x[1], reverse=True)[:5]
     ]
     
-    # Calcular top productos
-    productos_totales = {}
-    productos_cantidades = {}
-    for factura in facturas_filtradas:
-        # Compatibilidad: puede ser 'items' o ('productos' y 'cantidades')
-        if 'items' in factura:
-            for item in factura['items']:
-                pid = item['producto_id']
-                if pid not in productos_totales:
-                    productos_totales[pid] = 0
-                    productos_cantidades[pid] = 0
-                productos_totales[pid] += float(item.get('subtotal', 0))
-                productos_cantidades[pid] += int(item.get('cantidad', 0))
-        else:
-            for prod_id, cantidad in zip(factura.get('productos', []), factura.get('cantidades', [])):
-                if prod_id not in productos_totales:
-                    productos_totales[prod_id] = 0
-                    productos_cantidades[prod_id] = 0
-                precio = float(inventario.get(prod_id, {}).get('precio', 0))
-                productos_totales[prod_id] += precio * int(cantidad)
-                productos_cantidades[prod_id] += int(cantidad)
-    
-    top_productos = [
-        {
-            'nombre': inventario[pid]['nombre'] if pid in inventario else pid,
-            'cantidad': productos_cantidades[pid],
-            'total': total
-        }
-        for pid, total in sorted(productos_totales.items(), key=lambda x: x[1], reverse=True)[:5]
-    ]
-    
     return render_template('reporte_facturas.html',
                          facturas=facturas_filtradas,
                          clientes=clientes,
                          total_usd=total_usd,
                          total_bs=total_bs,
                          top_clientes=top_clientes,
-                         top_productos=top_productos,
                          filtro_anio=filtro_anio,
                          filtro_mes=filtro_mes,
                          filtro_cliente=filtro_cliente)
@@ -1644,6 +1832,193 @@ def reporte_cotizaciones():
     total_cotizaciones = len(cotizaciones)
     total_monto = sum(float(c.get('total_usd', 0)) for c in cotizaciones)
     return render_template('reporte_cotizaciones.html', cotizaciones=cotizaciones, total_cotizaciones=total_cotizaciones, total_monto=total_monto)
+
+@app.route('/cotizaciones/<id>/convertir-a-factura')
+def convertir_cotizacion_a_factura(id):
+    """Convierte una cotización en factura y abre el formulario de factura para editar antes de guardar."""
+    cotizaciones_dir = 'cotizaciones_json'
+    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
+    if not os.path.exists(filename):
+        flash('Cotización no encontrada', 'danger')
+        return redirect(url_for('mostrar_cotizaciones'))
+    with open(filename, 'r', encoding='utf-8') as f:
+        cotizacion = json.load(f)
+    clientes = cargar_datos(ARCHIVO_CLIENTES)
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    empresa = cargar_empresa()
+    # Preparar datos para el formulario de factura
+    factura = {
+        'numero': '',
+        'fecha': datetime.now().strftime('%Y-%m-%d'),
+        'hora': datetime.now().strftime('%H:%M'),
+        'condicion_pago': 'contado',
+        'fecha_vencimiento': '',
+        'tasa_bcv': cotizacion.get('tasa_bcv', ''),
+        'cliente_id': cotizacion['cliente'].get('id', ''),
+        'productos': cotizacion.get('productos', []),
+        'cantidades': cotizacion.get('cantidades', []),
+        'precios': [float(p) for p in cotizacion.get('precios', [])],
+        'descuento': cotizacion.get('descuento', '0'),
+        'tipo_descuento': cotizacion.get('tipo_descuento', 'bs'),
+        'iva': cotizacion.get('iva', '16'),
+        'subtotal_usd': cotizacion.get('subtotal_usd', '0'),
+        'subtotal_bs': cotizacion.get('subtotal_bs', '0'),
+        'descuento_total': cotizacion.get('descuento_total', '0'),
+        'iva_total': cotizacion.get('iva_total', '0'),
+        'total_usd': cotizacion.get('total_usd', '0'),
+        'total_bs': cotizacion.get('total_bs', '0'),
+        'pagos': [],
+        'estado': 'pendiente',
+        'total_abonado': 0,
+        'saldo_pendiente': cotizacion.get('total_usd', '0'),
+    }
+    inventario_disponible = {k: v for k, v in inventario.items() if int(v.get('cantidad', 0)) > 0 or k in factura.get('productos', [])}
+    return render_template('factura_form.html', factura=factura, clientes=clientes, inventario=inventario_disponible, editar=False, empresa=empresa)
+
+@app.route('/cotizaciones/<id>/imprimir')
+def imprimir_cotizacion(id):
+    """Vista amigable para imprimir la cotización."""
+    cotizaciones_dir = 'cotizaciones_json'
+    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
+    if not os.path.exists(filename):
+        flash('Cotización no encontrada', 'danger')
+        return redirect(url_for('mostrar_cotizaciones'))
+    with open(filename, 'r', encoding='utf-8') as f:
+        cotizacion = json.load(f)
+    clientes = cargar_datos(ARCHIVO_CLIENTES)
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    empresa = cargar_empresa()
+    return render_template('cotizacion_imprimir.html', cotizacion=cotizacion, clientes=clientes, inventario=inventario, empresa=empresa, zip=zip)
+
+@app.route('/cotizaciones/<id>/pdf')
+def descargar_cotizacion_pdf(id):
+    """Descargar la cotización como PDF."""
+    try:
+        import pdfkit
+    except ImportError:
+        flash('PDFKit no está instalado. Instala con: pip install pdfkit', 'danger')
+        return redirect(url_for('imprimir_cotizacion', id=id))
+    cotizaciones_dir = 'cotizaciones_json'
+    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
+    if not os.path.exists(filename):
+        flash('Cotización no encontrada', 'danger')
+        return redirect(url_for('mostrar_cotizaciones'))
+    with open(filename, 'r', encoding='utf-8') as f:
+        cotizacion = json.load(f)
+    clientes = cargar_datos(ARCHIVO_CLIENTES)
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    empresa = cargar_empresa()
+    rendered = render_template('cotizacion_imprimir.html', cotizacion=cotizacion, clientes=clientes, inventario=inventario, empresa=empresa, zip=zip)
+    try:
+        config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+        options = {
+            'page-size': 'Letter',
+            'margin-top': '0.75in',
+            'margin-right': '0.75in',
+            'margin-bottom': '0.75in',
+            'margin-left': '0.75in',
+            'encoding': 'UTF-8',
+            'no-outline': None,
+            'quiet': '',
+            'print-media-type': '',
+            'disable-smart-shrinking': '',
+            'dpi': 300,
+            'image-quality': 100,
+            'enable-local-file-access': None,
+            'footer-right': '[page] de [topage]',
+            'footer-font-size': '8',
+            'footer-spacing': '5'
+        }
+        pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion["numero_cotizacion"]}.pdf'
+        return response
+    except Exception as e:
+        print(f"Error generando PDF: {str(e)}")
+        flash('Error al generar el PDF. Por favor, verifica que wkhtmltopdf esté instalado correctamente.', 'danger')
+        return redirect(url_for('imprimir_cotizacion', id=id))
+
+@app.route('/cotizacion/<numero>')
+def ver_cotizacion(numero):
+    try:
+        # Cargar la cotización
+        cotizacion_path = os.path.join('cotizaciones_json', f'cotizacion_{numero}.json')
+        if not os.path.exists(cotizacion_path):
+            flash('Cotización no encontrada', 'error')
+            return redirect(url_for('cotizaciones'))
+        
+        with open(cotizacion_path, 'r', encoding='utf-8') as f:
+            cotizacion = json.load(f)
+        
+        # Cargar datos adicionales necesarios
+        with open('inventario.json', 'r', encoding='utf-8') as f:
+            inventario = json.load(f)
+        with open('empresa.json', 'r', encoding='utf-8') as f:
+            empresa = json.load(f)
+        
+        return render_template('cotizacion_imprimir.html', cotizacion=cotizacion, inventario=inventario, empresa=empresa, zip=zip)
+    except Exception as e:
+        flash(f'Error al cargar la cotización: {str(e)}', 'error')
+        return redirect(url_for('cotizaciones'))
+
+@app.route('/login', methods=['GET', 'POST'])
+@csrf.exempt
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Cargar usuarios
+        if os.path.exists('usuarios.json'):
+            with open('usuarios.json', 'r', encoding='utf-8') as f:
+                usuarios = json.load(f)
+        else:
+            usuarios = {}
+        user = usuarios.get(username)
+        if user and check_password_hash(user['password'], password):
+            session['usuario'] = username
+            registrar_bitacora(username, 'Login', 'Inicio de sesión exitoso')
+            return redirect(url_for('index'))
+        else:
+            registrar_bitacora(username, 'Login fallido', 'Intento fallido de login')
+            flash('Usuario o contraseña incorrectos', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    usuario = session.get('usuario', 'desconocido')
+    registrar_bitacora(usuario, 'Logout', 'Cierre de sesión')
+    session.pop('usuario', None)
+    return redirect(url_for('login'))
+
+@app.route('/bitacora')
+@login_required
+def ver_bitacora():
+    try:
+        with open('bitacora.log', 'r', encoding='utf-8') as f:
+            lineas = f.readlines()
+    except Exception:
+        lineas = []
+    return render_template('bitacora.html', lineas=lineas)
+
+@app.route('/bitacora/limpiar', methods=['POST'])
+@login_required
+@csrf.exempt
+def limpiar_bitacora():
+    try:
+        # Registrar la acción antes de limpiar
+        usuario = session.get('usuario', 'desconocido')
+        registrar_bitacora(usuario, 'Limpiar bitácora', 'Se limpió toda la bitácora del sistema')
+        
+        # Limpiar el archivo
+        open('bitacora.log', 'w').close()
+        
+        flash('Bitácora limpiada exitosamente.', 'success')
+    except Exception as e:
+        flash(f'Error al limpiar la bitácora: {str(e)}', 'danger')
+    
+    return redirect(url_for('ver_bitacora'))
 
 # --- Bloque para Ejecutar la Aplicación ---
 if __name__ == '__main__':

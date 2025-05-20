@@ -38,6 +38,36 @@
             </div>
         </div>
         
+        <!-- Resumen Financiero del Cliente -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Resumen Financiero</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Total Facturado:</strong><br>
+                                <span class="text-primary">${{ '%.2f' % total_facturado }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Total Abonado:</strong><br>
+                                <span class="text-success">${{ '%.2f' % total_abonado }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Total por Cobrar (USD):</strong><br>
+                                <span class="text-danger">${{ '%.2f' % total_por_cobrar }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Total por Cobrar (Bs):</strong><br>
+                                <span class="text-danger">{{ total_por_cobrar_bs|es_number }} Bs</span>
+                                <br><small class="text-muted">Tasa BCV: {{ tasa_bcv|es_number }} Bs/USD</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="mt-4">
             {% if cliente.id %}
             <a href="{{ url_for('editar_cliente', id=cliente.id|urlencode) }}" class="btn btn-warning">

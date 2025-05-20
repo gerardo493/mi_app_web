@@ -18,6 +18,28 @@
             <h4 class="mb-0">Seleccionar Productos</h4>
         </div>
         <div class="card-body">
+            <form method="get" class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="q" placeholder="Buscar por nombre de producto" value="{{ q or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="categoria" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% for cat in categorias %}
+                        <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="orden" class="form-select">
+                        <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>Ordenar alfabéticamente</option>
+                        <option value="stock" {% if filtro_orden == 'stock' %}selected{% endif %}>Ordenar por stock</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Buscar/Filtrar</button>
+                </div>
+            </form>
             <form method="POST" id="ajusteStockForm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 

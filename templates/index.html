@@ -4,8 +4,9 @@
 
     {% block content %}
     <div class="row mb-4">
-        <div class="col-12">
+        <div class="col-12 d-flex justify-content-between align-items-center">
             <h1 class="display-4 mb-4">Bienvenido al Sistema de Facturación</h1>
+            <div id="fecha-hora-actual" class="text-end" style="font-size:1.2em; color:#154360; min-width: 220px;"></div>
         </div>
     </div>
 
@@ -149,4 +150,18 @@
             </div>
         </div>
     </div>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+    function actualizarFechaHora() {
+        const now = new Date();
+        const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const fecha = now.toLocaleDateString('es-VE', opciones);
+        const hora = now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('fecha-hora-actual').textContent = `${fecha} ${hora}`;
+    }
+    actualizarFechaHora();
+    setInterval(actualizarFechaHora, 1000);
+    </script>
     {% endblock %} 

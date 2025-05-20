@@ -75,7 +75,7 @@
                                         <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="{{ cantidad }}" required>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" value="{{ inventario[prod_id].precio if prod_id in inventario else '' }}" required>
+                                        <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" value="{{ cotizacion.precios[loop.index0] if cotizacion.precios else (inventario[prod_id].precio if prod_id in inventario else '') }}" required>
                                     </div>
                                     <div class="col-md-3">
                                         <input type="text" class="form-control subtotal" readonly>
@@ -130,11 +130,26 @@
                             <label for="iva" class="form-label">IVA (%)</label>
                             <input type="number" class="form-control" id="iva" name="iva" min="0" max="100" value="{{ cotizacion.iva if cotizacion and cotizacion.iva else '16' }}" required>
                         </div>
+                        <div class="col-md-4">
+                            <label for="tasa_bcv" class="form-label">Tasa BCV (Bs/USD)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control" id="tasa_bcv" name="tasa_bcv" value="{{ cotizacion.tasa_bcv if cotizacion and cotizacion.tasa_bcv else '' }}" required>
+                                <button type="button" class="btn btn-outline-secondary" id="obtenerTasa">Obtener BCV</button>
+                            </div>
+                            <div id="advertencia-tasa" class="alert alert-warning mt-2" style="display:none; font-size:0.95em;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="mensaje-tasa">No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la cotización.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Totales</label>
                             <div class="input-group mb-1">
                                 <span class="input-group-text">Subtotal USD</span>
                                 <input type="text" class="form-control" id="subtotal_usd" name="subtotal_usd" readonly>
+                                <span class="input-group-text">Subtotal Bs</span>
+                                <input type="text" class="form-control" id="subtotal_bs" name="subtotal_bs" readonly>
                             </div>
                             <div class="input-group mb-1">
                                 <span class="input-group-text">Descuento</span>
@@ -145,6 +160,8 @@
                             <div class="input-group">
                                 <span class="input-group-text">Total USD</span>
                                 <input type="text" class="form-control" id="total_usd" name="total_usd" readonly>
+                                <span class="input-group-text">Total Bs</span>
+                                <input type="text" class="form-control" id="total_bs" name="total_bs" readonly>
                             </div>
                         </div>
                     </div>
@@ -152,7 +169,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-2"></i>{{ 'Actualizar Cotización' if cotizacion else 'Guardar Cotización' }}
                         </button>
-                        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('mostrar_cotizaciones') }}" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
                     </div>
@@ -170,17 +187,87 @@ document.addEventListener('DOMContentLoaded', function() {
     const agregarProductoBtn = document.getElementById('agregar-producto');
     const cotizacionForm = document.getElementById('cotizacionForm');
 
+    // Obtener tasa BCV automáticamente
+    function mostrarAdvertenciaTasa(mostrar, mensaje) {
+        const adv = document.getElementById('advertencia-tasa');
+        const msg = document.getElementById('mensaje-tasa');
+        adv.style.display = mostrar ? '' : 'none';
+        if (mensaje) msg.textContent = mensaje;
+    }
+    document.getElementById('obtenerTasa').addEventListener('click', function() {
+        const button = this;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo...';
+        fetch('/api/tasa-bcv')
+            .then(response => response.json())
+            .then(data => {
+                if (data.tasa) {
+                    const tasa = parseFloat(data.tasa).toFixed(2);
+                    document.getElementById('tasa_bcv').value = tasa;
+                    calcularTotales();
+                    mostrarAdvertenciaTasa(data.advertencia, 'No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la cotización.');
+                } else {
+                    document.getElementById('tasa_bcv').value = '';
+                    mostrarAdvertenciaTasa(true, 'No hay tasa registrada. Ingrésala manualmente.');
+                }
+            })
+            .catch(() => {
+                document.getElementById('tasa_bcv').value = '';
+                mostrarAdvertenciaTasa(true, 'No hay tasa registrada. Ingrésala manualmente.');
+                alert('No se pudo obtener la tasa BCV automáticamente. Ingrésala manualmente.');
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.innerHTML = 'Obtener BCV';
+            });
+    });
+    // Validar y formatear tasa BCV al cambiar
+    document.getElementById('tasa_bcv').addEventListener('change', function() {
+        let valor = this.value.replace(',', '.');
+        if (isNaN(valor) || parseFloat(valor) <= 0) {
+            alert('Por favor ingrese una tasa BCV válida');
+            this.value = '36.00';
+        } else {
+            this.value = parseFloat(valor).toFixed(2);
+        }
+        calcularTotales();
+    });
+    // Inicializar tasa BCV si está vacía
+    if (!document.getElementById('tasa_bcv').value) {
+        document.getElementById('tasa_bcv').value = '36.00';
+    }
+
     // Función para calcular subtotales y total
     function calcularTotales() {
-        let total = 0;
+        let subtotal = 0;
         document.querySelectorAll('.producto-item').forEach(item => {
-            const precio = parseFloat(item.querySelector('.producto-select option:checked').dataset.precio || 0);
+            const precio = parseFloat(item.querySelector('.precio-input').value || 0);
             const cantidad = parseInt(item.querySelector('.cantidad-input').value || 0);
-            const subtotal = precio * cantidad;
-            item.querySelector('.subtotal').value = `$${subtotal.toFixed(2)}`;
-            total += subtotal;
+            const subtotalItem = precio * cantidad;
+            item.querySelector('.subtotal').value = `$${subtotalItem.toFixed(2)}`;
+            subtotal += subtotalItem;
         });
-        document.getElementById('total_usd').value = `$${total.toFixed(2)}`;
+        document.getElementById('subtotal_usd').value = subtotal.toFixed(2);
+        const tasa = parseFloat(document.getElementById('tasa_bcv').value || 0);
+        document.getElementById('subtotal_bs').value = tasa ? (subtotal * tasa).toFixed(2) : '';
+        // Descuento
+        const descuento = parseFloat(document.getElementById('descuento').value || 0);
+        const tipoDescuento = document.getElementById('tipo_descuento').value;
+        let descuentoTotal = 0;
+        if (tipoDescuento === 'porc') {
+            descuentoTotal = subtotal * (descuento / 100);
+        } else {
+            descuentoTotal = tasa ? (descuento / tasa) : 0;
+        }
+        document.getElementById('descuento_total').value = descuentoTotal.toFixed(2);
+        // IVA
+        const iva = parseFloat(document.getElementById('iva').value || 0);
+        const ivaTotal = ((subtotal - descuentoTotal) * iva / 100);
+        document.getElementById('iva_total').value = ivaTotal.toFixed(2);
+        // Totales
+        const totalUSD = subtotal - descuentoTotal + ivaTotal;
+        document.getElementById('total_usd').value = totalUSD.toFixed(2);
+        document.getElementById('total_bs').value = tasa ? (totalUSD * tasa).toFixed(2) : '';
     }
 
     // Agregar producto
@@ -195,8 +282,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Configurar event listeners para un item de producto
     function setupEventListeners(item) {
-        item.querySelector('.producto-select').addEventListener('change', calcularTotales);
+        const select = item.querySelector('.producto-select');
+        const precioInput = item.querySelector('.precio-input');
+        select.addEventListener('change', function() {
+            const precio = parseFloat(this.options[this.selectedIndex].dataset.precio || 0);
+            if (precio) {
+                precioInput.value = precio.toFixed(2);
+            }
+            calcularTotales();
+        });
         item.querySelector('.cantidad-input').addEventListener('input', calcularTotales);
+        precioInput.addEventListener('input', calcularTotales);
         item.querySelector('.remove-producto').addEventListener('click', function() {
             if (document.querySelectorAll('.producto-item').length > 1) {
                 item.remove();
@@ -218,6 +314,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         this.submit();
     });
+
+    // Inicializar totales
+    calcularTotales();
 });
 </script>
 {% endblock %} 

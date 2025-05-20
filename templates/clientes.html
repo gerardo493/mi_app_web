@@ -18,14 +18,29 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="table-responsive">
+            <form method="get" class="row g-2 mb-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="q" placeholder="Buscar por nombre o RIF" value="{{ q or '' }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="orden" class="form-select">
+                        <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>Ordenar por Nombre</option>
+                        <option value="rif" {% if filtro_orden == 'rif' %}selected{% endif %}>Ordenar por RIF</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Buscar/Filtrar</button>
+                </div>
+            </form>
+            <div class="table-responsive" style="overflow-x: auto;">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>RIF</th>
                             <th>Nombre</th>
-                            <th>Email</th>
                             <th>Teléfono</th>
+                            <th style="max-width: 180px; min-width: 120px; width: 18%;">Email</th>
+                            <th style="max-width: 200px; min-width: 120px; width: 22%;">Dirección</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -34,8 +49,9 @@
                         <tr>
                             <td>{{ id }}</td>
                             <td>{{ cliente.nombre }}</td>
-                            <td>{{ cliente.email or 'No disponible' }}</td>
-                            <td>{{ cliente.telefono or 'No disponible' }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td style="max-width: 180px; min-width: 120px; width: 18%; white-space: normal; word-break: break-all;" title="{{ cliente.email }}">{{ cliente.email }}</td>
+                            <td style="max-width: 200px; min-width: 120px; width: 22%; white-space: normal; word-break: break-all;">{{ cliente.direccion }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a href="{{ url_for('historial_cliente', id=id) }}" class="btn btn-sm btn-info" title="Ver historial">

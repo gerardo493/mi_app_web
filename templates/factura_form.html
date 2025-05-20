@@ -51,13 +51,10 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="cliente_id" class="form-label">Cliente</label>
-                        <select class="form-select" id="cliente_id" name="cliente_id" required>
-                            <option value="">Seleccione un cliente</option>
-                            {% for id, cliente in clientes.items() %}
-                            <option value="{{ id }}" {% if editar and factura.cliente_id == id %}selected{% endif %}>{{ cliente.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="cliente_autocomplete" class="form-label">Cliente</label>
+                        <input type="text" class="form-control" id="cliente_autocomplete" placeholder="Buscar cliente por nombre o RIF" autocomplete="off" required>
+                        <input type="hidden" name="cliente_id" id="cliente_id" value="{{ factura.cliente_id if editar else '' }}">
+                        <div id="cliente_suggestions" class="list-group position-absolute w-100" style="z-index: 10;"></div>
                     </div>
                     <div class="card mb-3">
                         <div class="card-header">
@@ -86,14 +83,9 @@
                                     {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
                                 <div class="row mb-3 producto-item">
                                     <div class="col-md-4">
-                                        <select class="form-select producto-select" name="productos[]" required>
-                                            <option value="">Seleccione un producto</option>
-                                                {% for id, producto in inventario.items() %}
-                                                <option value="{{ id }}" data-precio="{{ producto.precio }}" {% if id == prod_id %}selected{% endif %}>
-                                                    {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
-                                                </option>
-                                                {% endfor %}
-                                            </select>
+                                        <input type="text" class="form-control producto-autocomplete" placeholder="Buscar producto por nombre" autocomplete="off" value="{{ inventario[prod_id].nombre if prod_id in inventario else '' }}" required>
+                                        <input type="hidden" name="productos[]" class="producto-id" value="{{ prod_id }}">
+                                        <div class="producto-suggestions list-group position-absolute w-100" style="z-index: 10;"></div>
                                         </div>
                                         <div class="col-md-2">
                                             <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="{{ cantidad }}" required>
@@ -112,14 +104,9 @@
                                             {% else %}
                                     <div class="row mb-3 producto-item">
                                         <div class="col-md-4">
-                                            <select class="form-select producto-select" name="productos[]" required>
-                                                <option value="">Seleccione un producto</option>
-                                            {% for id, producto in inventario.items() %}
-                                            <option value="{{ id }}" data-precio="{{ producto.precio }}">
-                                                {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
-                                            </option>
-                                            {% endfor %}
-                                        </select>
+                                        <input type="text" class="form-control producto-autocomplete" placeholder="Buscar producto por nombre" autocomplete="off" required>
+                                        <input type="hidden" name="productos[]" class="producto-id">
+                                        <div class="producto-suggestions list-group position-absolute w-100" style="z-index: 10;"></div>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="1" required>
@@ -249,21 +236,242 @@
 <script>
 // Inicializar variable pagos con los datos de la factura o array vacío
 const pagos = JSON.parse('{{ (factura.pagos if factura and factura.pagos else [])|tojson|safe }}');
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar campo de vencimiento si es crédito
+
+// Datos de clientes y productos
+const datosIniciales = {
+    clientes: {{ clientes|tojson|safe }},
+    inventario: {{ inventario|tojson|safe }},
+    factura: {{ factura|tojson|safe if factura else 'null' }}
+};
+
+// --- Autocompletado y selección de clientes ---
+const listaClientes = Object.entries(datosIniciales.clientes).map(([id, cliente]) => ({
+    id: id,
+    nombre: cliente.nombre,
+    rif: id
+}));
+
+const clienteInput = document.getElementById('cliente_autocomplete');
+const clienteIdInput = document.getElementById('cliente_id');
+const clienteSuggestions = document.getElementById('cliente_suggestions');
+
+// Estilo para el dropdown
+clienteSuggestions.style.maxHeight = '200px';
+clienteSuggestions.style.overflowY = 'auto';
+clienteSuggestions.style.display = 'none';
+clienteSuggestions.style.position = 'absolute';
+clienteSuggestions.style.zIndex = '1000';
+clienteSuggestions.style.width = '100%';
+clienteSuggestions.style.backgroundColor = 'white';
+clienteSuggestions.style.border = '1px solid #ddd';
+clienteSuggestions.style.borderRadius = '4px';
+clienteSuggestions.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+
+function mostrarSugerenciasClientes(valor) {
+    clienteSuggestions.innerHTML = '';
+    clienteSuggestions.style.display = 'block';
+    
+    const matches = valor.length < 2 ? 
+        listaClientes : 
+        listaClientes.filter(c => 
+            c.nombre.toLowerCase().includes(valor.toLowerCase()) || 
+            c.rif.toLowerCase().includes(valor.toLowerCase())
+        );
+    
+    matches.forEach(c => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = `${c.nombre} (${c.rif})`;
+        item.onclick = () => {
+            clienteInput.value = `${c.nombre} (${c.rif})`;
+            clienteIdInput.value = c.id;
+            clienteSuggestions.style.display = 'none';
+        };
+        clienteSuggestions.appendChild(item);
+    });
+}
+
+// Eventos para el autocompletado de clientes
+clienteInput.addEventListener('click', function() {
+    mostrarSugerenciasClientes(this.value);
+});
+
+clienteInput.addEventListener('input', function() {
+    mostrarSugerenciasClientes(this.value);
+});
+
+// Cerrar el dropdown al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (!clienteSuggestions.contains(e.target) && e.target !== clienteInput) {
+        clienteSuggestions.style.display = 'none';
+    }
+});
+
+// Si ya hay un cliente seleccionado (edición), mostrarlo
+if (datosIniciales.factura && datosIniciales.factura.cliente_id) {
+    const clienteSel = listaClientes.find(c => c.id === datosIniciales.factura.cliente_id);
+    if (clienteSel) {
+        clienteInput.value = `${clienteSel.nombre} (${clienteSel.rif})`;
+        clienteIdInput.value = clienteSel.id;
+    }
+}
+
+// --- Autocompletado y selección de productos ---
+const listaProductos = Object.entries(datosIniciales.inventario).map(([id, producto]) => ({
+    id: id,
+    nombre: producto.nombre,
+    precio: producto.precio,
+    stock: producto.cantidad
+}));
+
+function initProductoAutocomplete(container) {
+    const input = container.querySelector('.producto-autocomplete');
+    const idInput = container.querySelector('.producto-id');
+    const suggestions = container.querySelector('.producto-suggestions');
+    
+    // Estilo para el dropdown
+    suggestions.style.maxHeight = '200px';
+    suggestions.style.overflowY = 'auto';
+    suggestions.style.display = 'none';
+    suggestions.style.position = 'absolute';
+    suggestions.style.zIndex = '1000';
+    suggestions.style.width = '100%';
+    suggestions.style.backgroundColor = 'white';
+    suggestions.style.border = '1px solid #ddd';
+    suggestions.style.borderRadius = '4px';
+    suggestions.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    
+    function mostrarSugerenciasProductos(valor) {
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'block';
+        
+        const matches = valor.length < 2 ? 
+            listaProductos : 
+            listaProductos.filter(p => 
+                p.nombre.toLowerCase().includes(valor.toLowerCase())
+            );
+        
+        matches.forEach(p => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = `${p.nombre} - $${p.precio} (Stock: ${p.stock})`;
+            item.onclick = () => {
+                input.value = p.nombre;
+                idInput.value = p.id;
+                const precioInput = container.querySelector('.precio-input');
+                if (precioInput) {
+                    precioInput.value = p.precio;
+                    calcularSubtotal(container);
+                }
+                suggestions.style.display = 'none';
+            };
+            suggestions.appendChild(item);
+        });
+    }
+    
+    input.addEventListener('click', function() {
+        mostrarSugerenciasProductos(this.value);
+    });
+    
+    input.addEventListener('input', function() {
+        mostrarSugerenciasProductos(this.value);
+    });
+    
+    // Cerrar el dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!suggestions.contains(e.target) && e.target !== input) {
+            suggestions.style.display = 'none';
+        }
+    });
+}
+
+// Inicializar autocompletado para productos existentes
+document.querySelectorAll('.producto-item').forEach(initProductoAutocomplete);
+
+// Al agregar producto dinámicamente
+const agregarBtn = document.getElementById('agregar-producto');
+agregarBtn.addEventListener('click', function() {
+    const template = document.querySelector('.producto-item').cloneNode(true);
+    template.querySelector('.producto-autocomplete').value = '';
+    template.querySelector('.producto-id').value = '';
+    template.querySelector('.cantidad-input').value = '1';
+    template.querySelector('.precio-input').value = '';
+    template.querySelector('.subtotal').value = '';
+    document.getElementById('productos-container').appendChild(template);
+    initProductoAutocomplete(template);
+});
+
+// Al cargar la página, si el campo hora está vacío, poner la hora actual
+const horaInput = document.getElementById('hora');
+if (!horaInput.value) {
+    const now = new Date();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    horaInput.value = `${horas}:${minutos}`;
+}
+
+// --- Crédito: campo de días y cálculo automático de vencimiento ---
     const condicionPago = document.getElementById('condicion_pago');
     const vencimientoGroup = document.getElementById('vencimiento_group');
+let diasCreditoInput = document.getElementById('dias_credito');
+let labelDiasCredito = document.getElementById('label_dias_credito');
+
+// Si no existe el campo, lo creamos dinámicamente
+if (!diasCreditoInput) {
+    // Crear label
+    labelDiasCredito = document.createElement('label');
+    labelDiasCredito.id = 'label_dias_credito';
+    labelDiasCredito.className = 'form-label';
+    labelDiasCredito.textContent = 'Días de crédito';
+    labelDiasCredito.style.marginTop = '8px';
+    // Crear input
+    diasCreditoInput = document.createElement('input');
+    diasCreditoInput.type = 'number';
+    diasCreditoInput.className = 'form-control';
+    diasCreditoInput.id = 'dias_credito';
+    diasCreditoInput.placeholder = 'Días de crédito';
+    diasCreditoInput.min = '1';
+    diasCreditoInput.style.marginTop = '4px';
+    // Insertar antes del campo de vencimiento
+    vencimientoGroup.insertBefore(labelDiasCredito, vencimientoGroup.firstChild);
+    vencimientoGroup.insertBefore(diasCreditoInput, vencimientoGroup.firstChild.nextSibling);
+}
+
+diasCreditoInput.style.display = 'none';
+labelDiasCredito.style.display = 'none';
+
     function toggleVencimiento() {
         if (condicionPago.value === 'credito') {
             vencimientoGroup.style.display = '';
+        diasCreditoInput.style.display = '';
+        labelDiasCredito.style.display = '';
         } else {
             vencimientoGroup.style.display = 'none';
+        diasCreditoInput.style.display = 'none';
+        labelDiasCredito.style.display = 'none';
         }
     }
+
     condicionPago.addEventListener('change', toggleVencimiento);
     toggleVencimiento();
+
+// Calcular fecha de vencimiento automáticamente
+function calcularVencimiento() {
+    const fechaFactura = document.getElementById('fecha').value;
+    const dias = parseInt(diasCreditoInput.value);
+    if (fechaFactura && dias && dias > 0) {
+        const fecha = new Date(fechaFactura);
+        fecha.setDate(fecha.getDate() + dias);
+        const yyyy = fecha.getFullYear();
+        const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+        const dd = String(fecha.getDate()).padStart(2, '0');
+        document.getElementById('fecha_vencimiento').value = `${yyyy}-${mm}-${dd}`;
+    }
+}
+diasCreditoInput.addEventListener('input', calcularVencimiento);
+document.getElementById('fecha').addEventListener('input', calcularVencimiento);
 
     // Productos y totales
     const productosContainer = document.getElementById('productos-container');
@@ -323,20 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 precioInput.value = precio.toFixed(2);
                 calcularSubtotal(this.closest('.producto-item'));
             }
-        });
-    });
-    // Al agregar producto, también validar
-    agregarProductoBtn.addEventListener('click', function() {
-        const template = productosContainer.querySelector('.producto-item').cloneNode(true);
-        template.querySelector('.producto-select').value = '';
-        template.querySelector('.cantidad-input').value = '1';
-        template.querySelector('.precio-input').value = '';
-        template.querySelector('.subtotal').value = '';
-        productosContainer.appendChild(template);
-        setupEventListeners(template);
-        // Validar stock al cambiar
-        template.querySelector('.producto-select').addEventListener('change', function() {
-            productoSinStock(this);
         });
     });
     // Obtener tasa BCV automáticamente
@@ -514,7 +708,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('tasa_bcv').value = '';
                 mostrarAdvertenciaTasa(true, 'No hay tasa registrada. Ingrésala manualmente.');
             }
-        });
 });
 </script>
 {% if editar and factura.estado == 'pagada' %}

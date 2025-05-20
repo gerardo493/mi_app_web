@@ -48,17 +48,14 @@
                         <td>
                             {% if cotizacion.numero and cotizacion.fecha and cotizacion.cliente_id %}
                             <div class="btn-group">
-                                <a href="#" class="btn btn-sm btn-info disabled" title="Ver detalles">
-                                    <i class="fas fa-eye"></i>
-                                </a>
                                 <a href="{{ url_for('editar_cotizacion', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-success disabled" title="Convertir a Factura">
+                                <a href="{{ url_for('convertir_cotizacion_a_factura', id=id) }}" class="btn btn-sm btn-success" title="Convertir a Factura">
                                     <i class="fas fa-file-invoice"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-primary disabled" title="Descargar PDF">
-                                    <i class="fas fa-file-pdf"></i>
+                                <a href="{{ url_for('imprimir_cotizacion', id=id) }}" class="btn btn-sm btn-secondary" title="Imprimir" target="_blank">
+                                    <i class="fas fa-print"></i>
                                 </a>
                                 <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
                                         onclick="confirmarEliminar('{{ id }}', '{{ cotizacion.numero }}')">
