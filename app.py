@@ -10,6 +10,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
+from auth import login_required, admin_required, verify_password
 try:
     import pdfkit
 except ImportError:
@@ -887,6 +888,7 @@ def eliminar_factura(id):
     return redirect(url_for('mostrar_facturas'))
 
 @app.route('/cotizaciones')
+@login_required
 def mostrar_cotizaciones():
     """Muestra lista de cotizaciones válidas."""
     try:
@@ -1613,7 +1615,8 @@ def es_number(value, decimales=2):
         return str(value) if value is not None else "0"
 
 @app.route('/cuentas-por-cobrar')
-def reporte_cuentas_por_cobrar():
+@login_required
+def mostrar_cuentas_por_cobrar():
     facturas = cargar_datos(ARCHIVO_FACTURAS)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     filtro = request.args.get('estado', 'por_cobrar')
@@ -1676,7 +1679,8 @@ def reporte_cuentas_por_cobrar():
     )
 
 @app.route('/pagos-recibidos')
-def pagos_recibidos():
+@login_required
+def mostrar_pagos_recibidos():
     facturas = cargar_datos(ARCHIVO_FACTURAS)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     pagos = []
@@ -1968,19 +1972,18 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        # Cargar usuarios
-        if os.path.exists('usuarios.json'):
-            with open('usuarios.json', 'r', encoding='utf-8') as f:
-                usuarios = json.load(f)
-        else:
-            usuarios = {}
-        user = usuarios.get(username)
-        if user and check_password_hash(user['password'], password):
+        
+        if not username or not password:
+            flash('Por favor ingrese usuario y contraseña', 'warning')
+            return render_template('login.html')
+        
+        if verify_password(username, password):
             session['usuario'] = username
-            registrar_bitacora(username, 'Login', 'Inicio de sesión exitoso')
+            registrar_bitacora(username, 'Inicio de sesión', 'Inicio de sesión exitoso')
+            flash('Bienvenido al sistema', 'success')
             return redirect(url_for('index'))
         else:
-            registrar_bitacora(username, 'Login fallido', 'Intento fallido de login')
+            registrar_bitacora(username, 'Intento fallido', 'Intento fallido de inicio de sesión')
             flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
 
@@ -1988,8 +1991,9 @@ def login():
 @login_required
 def logout():
     usuario = session.get('usuario', 'desconocido')
-    registrar_bitacora(usuario, 'Logout', 'Cierre de sesión')
+    registrar_bitacora(usuario, 'Cierre de sesión', 'Sesión finalizada')
     session.pop('usuario', None)
+    flash('Sesión cerrada exitosamente', 'info')
     return redirect(url_for('login'))
 
 @app.route('/bitacora')

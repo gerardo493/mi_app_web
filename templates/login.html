@@ -1,57 +1,684 @@
-{% extends 'base.html' %}
-{% block title %}Iniciar Sesión{% endblock %}
-{% block content %}
-<div class="container" style="max-width:400px; margin-top:60px;">
-    <div class="card shadow">
-        <div class="card-header text-center bg-primary text-white">
-            <h4 class="mb-0">Iniciar Sesión</h4>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Facturación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background: linear-gradient(-45deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+            cursor: default;
+            transition: all 0.5s ease;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Paleta de colores dinámica */
+        :root {
+            --color-primary: #FF6B6B;
+            --color-secondary: #4ECDC4;
+            --color-accent: #45B7D1;
+            --color-dark: #00473b;
+            --color-light: #ffffff;
+        }
+
+        /* Animación de cambio de color */
+        @keyframes colorChange {
+            0% { --color-primary: #FF6B6B; --color-secondary: #4ECDC4; --color-accent: #45B7D1; }
+            10% { --color-primary: #96CEB4; --color-secondary: #FFEEAD; --color-accent: #D4A5A5; }
+            20% { --color-primary: #9B59B6; --color-secondary: #3498DB; --color-accent: #2ECC71; }
+            30% { --color-primary: #E74C3C; --color-secondary: #F1C40F; --color-accent: #1ABC9C; }
+            40% { --color-primary: #FF9F1C; --color-secondary: #2EC4B6; --color-accent: #E71D36; }
+            50% { --color-primary: #7209B7; --color-secondary: #3A0CA3; --color-accent: #4361EE; }
+            60% { --color-primary: #F72585; --color-secondary: #B5179E; --color-accent: #7209B7; }
+            70% { --color-primary: #4CC9F0; --color-secondary: #4895EF; --color-accent: #4361EE; }
+            80% { --color-primary: #3A0CA3; --color-secondary: #4361EE; --color-accent: #4CC9F0; }
+            90% { --color-primary: #F94144; --color-secondary: #F3722C; --color-accent: #F8961E; }
+            100% { --color-primary: #F9C74F; --color-secondary: #90BE6D; --color-accent: #43AA8B; }
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: rgba(var(--color-primary-rgb), 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            width: 100%;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(var(--color-primary-rgb), 0.4);
+            animation: cardColorChange 30s linear infinite;
+        }
+
+        .card-header {
+            background-color: rgba(var(--color-primary-rgb), 0.95);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.6);
+            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+        }
+
+        .card-header h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .card-body {
+            padding: 35px;
+            transition: all 0.3s ease;
+            background: rgba(var(--color-primary-rgb), 0.1);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
+            transition: all 0.3s ease;
+            color: var(--color-primary);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5),
+                       0 0 30px rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .input-group {
+            transition: all 0.3s ease;
+        }
+
+        .input-group-text {
+            background-color: rgba(var(--color-primary-rgb), 0.2);
+            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
+            border-radius: 8px 0 0 8px;
+            padding: 12px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .input-group-text i {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                         0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background-color: rgba(var(--color-primary-rgb), 0.95);
+            border: none;
+            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.5);
+            background-color: rgba(var(--color-primary-rgb), 1);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container img {
+            max-width: 250px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+            transition: all 0.3s ease;
+        }
+
+        .form-label {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                         0 0 20px rgba(255, 255, 255, 0.5),
+                         0 0 30px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .form-label:hover {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 1),
+                         0 0 25px rgba(255, 255, 255, 0.8),
+                         0 0 35px rgba(255, 255, 255, 0.6);
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
+        }
+
+        .alert-success {
+            background-color: rgba(var(--color-primary-rgb), 0.15);
+            border-color: rgba(var(--color-primary-rgb), 0.6);
+            color: rgba(var(--color-primary-rgb), 0.95);
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.6);
+            color: rgba(220, 53, 69, 0.95);
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.6);
+            color: rgba(255, 193, 7, 0.95);
+        }
+
+        .btn-outline-secondary {
+            border-color: rgba(var(--color-primary-rgb), 0.6);
+            color: white;
+            background-color: rgba(var(--color-primary-rgb), 0.1);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: rgba(var(--color-primary-rgb), 0.2);
+            border-color: rgba(var(--color-primary-rgb), 0.8);
+            color: white;
+        }
+
+        .btn-outline-secondary i {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                         0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .login-container {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .logo-container img {
+                max-width: 200px;
+            }
+
+            .card-header {
+                padding: 20px;
+            }
+
+            .card-body {
+                padding: 25px;
+            }
+
+            .form-control, .input-group-text {
+                padding: 10px;
+                font-size: 1rem;
+            }
+
+            .btn-primary {
+                padding: 10px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+
+            .login-container {
+                padding: 10px;
+                margin-top: 10px;
+            }
+
+            .logo-container {
+                margin: 15px 0;
+            }
+
+            .logo-container img {
+                max-width: 180px;
+            }
+
+            .card-header {
+                padding: 15px;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .form-control, .input-group-text {
+                padding: 8px;
+                font-size: 0.95rem;
+            }
+
+            .btn-primary {
+                padding: 8px;
+                font-size: 0.95rem;
+            }
+
+            .form-label {
+                font-size: 0.95rem;
+                margin-bottom: 5px;
+            }
+
+            .input-group {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .logo-container img {
+                max-width: 150px;
+            }
+
+            .card-header {
+                padding: 12px;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+
+            .form-control, .input-group-text {
+                padding: 6px;
+                font-size: 0.9rem;
+            }
+
+            .btn-primary {
+                padding: 6px;
+                font-size: 0.9rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+
+            .input-group {
+                margin-bottom: 12px;
+            }
+        }
+
+        @media (min-height: 900px) {
+            body {
+                padding-top: 50px;
+            }
+
+            .login-container {
+                margin-top: 30px;
+            }
+
+            .logo-container {
+                margin: 30px 0;
+            }
+
+            .logo-container img {
+                max-width: 300px;
+            }
+
+            .card-header {
+                padding: 30px;
+            }
+
+            .card-body {
+                padding: 40px;
+            }
+
+            .form-control, .input-group-text {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+
+            .btn-primary {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+
+            .form-label {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .login-container {
+                margin-top: 10px;
+            }
+
+            .logo-container {
+                margin: 10px 0;
+            }
+
+            .logo-container img {
+                max-width: 150px;
+            }
+
+            .card-header {
+                padding: 12px;
+            }
+
+            .card-body {
+                padding: 15px;
+            }
+
+            .form-control, .input-group-text {
+                padding: 6px;
+                font-size: 0.9rem;
+            }
+
+            .btn-primary {
+                padding: 6px;
+                font-size: 0.9rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+
+            .input-group {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Más figuras animadas */
+        .animated-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s infinite;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .shape:hover {
+            transform: scale(1.5) rotate(180deg);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation-play-state: paused;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-50px) rotate(90deg) scale(1.2) translateX(30px); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.4) translateX(-30px); }
+            75% { transform: translateY(-60px) rotate(270deg) scale(1.2) translateX(30px); }
+            100% { transform: translateY(0) rotate(360deg) scale(1); }
+        }
+
+        .shape:nth-child(1) { width: 100px; height: 100px; left: 10%; top: 20%; animation-delay: 0s; animation-duration: 8s; }
+        .shape:nth-child(2) { width: 150px; height: 150px; left: 20%; top: 60%; animation-delay: 1s; animation-duration: 7s; }
+        .shape:nth-child(3) { width: 80px; height: 80px; left: 30%; top: 40%; animation-delay: 2s; animation-duration: 9s; }
+        .shape:nth-child(4) { width: 120px; height: 120px; left: 40%; top: 80%; animation-delay: 3s; animation-duration: 6s; }
+        .shape:nth-child(5) { width: 90px; height: 90px; left: 50%; top: 30%; animation-delay: 4s; animation-duration: 8s; }
+        .shape:nth-child(6) { width: 110px; height: 110px; left: 60%; top: 70%; animation-delay: 5s; animation-duration: 7s; }
+        .shape:nth-child(7) { width: 70px; height: 70px; left: 70%; top: 50%; animation-delay: 6s; animation-duration: 9s; }
+        .shape:nth-child(8) { width: 130px; height: 130px; left: 80%; top: 20%; animation-delay: 7s; animation-duration: 8s; }
+        .shape:nth-child(9) { width: 95px; height: 95px; left: 90%; top: 60%; animation-delay: 8s; animation-duration: 7s; }
+        .shape:nth-child(10) { width: 85px; height: 85px; left: 5%; top: 80%; animation-delay: 9s; animation-duration: 8s; }
+
+        /* Efecto de brillo al mover el mouse */
+        .mouse-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: all 0.2s ease;
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+<body>
+    <div class="mouse-glow"></div>
+    <div class="animated-background">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
         </div>
-        <div class="card-body">
-            <form method="POST" autocomplete="off">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Usuario</label>
-                    <input type="text" class="form-control" id="username" name="username" required autofocus autocomplete="off" value="">
-                </div>
-                <div class="mb-3 position-relative">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="password" name="password" required autocomplete="off" value="">
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
-                            <i class="fas fa-eye" id="icono-ojo"></i>
-                        </button>
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="mb-0">Iniciar Sesión</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" autocomplete="off">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus autocomplete="off">
+                        </div>
                     </div>
-                </div>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required autocomplete="off">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye" id="icono-ojo"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
-    const icon = document.getElementById('icono-ojo');
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-});
-</script>
-{% endblock %} 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const iconoOjo = document.getElementById('icono-ojo');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                iconoOjo.classList.remove('fa-eye');
+                iconoOjo.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                iconoOjo.classList.remove('fa-eye-slash');
+                iconoOjo.classList.add('fa-eye');
+            }
+        });
+
+        // Efecto de destello al hacer clic
+        document.addEventListener('click', function(e) {
+            const clickEffect = document.createElement('div');
+            clickEffect.className = 'click-effect';
+            clickEffect.style.left = e.clientX + 'px';
+            clickEffect.style.top = e.clientY + 'px';
+            document.body.appendChild(clickEffect);
+
+            // Crear partículas
+            for(let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+
+            setTimeout(() => {
+                clickEffect.remove();
+            }, 500);
+        });
+
+        // Efecto de brillo al mover el mouse
+        document.addEventListener('mousemove', function(e) {
+            const glow = document.querySelector('.mouse-glow');
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // Efecto de interacción con las partículas
+        document.querySelectorAll('.animated-background span').forEach(span => {
+            span.addEventListener('mouseover', function() {
+                this.style.transform = 'scale(1.5)';
+                this.style.background = 'rgba(255, 255, 255, 0.3)';
+            });
+
+            span.addEventListener('mouseout', function() {
+                this.style.transform = 'scale(1)';
+                this.style.background = '';
+            });
+        });
+
+        // Script para manejar los cambios de color
+        document.addEventListener('DOMContentLoaded', function() {
+            const root = document.documentElement;
+            let colorIndex = 0;
+            const colors = [
+                { primary: '#FF6B6B', secondary: '#4ECDC4', accent: '#45B7D1' },
+                { primary: '#96CEB4', secondary: '#FFEEAD', accent: '#D4A5A5' },
+                { primary: '#9B59B6', secondary: '#3498DB', accent: '#2ECC71' },
+                { primary: '#E74C3C', secondary: '#F1C40F', accent: '#1ABC9C' },
+                { primary: '#FF9F1C', secondary: '#2EC4B6', accent: '#E71D36' },
+                { primary: '#7209B7', secondary: '#3A0CA3', accent: '#4361EE' },
+                { primary: '#F72585', secondary: '#B5179E', accent: '#7209B7' },
+                { primary: '#4CC9F0', secondary: '#4895EF', accent: '#4361EE' },
+                { primary: '#3A0CA3', secondary: '#4361EE', accent: '#4CC9F0' },
+                { primary: '#F94144', secondary: '#F3722C', accent: '#F8961E' },
+                { primary: '#F9C74F', secondary: '#90BE6D', accent: '#43AA8B' },
+                { primary: '#577590', secondary: '#43AA8B', accent: '#90BE6D' },
+                { primary: '#FF006E', secondary: '#FB5607', accent: '#8338EC' },
+                { primary: '#3A86FF', secondary: '#8338EC', accent: '#FF006E' },
+                { primary: '#FB5607', secondary: '#FF006E', accent: '#3A86FF' },
+                { primary: '#8338EC', secondary: '#3A86FF', accent: '#FB5607' },
+                // ... Añadir más combinaciones de colores aquí ...
+            ];
+
+            function updateColors() {
+                const color = colors[colorIndex];
+                document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary}, ${color.accent})`;
+                root.style.setProperty('--color-primary', color.primary);
+                root.style.setProperty('--color-secondary', color.secondary);
+                root.style.setProperty('--color-accent', color.accent);
+                
+                const primaryRGB = hexToRgb(color.primary);
+                root.style.setProperty('--color-primary-rgb', `${primaryRGB.r}, ${primaryRGB.g}, ${primaryRGB.b}`);
+                
+                colorIndex = (colorIndex + 1) % colors.length;
+            }
+
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            // Cambiar colores cada 3 segundos para una transición más rápida
+            setInterval(updateColors, 3000);
+            updateColors();
+
+            // Efecto de brillo al mover el mouse
+            document.addEventListener('mousemove', function(e) {
+                const glow = document.querySelector('.mouse-glow');
+                if (!glow) {
+                    const newGlow = document.createElement('div');
+                    newGlow.className = 'mouse-glow';
+                    document.body.appendChild(newGlow);
+                }
+                document.querySelector('.mouse-glow').style.left = e.clientX + 'px';
+                document.querySelector('.mouse-glow').style.top = e.clientY + 'px';
+            });
+
+            // Crear formas animadas
+            const shapesContainer = document.createElement('div');
+            shapesContainer.className = 'animated-shapes';
+            document.body.appendChild(shapesContainer);
+
+            for (let i = 0; i < 10; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+                shapesContainer.appendChild(shape);
+            }
+        });
+    </script>
+</body>
+</html> 
