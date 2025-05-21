@@ -2,7 +2,7 @@
     "1": {
         "nombre": "ADELGALAX  X 60 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 0,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-18 22:47:22",
@@ -55,7 +55,7 @@
     "2": {
         "nombre": "ANTITUMORAL X 60 CAP",
         "precio": 3.0,
-        "cantidad": 94,
+        "cantidad": 4,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -84,7 +84,7 @@
     "3": {
         "nombre": "ARANDANO NEGRO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 97,
+        "cantidad": 7,
         "categoria": "Protector Ocular",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -171,7 +171,7 @@
     "7": {
         "nombre": "CALCIO MAG-ZINC X 50 CAP",
         "precio": 3.0,
-        "cantidad": 500,
+        "cantidad": 200,
         "categoria": "Vitaminas y Minerales",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -321,7 +321,7 @@
     "13": {
         "nombre": "CHANCA PIEDRA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 91,
+        "cantidad": 90,
         "categoria": "Calculo Renal",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",
@@ -414,7 +414,7 @@
     "16": {
         "nombre": "COLON CLEANSER X 60 CAP",
         "precio": 3.0,
-        "cantidad": 497,
+        "cantidad": 97,
         "categoria": "Limpieza De colon",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-17 12:29:57",

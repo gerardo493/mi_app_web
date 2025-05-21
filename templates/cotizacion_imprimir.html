@@ -188,8 +188,8 @@
         <div class="factura-title">COTIZACIÓN</div>
         <div class="datos-row">
             <div class="datos-box">
-                Cliente RIF: {{ cotizacion.cliente.rif if cotizacion.cliente.rif else '' }}<br>
-                Nombre: {{ cotizacion.cliente.nombre if cotizacion.cliente.nombre else '' }}<br>
+                <span class="bold">Nombre:</span> {{ cotizacion.cliente.nombre if cotizacion.cliente.nombre else '' }}<br>
+                <span class="bold">RIF:</span> {{ cotizacion.cliente.rif if cotizacion.cliente.rif else cotizacion.cliente.id if cotizacion.cliente.id else '' }}<br>
                 Dirección: {{ cotizacion.cliente.direccion if cotizacion.cliente.direccion else '' }}<br>
                 Teléfono: {{ cotizacion.cliente.telefono if cotizacion.cliente.telefono else '' }}<br>
                 Validez (días): {{ cotizacion.validez_dias }}<br>
@@ -212,20 +212,25 @@
             </thead>
             <tbody>
                 {% for prod_id, cantidad in zip(cotizacion.productos, cotizacion.cantidades) %}
+                {% set precio = cotizacion.precios[loop.index0]|default(0)|float %}
+                {% set cant = cantidad|default(0)|int %}
+                {% set tasa = cotizacion.tasa_bcv|default(0)|float %}
+                {% set subtotal_usd = precio * cant %}
+                {% set subtotal_bs = subtotal_usd * tasa %}
                 <tr>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ cantidad }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ cant }}</td>
                     <td style="border: 2px solid #bfa43a;">{{ inventario[prod_id].nombre if prod_id in inventario else prod_id }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ cotizacion.precios[loop.index0]|default(0)|float|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (cotizacion.precios[loop.index0]|default(0)|float * cotizacion.tasa_bcv|default(0)|float)|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (cotizacion.precios[loop.index0]|default(0)|float * cantidad|default(0)|int * cotizacion.tasa_bcv|default(0)|float)|es_number }}</td>
-                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (cotizacion.precios[loop.index0]|default(0)|float * cantidad|default(0)|int)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ precio|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (precio * tasa)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ subtotal_bs|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ subtotal_usd|es_number }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         <div class="totales">
-            <span class="total-label">Total Exento:</span> Bs. {{ cotizacion.subtotal_bs|default(0)|float|es_number }}<br>
-            <span class="total-label">USD {{ cotizacion.subtotal_usd|default(0)|float|es_number }}</span><br>
+            <span class="total-label">Total Exento:</span> Bs. {{ total_bs|es_number }}<br>
+            <span class="total-label">USD {{ total_usd|es_number }}</span><br>
             {% if cotizacion.iva_total|default(0)|float > 0 %}
             <span class="total-label">IVA ({{ cotizacion.iva|default(0) }}%):</span> Bs. {{ (cotizacion.iva_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float)|es_number }}<br>
             <span class="total-label">USD {{ cotizacion.iva_total|default(0)|float|es_number }}</span><br>
@@ -236,8 +241,8 @@
             {% endif %}
             <br>
             <span class="total-label">Total a Pagar:</span><br>
-            <span class="total-main">Bs. {{ cotizacion.total_bs|default(0)|float|es_number }}</span><br>
-            <span class="total-secondary">USD {{ cotizacion.total_usd|default(0)|float|es_number }}</span><br>
+            <span class="total-main">Bs. {{ (total_bs - (cotizacion.descuento_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float) + (cotizacion.iva_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float))|es_number }}</span><br>
+            <span class="total-secondary">USD {{ (total_usd - cotizacion.descuento_total|default(0)|float + cotizacion.iva_total|default(0)|float)|es_number }}</span><br>
             <span class="tasa">Tasa de cambio utilizada: {{ cotizacion.tasa_bcv|default(0)|float|es_number }} Bs./USD</span>
         </div>
         <div class="notas">

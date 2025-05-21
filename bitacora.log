@@ -1,46 +1,5 @@
-[2025-05-20 00:43:01] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:46:05] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:47:06] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:47:25] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:48:38] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:50:51] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:51:05] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:51:11] Usuario: admin | Acción: Eliminar factura | Detalles: ID: 2
-[2025-05-20 00:51:25] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:51:31] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:51:40] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:52:01] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8024
-[2025-05-20 00:52:04] Usuario: admin | Acción: Logout | Detalles: Cierre de sesión
-[2025-05-20 19:49:34] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:49:37] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:49:42] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:49:43] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:49:51] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:50:30] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:50:31] Usuario: sistema | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:56:10] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 19:56:10] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:56:19] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 19:58:21] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 19:58:22] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 19:58:25] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 20:19:54] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 20:19:55] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 20:20:17] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 20:30:36] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 20:30:37] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 20:31:02] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 20:43:52] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 20:43:53] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 20:44:52] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 21:07:52] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 21:07:53] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 21:10:38] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 21:12:10] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 21:21:54] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 21:21:59] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 21:22:03] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 21:22:34] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
-[2025-05-20 22:10:54] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso
-[2025-05-20 22:10:55] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556
-[2025-05-20 22:11:00] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada
+[2025-05-21 04:52:14] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556 | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5774464
+[2025-05-21 04:52:16] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 94.8556 | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5774464
+[2025-05-21 04:56:31] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5774464
+[2025-05-21 04:56:37] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5774464
+[2025-05-21 04:56:53] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5774464
