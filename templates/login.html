@@ -390,6 +390,39 @@
         @media (max-width: 768px) {
             body {
                 padding: 10px;
+                /* Reducir la complejidad del gradiente */
+                background: linear-gradient(-45deg, var(--color-primary), var(--color-secondary));
+                animation: none;
+            }
+
+            /* Desactivar animaciones pesadas en móvil */
+            .stars-container, .grid-mesh, .connection, .star::before, .star::after {
+                display: none;
+            }
+
+            /* Reducir el número de estrellas */
+            .star {
+                display: none;
+            }
+
+            /* Simplificar efectos de hover */
+            .form-label:hover {
+                text-shadow: none;
+            }
+
+            /* Reducir efectos de sombra */
+            .card {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            }
+
+            .btn-primary:hover {
+                transform: none;
+                box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.4);
+            }
+
+            /* Desactivar el efecto de brillo del mouse en móvil */
+            .mouse-glow {
+                display: none;
             }
 
             .login-container {
@@ -439,7 +472,18 @@
             }
 
             .card {
-                width: 100%;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .card-header {
+                background-color: var(--color-primary);
+            }
+
+            /* Simplificar transiciones */
+            .form-control, .btn-primary, .input-group-text {
+                transition: none;
             }
 
             .logo-container {
@@ -820,36 +864,46 @@ document.getElementById('togglePassword').addEventListener('click', function() {
             });
         });
 
-        // Script para manejar los cambios de color
+        // Optimización para móvil
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Modificar la creación de estrellas para móvil
+        function createStars(count) {
+            if (isMobile()) {
+                return; // No crear estrellas en móvil
+            }
+            const container = document.querySelector('.stars-container');
+            for (let i = 0; i < count; i++) {
+                createStar(container);
+            }
+        }
+
+        // Optimizar el cambio de colores para móvil
         document.addEventListener('DOMContentLoaded', function() {
             const root = document.documentElement;
             let colorIndex = 0;
             const colors = [
-                { primary: '#FF6B6B', secondary: '#4ECDC4', accent: '#45B7D1' },
-                { primary: '#96CEB4', secondary: '#FFEEAD', accent: '#D4A5A5' },
-                { primary: '#9B59B6', secondary: '#3498DB', accent: '#2ECC71' },
-                { primary: '#E74C3C', secondary: '#F1C40F', accent: '#1ABC9C' },
-                { primary: '#FF9F1C', secondary: '#2EC4B6', accent: '#E71D36' },
-                { primary: '#7209B7', secondary: '#3A0CA3', accent: '#4361EE' },
-                { primary: '#F72585', secondary: '#B5179E', accent: '#7209B7' },
-                { primary: '#4CC9F0', secondary: '#4895EF', accent: '#4361EE' },
-                { primary: '#3A0CA3', secondary: '#4361EE', accent: '#4CC9F0' },
-                { primary: '#F94144', secondary: '#F3722C', accent: '#F8961E' },
-                { primary: '#F9C74F', secondary: '#90BE6D', accent: '#43AA8B' },
-                { primary: '#577590', secondary: '#43AA8B', accent: '#90BE6D' },
-                { primary: '#FF006E', secondary: '#FB5607', accent: '#8338EC' },
-                { primary: '#3A86FF', secondary: '#8338EC', accent: '#FF006E' },
-                { primary: '#FB5607', secondary: '#FF006E', accent: '#3A86FF' },
-                { primary: '#8338EC', secondary: '#3A86FF', accent: '#FB5607' },
-                // ... Añadir más combinaciones de colores aquí ...
+                { primary: '#FF6B6B', secondary: '#4ECDC4' },
+                { primary: '#96CEB4', secondary: '#FFEEAD' },
+                { primary: '#9B59B6', secondary: '#3498DB' },
+                { primary: '#E74C3C', secondary: '#F1C40F' },
+                { primary: '#FF9F1C', secondary: '#2EC4B6' }
             ];
 
             function updateColors() {
                 const color = colors[colorIndex];
-                document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary}, ${color.accent})`;
+                if (isMobile()) {
+                    // Usar solo dos colores en móvil
+                    document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary})`;
+                } else {
+                    // Usar tres colores en desktop
+                    document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary}, ${color.accent})`;
+                }
+                
                 root.style.setProperty('--color-primary', color.primary);
                 root.style.setProperty('--color-secondary', color.secondary);
-                root.style.setProperty('--color-accent', color.accent);
                 
                 const primaryRGB = hexToRgb(color.primary);
                 root.style.setProperty('--color-primary-rgb', `${primaryRGB.r}, ${primaryRGB.g}, ${primaryRGB.b}`);
@@ -866,8 +920,9 @@ document.getElementById('togglePassword').addEventListener('click', function() {
                 } : null;
             }
 
-            // Cambiar colores cada 3 segundos para una transición más rápida
-            setInterval(updateColors, 3000);
+            // Cambiar colores cada 5 segundos en móvil (más lento)
+            const interval = isMobile() ? 5000 : 3000;
+            setInterval(updateColors, interval);
             updateColors();
         });
 </script>
