@@ -55,6 +55,15 @@
             100% { --color-primary: #F9C74F; --color-secondary: #90BE6D; --color-accent: #43AA8B; }
         }
 
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
         .card {
             border: none;
             border-radius: 15px;
@@ -66,6 +75,8 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(var(--color-primary-rgb), 0.4);
             animation: cardColorChange 30s linear infinite;
+            position: relative;
+            z-index: 2;
         }
 
         .card-header {
@@ -145,10 +156,11 @@
 
         .logo-container {
             text-align: center;
-            margin: 20px 0;
+            margin: 20px auto;
             position: relative;
             z-index: 2;
             width: 100%;
+            max-width: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -224,14 +236,173 @@
                          0 0 20px rgba(255, 255, 255, 0.5);
         }
 
+        /* Efecto de estrellas brillantes y malla */
+        .stars-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .grid-mesh {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 0%, transparent 49%, rgba(255, 255, 255, 0.1) 50%, transparent 51%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, transparent 49%, rgba(255, 255, 255, 0.1) 50%, transparent 51%, transparent 100%);
+            background-size: 50px 50px;
+            animation: gridPulse 4s infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        .star {
+            position: absolute;
+            background: radial-gradient(circle at center,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 255, 0.95) 10%,
+                rgba(255, 255, 255, 0) 30%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: starTwinkle 2s infinite;
+            filter: brightness(2) drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+        }
+
+        .star::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            right: -30%;
+            bottom: -30%;
+            background: radial-gradient(circle at center,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 255, 0.9) 20%,
+                rgba(255, 255, 255, 0) 50%);
+            border-radius: 50%;
+            animation: starGlow 1.5s infinite;
+            filter: brightness(1.5);
+        }
+
+        .star::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle at center,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(255, 255, 255, 0.5) 30%,
+                rgba(255, 255, 255, 0) 60%);
+            border-radius: 50%;
+            animation: starPulse 3s infinite;
+            filter: brightness(1.5);
+        }
+
+        .connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%);
+            transform-origin: left center;
+            animation: connectionPulse 3s infinite;
+        }
+
+        @keyframes connectionPulse {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes starGlow {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.5);
+            }
+        }
+
+        @keyframes starPulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(2);
+            }
+        }
+
+        /* Eliminar las clases de electricidad anteriores */
+        .electricity-container, .lightning-grid, .lightning, .electricity-node {
+            display: none;
+        }
+
+        /* Efecto de brillo al mover el mouse */
+        .mouse-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: all 0.2s ease;
+            mix-blend-mode: screen;
+        }
+
+        /* Media queries solo para el formulario */
         @media (max-width: 768px) {
             body {
-                padding: 15px;
+                padding: 10px;
             }
 
             .login-container {
+                width: 90%;
                 padding: 15px;
-                margin-top: 15px;
+            }
+
+            .card {
+                width: 100%;
+            }
+
+            .logo-container {
+                width: 90%;
             }
 
             .logo-container img {
@@ -259,16 +430,20 @@
 
         @media (max-width: 576px) {
             body {
-                padding: 10px;
+                padding: 5px;
             }
 
             .login-container {
+                width: 95%;
                 padding: 10px;
-                margin-top: 10px;
+            }
+
+            .card {
+                width: 100%;
             }
 
             .logo-container {
-                margin: 15px 0;
+                width: 95%;
             }
 
             .logo-container img {
@@ -297,13 +472,22 @@
                 font-size: 0.95rem;
                 margin-bottom: 5px;
             }
-
-            .input-group {
-                margin-bottom: 15px;
-            }
         }
 
         @media (max-width: 360px) {
+            .login-container {
+                width: 98%;
+                padding: 8px;
+            }
+
+            .card {
+                width: 100%;
+            }
+
+            .logo-container {
+                width: 98%;
+            }
+
             .logo-container img {
                 max-width: 150px;
             }
@@ -330,23 +514,22 @@
                 font-size: 0.9rem;
                 margin-bottom: 4px;
             }
-
-            .input-group {
-                margin-bottom: 12px;
-            }
         }
 
         @media (min-height: 900px) {
-            body {
-                padding-top: 50px;
+            .login-container {
+                width: 80%;
+                max-width: 450px;
+                padding: 30px;
             }
 
-            .login-container {
-                margin-top: 30px;
+            .card {
+                width: 100%;
             }
 
             .logo-container {
-                margin: 30px 0;
+                width: 80%;
+                max-width: 450px;
             }
 
             .logo-container img {
@@ -378,16 +561,19 @@
         }
 
         @media (max-height: 600px) {
-            body {
+            .login-container {
+                width: 90%;
+                max-width: 320px;
                 padding: 10px;
             }
 
-            .login-container {
-                margin-top: 10px;
+            .card {
+                width: 100%;
             }
 
             .logo-container {
-                margin: 10px 0;
+                width: 90%;
+                max-width: 320px;
             }
 
             .logo-container img {
@@ -416,89 +602,12 @@
                 font-size: 0.9rem;
                 margin-bottom: 4px;
             }
-
-            .input-group {
-                margin-bottom: 10px;
-            }
-        }
-
-        /* Más figuras animadas */
-        .animated-shapes {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .shape {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 8s infinite;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        .shape:hover {
-            transform: scale(1.5) rotate(180deg);
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            animation-play-state: paused;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-50px) rotate(90deg) scale(1.2) translateX(30px); }
-            50% { transform: translateY(-30px) rotate(180deg) scale(1.4) translateX(-30px); }
-            75% { transform: translateY(-60px) rotate(270deg) scale(1.2) translateX(30px); }
-            100% { transform: translateY(0) rotate(360deg) scale(1); }
-        }
-
-        .shape:nth-child(1) { width: 100px; height: 100px; left: 10%; top: 20%; animation-delay: 0s; animation-duration: 8s; }
-        .shape:nth-child(2) { width: 150px; height: 150px; left: 20%; top: 60%; animation-delay: 1s; animation-duration: 7s; }
-        .shape:nth-child(3) { width: 80px; height: 80px; left: 30%; top: 40%; animation-delay: 2s; animation-duration: 9s; }
-        .shape:nth-child(4) { width: 120px; height: 120px; left: 40%; top: 80%; animation-delay: 3s; animation-duration: 6s; }
-        .shape:nth-child(5) { width: 90px; height: 90px; left: 50%; top: 30%; animation-delay: 4s; animation-duration: 8s; }
-        .shape:nth-child(6) { width: 110px; height: 110px; left: 60%; top: 70%; animation-delay: 5s; animation-duration: 7s; }
-        .shape:nth-child(7) { width: 70px; height: 70px; left: 70%; top: 50%; animation-delay: 6s; animation-duration: 9s; }
-        .shape:nth-child(8) { width: 130px; height: 130px; left: 80%; top: 20%; animation-delay: 7s; animation-duration: 8s; }
-        .shape:nth-child(9) { width: 95px; height: 95px; left: 90%; top: 60%; animation-delay: 8s; animation-duration: 7s; }
-        .shape:nth-child(10) { width: 85px; height: 85px; left: 5%; top: 80%; animation-delay: 9s; animation-duration: 8s; }
-
-        /* Efecto de brillo al mover el mouse */
-        .mouse-glow {
-            position: fixed;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            transition: all 0.2s ease;
-            mix-blend-mode: screen;
         }
     </style>
 </head>
 <body>
     <div class="mouse-glow"></div>
-    <div class="animated-background">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
+    <div class="stars-container"></div>
     <div class="login-container">
         <div class="logo-container">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
@@ -506,54 +615,54 @@
         <div class="card">
             <div class="card-header text-center">
                 <h4 class="mb-0">Iniciar Sesión</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" autocomplete="off">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Usuario</label>
+        </div>
+        <div class="card-body">
+            <form method="POST" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Usuario</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                             <input type="text" class="form-control" id="username" name="username" required autofocus autocomplete="off">
                         </div>
-                    </div>
+                </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <div class="input-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                             <input type="password" class="form-control" id="password" name="password" required autocomplete="off">
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                <i class="fas fa-eye" id="icono-ojo"></i>
-                            </button>
-                        </div>
+                            <i class="fas fa-eye" id="icono-ojo"></i>
+                        </button>
                     </div>
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Entrar</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
             const iconoOjo = document.getElementById('icono-ojo');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
                 iconoOjo.classList.remove('fa-eye');
                 iconoOjo.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
+    } else {
+        passwordInput.type = 'password';
                 iconoOjo.classList.remove('fa-eye-slash');
                 iconoOjo.classList.add('fa-eye');
             }
@@ -586,23 +695,128 @@
             }, 500);
         });
 
-        // Efecto de brillo al mover el mouse
-        document.addEventListener('mousemove', function(e) {
-            const glow = document.querySelector('.mouse-glow');
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
+        // Efecto de estrellas brillantes y malla
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.stars-container');
+            if (!container) {
+                const newContainer = document.createElement('div');
+                newContainer.className = 'stars-container';
+                document.body.appendChild(newContainer);
+            }
 
-        // Efecto de interacción con las partículas
-        document.querySelectorAll('.animated-background span').forEach(span => {
-            span.addEventListener('mouseover', function() {
-                this.style.transform = 'scale(1.5)';
-                this.style.background = 'rgba(255, 255, 255, 0.3)';
-            });
+            // Crear la malla
+            const grid = document.createElement('div');
+            grid.className = 'grid-mesh';
+            container.appendChild(grid);
 
-            span.addEventListener('mouseout', function() {
-                this.style.transform = 'scale(1)';
-                this.style.background = '';
+            // Crear estrellas iniciales
+            createStars(30);
+
+            function createStars(count) {
+                const container = document.querySelector('.stars-container');
+                for (let i = 0; i < count; i++) {
+                    createStar(container);
+                }
+            }
+
+            function createStar(container) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Tamaño más grande para las estrellas
+                const size = 4 + Math.random() * 6;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Posición aleatoria
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Retraso aleatorio en la animación
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                
+                container.appendChild(star);
+
+                // Crear conexiones con otras estrellas
+                createConnections(container, star);
+
+                // Crear destello aleatorio más frecuente
+                setTimeout(() => {
+                    createStarFlash(container, star);
+                }, Math.random() * 2000);
+            }
+
+            function createConnections(container, sourceStar) {
+                const stars = container.querySelectorAll('.star');
+                const sourceRect = sourceStar.getBoundingClientRect();
+                const sourceX = sourceRect.left + sourceRect.width / 2;
+                const sourceY = sourceRect.top + sourceRect.height / 2;
+
+                stars.forEach(targetStar => {
+                    if (targetStar !== sourceStar) {
+                        const targetRect = targetStar.getBoundingClientRect();
+                        const targetX = targetRect.left + targetRect.width / 2;
+                        const targetY = targetRect.top + targetRect.height / 2;
+
+                        const distance = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
+                        
+                        if (distance < 200) {
+                            const connection = document.createElement('div');
+                            connection.className = 'connection';
+                            connection.style.left = `${sourceX}px`;
+                            connection.style.top = `${sourceY}px`;
+                            connection.style.width = `${distance}px`;
+                            connection.style.transform = `rotate(${Math.atan2(targetY - sourceY, targetX - sourceX)}rad)`;
+                            container.appendChild(connection);
+
+                            setTimeout(() => {
+                                connection.remove();
+                            }, 3000);
+                        }
+                    }
+                });
+            }
+
+            function createStarFlash(container, sourceStar) {
+                const flash = document.createElement('div');
+                flash.className = 'star';
+                
+                // Tamaño más grande para los destellos
+                const size = 6 + Math.random() * 8;
+                flash.style.width = `${size}px`;
+                flash.style.height = `${size}px`;
+                
+                const rect = sourceStar.getBoundingClientRect();
+                flash.style.left = `${rect.left + (Math.random() - 0.5) * 150}px`;
+                flash.style.top = `${rect.top + (Math.random() - 0.5) * 150}px`;
+                
+                container.appendChild(flash);
+                
+                // Destellos más cortos
+                setTimeout(() => {
+                    flash.remove();
+                }, 1000);
+            }
+
+            // Actualizar conexiones y destellos periódicamente
+            setInterval(() => {
+                const stars = container.querySelectorAll('.star');
+                stars.forEach(star => {
+                    createConnections(container, star);
+                });
+
+                // Crear múltiples destellos a la vez
+                for (let i = 0; i < 4; i++) {
+                    const randomStar = stars[Math.floor(Math.random() * stars.length)];
+                    createStarFlash(container, randomStar);
+                }
+            }, 300);
+
+            // Efecto de brillo al mover el mouse
+            document.addEventListener('mousemove', function(e) {
+                const glow = document.querySelector('.mouse-glow');
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
             });
         });
 
@@ -655,30 +869,7 @@
             // Cambiar colores cada 3 segundos para una transición más rápida
             setInterval(updateColors, 3000);
             updateColors();
-
-            // Efecto de brillo al mover el mouse
-            document.addEventListener('mousemove', function(e) {
-                const glow = document.querySelector('.mouse-glow');
-                if (!glow) {
-                    const newGlow = document.createElement('div');
-                    newGlow.className = 'mouse-glow';
-                    document.body.appendChild(newGlow);
-                }
-                document.querySelector('.mouse-glow').style.left = e.clientX + 'px';
-                document.querySelector('.mouse-glow').style.top = e.clientY + 'px';
-            });
-
-            // Crear formas animadas
-            const shapesContainer = document.createElement('div');
-            shapesContainer.className = 'animated-shapes';
-            document.body.appendChild(shapesContainer);
-
-            for (let i = 0; i < 10; i++) {
-                const shape = document.createElement('div');
-                shape.className = 'shape';
-                shapesContainer.appendChild(shape);
-            }
         });
-    </script>
+</script>
 </body>
 </html> 
