@@ -7,6 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #FF6B6B;
+            --color-secondary: #4ECDC4;
+            --color-accent: #45B7D1;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -14,45 +20,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            background: linear-gradient(-45deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+            justify-content: center;
+            background: linear-gradient(-45deg, #FF6B6B, #4ECDC4, #45B7D1, #9B59B6, #3498DB, #E74C3C, #2ECC71);
             background-size: 400% 400%;
-            animation: gradient 8s ease infinite;
+            animation: gradient 20s ease infinite;
             position: relative;
             overflow-x: hidden;
             padding: 20px;
-            cursor: default;
-            transition: all 0.5s ease;
         }
 
         @keyframes gradient {
             0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            16.6% { background-position: 50% 25%; }
+            33.3% { background-position: 100% 50%; }
+            50% { background-position: 50% 75%; }
+            66.6% { background-position: 0% 75%; }
+            83.3% { background-position: 50% 25%; }
             100% { background-position: 0% 50%; }
-        }
-
-        /* Paleta de colores dinámica */
-        :root {
-            --color-primary: #FF6B6B;
-            --color-secondary: #4ECDC4;
-            --color-accent: #45B7D1;
-            --color-dark: #00473b;
-            --color-light: #ffffff;
-        }
-
-        /* Animación de cambio de color */
-        @keyframes colorChange {
-            0% { --color-primary: #FF6B6B; --color-secondary: #4ECDC4; --color-accent: #45B7D1; }
-            10% { --color-primary: #96CEB4; --color-secondary: #FFEEAD; --color-accent: #D4A5A5; }
-            20% { --color-primary: #9B59B6; --color-secondary: #3498DB; --color-accent: #2ECC71; }
-            30% { --color-primary: #E74C3C; --color-secondary: #F1C40F; --color-accent: #1ABC9C; }
-            40% { --color-primary: #FF9F1C; --color-secondary: #2EC4B6; --color-accent: #E71D36; }
-            50% { --color-primary: #7209B7; --color-secondary: #3A0CA3; --color-accent: #4361EE; }
-            60% { --color-primary: #F72585; --color-secondary: #B5179E; --color-accent: #7209B7; }
-            70% { --color-primary: #4CC9F0; --color-secondary: #4895EF; --color-accent: #4361EE; }
-            80% { --color-primary: #3A0CA3; --color-secondary: #4361EE; --color-accent: #4CC9F0; }
-            90% { --color-primary: #F94144; --color-secondary: #F3722C; --color-accent: #F8961E; }
-            100% { --color-primary: #F9C74F; --color-secondary: #90BE6D; --color-accent: #43AA8B; }
         }
 
         .login-container {
@@ -62,116 +46,228 @@
             z-index: 2;
             padding: 20px;
             margin: 0 auto;
-        }
-
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            background: rgba(var(--color-primary-rgb), 0.15);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            width: 100%;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(var(--color-primary-rgb), 0.4);
-            animation: cardColorChange 30s linear infinite;
-            position: relative;
-            z-index: 2;
-        }
-
-        .card-header {
-            background-color: rgba(var(--color-primary-rgb), 0.95);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            padding: 25px;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.6);
-            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
-        }
-
-        .card-header h4 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .card-body {
-            padding: 35px;
-            transition: all 0.3s ease;
-            background: rgba(var(--color-primary-rgb), 0.1);
-        }
-
-        .form-control {
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 1.1rem;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
-            transition: all 0.3s ease;
-            color: var(--color-primary);
-        }
-
-        .form-control:focus {
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5),
-                       0 0 30px rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.8);
-        }
-
-        .input-group {
-            transition: all 0.3s ease;
-        }
-
-        .input-group-text {
-            background-color: rgba(var(--color-primary-rgb), 0.2);
-            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
-            border-radius: 8px 0 0 8px;
-            padding: 12px;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .input-group-text i {
-            color: white;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                         0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .btn-primary {
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            background-color: rgba(var(--color-primary-rgb), 0.95);
-            border: none;
-            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.5);
-            background-color: rgba(var(--color-primary-rgb), 1);
+            transform-origin: center;
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
         .logo-container {
             text-align: center;
-            margin: 20px auto;
+            margin: 0 auto;
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 400px;
+            max-width: 300px;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: all 0.5s ease;
         }
 
         .logo-container img {
-            max-width: 250px;
-            width: 100%;
+            max-width: 100%;
+            width: auto;
             height: auto;
             filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
+            transform-origin: center;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            width: 100%;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: cardColorChange 20s linear infinite;
+        }
+
+        @keyframes cardColorChange {
+            0% { background: rgba(255, 107, 107, 0.15); border-color: rgba(255, 107, 107, 0.3); }
+            16.6% { background: rgba(78, 205, 196, 0.15); border-color: rgba(78, 205, 196, 0.3); }
+            33.3% { background: rgba(69, 183, 209, 0.15); border-color: rgba(69, 183, 209, 0.3); }
+            50% { background: rgba(155, 89, 182, 0.15); border-color: rgba(155, 89, 182, 0.3); }
+            66.6% { background: rgba(52, 152, 219, 0.15); border-color: rgba(52, 152, 219, 0.3); }
+            83.3% { background: rgba(231, 76, 60, 0.15); border-color: rgba(231, 76, 60, 0.3); }
+            100% { background: rgba(46, 204, 113, 0.15); border-color: rgba(46, 204, 113, 0.3); }
+        }
+
+        .card-header {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 25px;
+            transition: all 0.5s ease;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: headerColorChange 20s linear infinite;
+        }
+
+        @keyframes headerColorChange {
+            0% { background: rgba(255, 107, 107, 0.2); border-color: rgba(255, 107, 107, 0.3); }
+            16.6% { background: rgba(78, 205, 196, 0.2); border-color: rgba(78, 205, 196, 0.3); }
+            33.3% { background: rgba(69, 183, 209, 0.2); border-color: rgba(69, 183, 209, 0.3); }
+            50% { background: rgba(155, 89, 182, 0.2); border-color: rgba(155, 89, 182, 0.3); }
+            66.6% { background: rgba(52, 152, 219, 0.2); border-color: rgba(52, 152, 219, 0.3); }
+            83.3% { background: rgba(231, 76, 60, 0.2); border-color: rgba(231, 76, 60, 0.3); }
+            100% { background: rgba(46, 204, 113, 0.2); border-color: rgba(46, 204, 113, 0.3); }
+        }
+
+        .card-body {
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        /* Ajustes para diferentes tamaños de pantalla */
+        @media (min-width: 1920px) {
+            .login-container {
+                max-width: 500px;
+            }
+            .logo-container {
+                max-width: 400px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .login-container {
+                max-width: 600px;
+            }
+            .logo-container {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                width: 90%;
+                padding: 15px;
+            }
+            .logo-container {
+                max-width: 250px;
+            }
+            .card {
+                border-radius: 15px;
+            }
+            .card-header {
+                border-radius: 15px 15px 0 0 !important;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                width: 95%;
+                padding: 10px;
+            }
+            .logo-container {
+                max-width: 200px;
+            }
+            .card-header {
+                padding: 15px;
+            }
+            .card-body {
+                padding: 20px;
+            }
+        }
+
+        /* Ajustes para zoom */
+        @media screen and (min-resolution: 2dppx) {
+            .login-container {
+                transform: scale(0.9);
+            }
+            .logo-container img {
+                transform: scale(0.9);
+            }
+        }
+
+        @media screen and (min-resolution: 3dppx) {
+            .login-container {
+                transform: scale(0.8);
+            }
+            .logo-container img {
+                transform: scale(0.8);
+            }
+        }
+
+        /* Ajustes para altura de pantalla */
+        @media (max-height: 600px) {
+            .login-container {
+                transform: scale(0.9);
+            }
+            .logo-container {
+                max-width: 200px;
+            }
+        }
+
+        @media (max-height: 400px) {
+            .login-container {
+                transform: scale(0.8);
+            }
+            .logo-container {
+                max-width: 150px;
+            }
         }
 
         .form-label {
@@ -197,13 +293,13 @@
             font-size: 1.1rem;
             padding: 15px;
             background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(var(--color-primary-rgb), 0.6);
+            border: 1px solid rgba(255, 107, 107, 0.6);
         }
 
         .alert-success {
-            background-color: rgba(var(--color-primary-rgb), 0.15);
-            border-color: rgba(var(--color-primary-rgb), 0.6);
-            color: rgba(var(--color-primary-rgb), 0.95);
+            background-color: rgba(255, 107, 107, 0.15);
+            border-color: rgba(255, 107, 107, 0.6);
+            color: rgba(255, 107, 107, 0.95);
         }
 
         .alert-danger {
@@ -216,18 +312,6 @@
             background-color: rgba(255, 193, 7, 0.15);
             border-color: rgba(255, 193, 7, 0.6);
             color: rgba(255, 193, 7, 0.95);
-        }
-
-        .btn-outline-secondary {
-            border-color: rgba(var(--color-primary-rgb), 0.6);
-            color: white;
-            background-color: rgba(var(--color-primary-rgb), 0.1);
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: rgba(var(--color-primary-rgb), 0.2);
-            border-color: rgba(var(--color-primary-rgb), 0.8);
-            color: white;
         }
 
         .btn-outline-secondary i {
@@ -367,11 +451,6 @@
             }
         }
 
-        /* Eliminar las clases de electricidad anteriores */
-        .electricity-container, .lightning-grid, .lightning, .electricity-node {
-            display: none;
-        }
-
         /* Efecto de brillo al mover el mouse */
         .mouse-glow {
             position: fixed;
@@ -385,268 +464,6 @@
             transition: all 0.2s ease;
             mix-blend-mode: screen;
         }
-
-        /* Media queries solo para el formulario */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                /* Reducir la complejidad del gradiente */
-                background: linear-gradient(-45deg, var(--color-primary), var(--color-secondary));
-                animation: none;
-            }
-
-            /* Desactivar animaciones pesadas en móvil */
-            .stars-container, .grid-mesh, .connection, .star::before, .star::after {
-                display: none;
-            }
-
-            /* Reducir el número de estrellas */
-            .star {
-                display: none;
-            }
-
-            /* Simplificar efectos de hover */
-            .form-label:hover {
-                text-shadow: none;
-            }
-
-            /* Reducir efectos de sombra */
-            .card {
-                box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-            }
-
-            .btn-primary:hover {
-                transform: none;
-                box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.4);
-            }
-
-            /* Desactivar el efecto de brillo del mouse en móvil */
-            .mouse-glow {
-                display: none;
-            }
-
-            .login-container {
-                width: 90%;
-                padding: 15px;
-            }
-
-            .card {
-                width: 100%;
-            }
-
-            .logo-container {
-                width: 90%;
-            }
-
-            .logo-container img {
-                max-width: 200px;
-            }
-
-            .card-header {
-                padding: 20px;
-            }
-
-            .card-body {
-                padding: 25px;
-            }
-
-            .form-control, .input-group-text {
-                padding: 10px;
-                font-size: 1rem;
-            }
-
-            .btn-primary {
-                padding: 10px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            body {
-                padding: 5px;
-            }
-
-            .login-container {
-                width: 95%;
-                padding: 10px;
-            }
-
-            .card {
-                backdrop-filter: none;
-                -webkit-backdrop-filter: none;
-                background: rgba(255, 255, 255, 0.95);
-            }
-
-            .card-header {
-                background-color: var(--color-primary);
-            }
-
-            /* Simplificar transiciones */
-            .form-control, .btn-primary, .input-group-text {
-                transition: none;
-            }
-
-            .logo-container {
-                width: 95%;
-            }
-
-            .logo-container img {
-                max-width: 180px;
-            }
-
-            .card-header {
-                padding: 15px;
-            }
-
-            .card-body {
-                padding: 20px;
-            }
-
-            .form-control, .input-group-text {
-                padding: 8px;
-                font-size: 0.95rem;
-            }
-
-            .btn-primary {
-                padding: 8px;
-                font-size: 0.95rem;
-            }
-
-            .form-label {
-                font-size: 0.95rem;
-                margin-bottom: 5px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .login-container {
-                width: 98%;
-                padding: 8px;
-            }
-
-            .card {
-                width: 100%;
-            }
-
-            .logo-container {
-                width: 98%;
-            }
-
-            .logo-container img {
-                max-width: 150px;
-            }
-
-            .card-header {
-                padding: 12px;
-            }
-
-            .card-body {
-                padding: 15px;
-            }
-
-            .form-control, .input-group-text {
-                padding: 6px;
-                font-size: 0.9rem;
-            }
-
-            .btn-primary {
-                padding: 6px;
-                font-size: 0.9rem;
-            }
-
-            .form-label {
-                font-size: 0.9rem;
-                margin-bottom: 4px;
-            }
-        }
-
-        @media (min-height: 900px) {
-            .login-container {
-                width: 80%;
-                max-width: 450px;
-                padding: 30px;
-            }
-
-            .card {
-                width: 100%;
-            }
-
-            .logo-container {
-                width: 80%;
-                max-width: 450px;
-            }
-
-            .logo-container img {
-                max-width: 300px;
-            }
-
-            .card-header {
-                padding: 30px;
-            }
-
-            .card-body {
-                padding: 40px;
-            }
-
-            .form-control, .input-group-text {
-                padding: 15px;
-                font-size: 1.2rem;
-            }
-
-            .btn-primary {
-                padding: 15px;
-                font-size: 1.2rem;
-            }
-
-            .form-label {
-                font-size: 1.2rem;
-                margin-bottom: 10px;
-            }
-        }
-
-        @media (max-height: 600px) {
-            .login-container {
-                width: 90%;
-                max-width: 320px;
-                padding: 10px;
-            }
-
-            .card {
-                width: 100%;
-            }
-
-            .logo-container {
-                width: 90%;
-                max-width: 320px;
-            }
-
-            .logo-container img {
-                max-width: 150px;
-            }
-
-            .card-header {
-                padding: 12px;
-            }
-
-            .card-body {
-                padding: 15px;
-            }
-
-            .form-control, .input-group-text {
-                padding: 6px;
-                font-size: 0.9rem;
-            }
-
-            .btn-primary {
-                padding: 6px;
-                font-size: 0.9rem;
-            }
-
-            .form-label {
-                font-size: 0.9rem;
-                margin-bottom: 4px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -659,84 +476,57 @@
         <div class="card">
             <div class="card-header text-center">
                 <h4 class="mb-0">Iniciar Sesión</h4>
-        </div>
-        <div class="card-body">
-            <form method="POST" autocomplete="off">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Usuario</label>
+            </div>
+            <div class="card-body">
+                <form method="POST" autocomplete="off">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                             <input type="text" class="form-control" id="username" name="username" required autofocus autocomplete="off">
                         </div>
-                </div>
+                    </div>
                     <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <div class="input-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                             <input type="password" class="form-control" id="password" name="password" required autocomplete="off">
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                            <i class="fas fa-eye" id="icono-ojo"></i>
-                        </button>
+                                <i class="fas fa-eye" id="icono-ojo"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, message in messages %}
-                      <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Entrar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
             const iconoOjo = document.getElementById('icono-ojo');
             
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
                 iconoOjo.classList.remove('fa-eye');
                 iconoOjo.classList.add('fa-eye-slash');
-    } else {
-        passwordInput.type = 'password';
+            } else {
+                passwordInput.type = 'password';
                 iconoOjo.classList.remove('fa-eye-slash');
                 iconoOjo.classList.add('fa-eye');
             }
-        });
-
-        // Efecto de destello al hacer clic
-        document.addEventListener('click', function(e) {
-            const clickEffect = document.createElement('div');
-            clickEffect.className = 'click-effect';
-            clickEffect.style.left = e.clientX + 'px';
-            clickEffect.style.top = e.clientY + 'px';
-            document.body.appendChild(clickEffect);
-
-            // Crear partículas
-            for(let i = 0; i < 5; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = e.clientX + 'px';
-                particle.style.top = e.clientY + 'px';
-                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
-                document.body.appendChild(particle);
-
-                setTimeout(() => {
-                    particle.remove();
-                }, 1000);
-            }
-
-            setTimeout(() => {
-                clickEffect.remove();
-            }, 500);
         });
 
         // Efecto de estrellas brillantes y malla
@@ -863,68 +653,6 @@ document.getElementById('togglePassword').addEventListener('click', function() {
                 glow.style.top = e.clientY + 'px';
             });
         });
-
-        // Optimización para móvil
-        function isMobile() {
-            return window.innerWidth <= 768;
-        }
-
-        // Modificar la creación de estrellas para móvil
-        function createStars(count) {
-            if (isMobile()) {
-                return; // No crear estrellas en móvil
-            }
-            const container = document.querySelector('.stars-container');
-            for (let i = 0; i < count; i++) {
-                createStar(container);
-            }
-        }
-
-        // Optimizar el cambio de colores para móvil
-        document.addEventListener('DOMContentLoaded', function() {
-            const root = document.documentElement;
-            let colorIndex = 0;
-            const colors = [
-                { primary: '#FF6B6B', secondary: '#4ECDC4' },
-                { primary: '#96CEB4', secondary: '#FFEEAD' },
-                { primary: '#9B59B6', secondary: '#3498DB' },
-                { primary: '#E74C3C', secondary: '#F1C40F' },
-                { primary: '#FF9F1C', secondary: '#2EC4B6' }
-            ];
-
-            function updateColors() {
-                const color = colors[colorIndex];
-                if (isMobile()) {
-                    // Usar solo dos colores en móvil
-                    document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary})`;
-                } else {
-                    // Usar tres colores en desktop
-                    document.body.style.background = `linear-gradient(-45deg, ${color.primary}, ${color.secondary}, ${color.accent})`;
-                }
-                
-                root.style.setProperty('--color-primary', color.primary);
-                root.style.setProperty('--color-secondary', color.secondary);
-                
-                const primaryRGB = hexToRgb(color.primary);
-                root.style.setProperty('--color-primary-rgb', `${primaryRGB.r}, ${primaryRGB.g}, ${primaryRGB.b}`);
-                
-                colorIndex = (colorIndex + 1) % colors.length;
-            }
-
-            function hexToRgb(hex) {
-                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                return result ? {
-                    r: parseInt(result[1], 16),
-                    g: parseInt(result[2], 16),
-                    b: parseInt(result[3], 16)
-                } : null;
-            }
-
-            // Cambiar colores cada 5 segundos en móvil (más lento)
-            const interval = isMobile() ? 5000 : 3000;
-            setInterval(updateColors, interval);
-            updateColors();
-        });
-</script>
+    </script>
 </body>
 </html> 
