@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Cliente' if cliente else 'Nuevo Cliente' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ 'Editar Cliente' if cliente else 'Nuevo Cliente' }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% if cliente %}{{ url_for('editar_cliente', id=cliente.id|urlencode) }}{% else %}{{ url_for('nuevo_cliente') }}{% endif %}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if not cliente %}
+                    <div class="mb-3 row">
+                        <div class="col-md-3">
+                            <label for="tipo_id" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo_id" name="tipo_id" required>
+                                <option value="V">V (Natural)</option>
+                                <option value="J">J (Jurídico)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            <label for="numero_id" class="form-label">Cédula/RIF</label>
+                            <input type="text" class="form-control" id="numero_id" name="numero_id" pattern="[0-9]+" required>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID (RIF/Cédula)</label>
+                        <input type="text" class="form-control" id="id" name="id_visible" value="{{ cliente.id }}" readonly>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ cliente.nombre if cliente else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ cliente.email if cliente else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <div class="input-group">
+                            <select class="form-select" id="codigo_pais" name="codigo_pais" style="max-width: 140px;">
+                                <option value="+1" {% if cliente and cliente.telefono and cliente.telefono.startswith('+1') %}selected{% endif %}>🇺🇸 +1 (USA/Canadá)</option>
+                                <option value="+54" {% if cliente and cliente.telefono and cliente.telefono.startswith('+54') %}selected{% endif %}>🇦🇷 +54 (Argentina)</option>
+                                <option value="+591" {% if cliente and cliente.telefono and cliente.telefono.startswith('+591') %}selected{% endif %}>🇧🇴 +591 (Bolivia)</option>
+                                <option value="+55" {% if cliente and cliente.telefono and cliente.telefono.startswith('+55') %}selected{% endif %}>🇧🇷 +55 (Brasil)</option>
+                                <option value="+56" {% if cliente and cliente.telefono and cliente.telefono.startswith('+56') %}selected{% endif %}>🇨🇱 +56 (Chile)</option>
+                                <option value="+57" {% if cliente and cliente.telefono and cliente.telefono.startswith('+57') %}selected{% endif %}>🇨🇴 +57 (Colombia)</option>
+                                <option value="+506" {% if cliente and cliente.telefono and cliente.telefono.startswith('+506') %}selected{% endif %}>🇨🇷 +506 (Costa Rica)</option>
+                                <option value="+53" {% if cliente and cliente.telefono and cliente.telefono.startswith('+53') %}selected{% endif %}>🇨🇺 +53 (Cuba)</option>
+                                <option value="+593" {% if cliente and cliente.telefono and cliente.telefono.startswith('+593') %}selected{% endif %}>🇪🇨 +593 (Ecuador)</option>
+                                <option value="+503" {% if cliente and cliente.telefono and cliente.telefono.startswith('+503') %}selected{% endif %}>🇸🇻 +503 (El Salvador)</option>
+                                <option value="+34" {% if cliente and cliente.telefono and cliente.telefono.startswith('+34') %}selected{% endif %}>🇪🇸 +34 (España)</option>
+                                <option value="+502" {% if cliente and cliente.telefono and cliente.telefono.startswith('+502') %}selected{% endif %}>🇬🇹 +502 (Guatemala)</option>
+                                <option value="+504" {% if cliente and cliente.telefono and cliente.telefono.startswith('+504') %}selected{% endif %}>🇭🇳 +504 (Honduras)</option>
+                                <option value="+52" {% if cliente and cliente.telefono and cliente.telefono.startswith('+52') %}selected{% endif %}>🇲🇽 +52 (México)</option>
+                                <option value="+505" {% if cliente and cliente.telefono and cliente.telefono.startswith('+505') %}selected{% endif %}>🇳🇮 +505 (Nicaragua)</option>
+                                <option value="+507" {% if cliente and cliente.telefono and cliente.telefono.startswith('+507') %}selected{% endif %}>🇵🇦 +507 (Panamá)</option>
+                                <option value="+595" {% if cliente and cliente.telefono and cliente.telefono.startswith('+595') %}selected{% endif %}>🇵🇾 +595 (Paraguay)</option>
+                                <option value="+51" {% if cliente and cliente.telefono and cliente.telefono.startswith('+51') %}selected{% endif %}>🇵🇪 +51 (Perú)</option>
+                                <option value="+1" {% if cliente and cliente.telefono and cliente.telefono.startswith('+1') %}selected{% endif %}>🇩🇴 +1 (Rep. Dominicana)</option>
+                                <option value="+598" {% if cliente and cliente.telefono and cliente.telefono.startswith('+598') %}selected{% endif %}>🇺🇾 +598 (Uruguay)</option>
+                                <option value="+58" {% if cliente and cliente.telefono and cliente.telefono.startswith('+58') %}selected{% endif %}>🇻🇪 +58 (Venezuela)</option>
+                                <option value="+44" {% if cliente and cliente.telefono and cliente.telefono.startswith('+44') %}selected{% endif %}>🇬🇧 +44 (Reino Unido)</option>
+                                <option value="+49" {% if cliente and cliente.telefono and cliente.telefono.startswith('+49') %}selected{% endif %}>🇩🇪 +49 (Alemania)</option>
+                                <option value="+33" {% if cliente and cliente.telefono and cliente.telefono.startswith('+33') %}selected{% endif %}>🇫🇷 +33 (Francia)</option>
+                                <option value="+39" {% if cliente and cliente.telefono and cliente.telefono.startswith('+39') %}selected{% endif %}>🇮🇹 +39 (Italia)</option>
+                                <option value="+81" {% if cliente and cliente.telefono and cliente.telefono.startswith('+81') %}selected{% endif %}>🇯🇵 +81 (Japón)</option>
+                                <option value="+86" {% if cliente and cliente.telefono and cliente.telefono.startswith('+86') %}selected{% endif %}>🇨🇳 +86 (China)</option>
+                                <option value="+7" {% if cliente and cliente.telefono and cliente.telefono.startswith('+7') %}selected{% endif %}>🇷🇺 +7 (Rusia)</option>
+                                <option value="+91" {% if cliente and cliente.telefono and cliente.telefono.startswith('+91') %}selected{% endif %}>🇮🇳 +91 (India)</option>
+                                <!-- ... puedes agregar más países si lo deseas ... -->
+                            </select>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" value="{% if cliente and cliente.telefono %}{{ cliente.telefono[3:] if cliente.telefono.startswith('+') else cliente.telefono }}{% endif %}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion" rows="3" required>{{ cliente.direccion if cliente else '' }}</textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ 'Actualizar Cliente' if cliente else 'Guardar Cliente' }}
+                        </button>
+                        <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

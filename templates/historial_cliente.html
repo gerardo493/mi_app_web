@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ cliente.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Historial de {{ cliente.nombre }}</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-2"></i>Imprimir Historial
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtro por año y mes -->
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <select name="anio" class="form-select" id="filtroAnio">
+                {% for anio in anios_disponibles %}
+                <option value="{{ anio }}" {% if anio == filtro_anio %}selected{% endif %}>{{ anio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="mes" class="form-select" id="filtroMes">
+                <option value="">Todos los meses</option>
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if m == filtro_mes|int %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-auto align-self-center">
+            <span class="text-muted">Mes actual: {{ now.strftime('%B %Y') }}</span>
+        </div>
+    </form>
+
+    <!-- Resumen de Facturación del Cliente -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title mb-1">Total Facturado (Filtrado)</h6>
+                    <div><strong>${{ total_compras|es_number }}</strong></div>
+                    <div><strong>{{ total_bs|es_number }} Bs</strong></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title mb-1">Total Facturado (Año Actual)</h6>
+                    <div><strong>${{ total_anual_usd|es_number }}</strong></div>
+                    <div><strong>{{ total_anual_bs|es_number }} Bs</strong></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title mb-1">Total Facturado (Mes Actual)</h6>
+                    <div><strong>${{ (total_mensual_usd or 0)|es_number }}</strong></div>
+                    <div><strong>{{ (total_mensual_bs or 0)|es_number }} Bs</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Cliente -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Información del Cliente</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+                    <p><strong>Email:</strong> {{ cliente.email or 'No disponible' }}</p>
+                    <p><strong>Teléfono:</strong> {{ cliente.telefono or 'No disponible' }}</p>
+                    <p><strong>Dirección:</strong> <span style="white-space: normal; word-break: break-all;">{{ cliente.direccion or 'No disponible' }}</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Total Compras:</strong> ${{ (total_compras or 0)|es_number }}</p>
+                    <p><strong>Total Facturas:</strong> {{ facturas|length }}</p>
+                    {% if cuenta %}
+                    <p class="text-danger"><strong>Cuenta por Cobrar:</strong> ${{ (cuenta.monto or 0)|es_number }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mt-3">
+                {% if cliente.email %}
+                <a href="mailto:{{ cliente.email }}" class="btn btn-success me-2">
+                    <i class="fas fa-envelope me-2"></i>Enviar Email
+                </a>
+                {% endif %}
+                {% if cliente.telefono %}
+                <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" class="btn btn-success">
+                    <i class="fab fa-whatsapp me-2"></i>Enviar WhatsApp
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos Comprados -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Productos Comprados</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad Total</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, stats in productos_comprados.items() %}
+                        <tr>
+                            <td>{{ stats.nombre }}</td>
+                            <td>{{ stats.cantidad }}</td>
+                            <td>${{ stats.valor|es_number }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Facturas -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Historial de Facturas</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Total (USD $)</th>
+                            <th>Total (Bs)</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for factura in facturas|sort(attribute='fecha', reverse=true) %}
+                        <tr>
+                            <td>{{ factura.id }}</td>
+                            <td>{{ factura.fecha }}</td>
+                            <td>${{ (factura.total_usd or 0)|es_number }}</td>
+                            <td>{{ (factura.total_bs or 0)|es_number }} Bs</td>
+                            <td>
+                                {% if factura.estado == 'pagada' %}
+                                <span class="badge bg-success">Pagada</span>
+                                {% else %}
+                                <span class="badge bg-warning">Pendiente</span>
+                                {% endif %}
+                                {% if factura.condicion_pago == 'credito' %}
+                                    <div style="font-size:0.95em;">
+                                        Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
+                                        Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('ver_factura', id=factura.id) }}" class="btn btn-sm btn-info" title="Ver factura">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('editar_factura', id=factura.id) }}" class="btn btn-sm btn-warning" title="Editar factura">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('filtroAnio').focus();
+});
+</script>
+{% endblock %}
+
+<style>
+@media print {
+    .btn-group, .navbar {
+        display: none !important;
+    }
+    .card {
+        break-inside: avoid;
+    }
+}
+</style>
+{% endblock %} 

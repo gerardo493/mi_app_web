@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Pagos Recibidos{% endblock %}
+
+{% block content %}
+<style>
+    .pagos-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem 2rem 1rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .pagos-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    .pagos-header i {
+        font-size: 2.2rem;
+        margin-right: 1rem;
+    }
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+    .stats-card .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .stats-card .stats-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+    .table thead th {
+        background: #f8f9fa;
+        font-weight: 700;
+        color: #1a237e;
+        border-top: none;
+    }
+    .table tbody tr {
+        transition: all 0.2s;
+    }
+    .table tbody tr:hover {
+        background: #e3f2fd;
+        transform: scale(1.01);
+        box-shadow: 0 2px 8px rgba(13,71,161,0.07);
+    }
+    .btn-action {
+        padding: 0.4rem 0.7rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        margin-right: 0.2rem;
+    }
+</style>
+<div class="container-fluid">
+    <div class="pagos-header mb-4">
+        <h2><i class="fas fa-cash-register"></i> Pagos Recibidos</h2>
+        <div class="btn-group">
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+            </a>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="card-body">
+                    <div class="stats-value text-success">${{ total_usd|float|es_number }}</div>
+                    <div class="stats-label">Total Pagos Recibidos (USD)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="card-body">
+                    <div class="stats-value text-info">{{ total_bs|float|es_number }} Bs</div>
+                    <div class="stats-label">Total Pagos Recibidos (Bs)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <div class="card-body">
+                    <div class="stats-value text-secondary">{{ tasa_bcv|default('Cargando...', true)|es_number }} Bs/USD</div>
+                    <div class="stats-label">Tasa BCV Actual</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Detalle de Pagos Recibidos</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Factura</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Método</th>
+                            <th>Monto (USD)</th>
+                            <th>Monto (Bs)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pago in pagos %}
+                        <tr>
+                            <td><a href="/facturas/{{ pago.factura_id }}">#{{ pago.factura_id }}</a></td>
+                            <td>{{ pago.fecha }}</td>
+                            <td>
+                                {% if pago.cliente_id in clientes %}
+                                    <a href="/clientes/{{ pago.cliente_id }}">{{ clientes[pago.cliente_id].nombre }}</a>
+                                {% else %}
+                                    {{ pago.cliente_id }}
+                                {% endif %}
+                            </td>
+                            <td>{{ pago.metodo.replace('_', ' ').title() }}</td>
+                            <td>$ {{ pago.monto|float|es_number }}</td>
+                            <td>{{ (pago.monto|float * pago.tasa_bcv)|es_number }} Bs</td>
+                            <td>
+                                <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#modalDetallePago" 
+                                    data-factura="{{ pago.factura_id }}" data-fecha="{{ pago.fecha }}" data-monto="{{ pago.monto }}" 
+                                    data-metodo="{{ pago.metodo }}" 
+                                    data-referencia="{{ pago.referencia if pago.referencia is defined and pago.referencia else '-' }}" 
+                                    data-banco="{{ pago.banco if pago.banco is defined and pago.banco else '-' }}" 
+                                    data-captura="{{ pago.captura_path|default('') }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if pagos|length == 0 %}
+                        <tr>
+                            <td colspan="7">No hay pagos registrados.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalle de Pago -->
+<div class="modal fade" id="modalDetallePago" tabindex="-1" aria-labelledby="modalDetallePagoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetallePagoLabel">Detalle del Pago</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Factura:</strong> <span id="detalle-factura"></span></li>
+          <li class="list-group-item"><strong>Fecha:</strong> <span id="detalle-fecha"></span></li>
+          <li class="list-group-item"><strong>Monto:</strong> $<span id="detalle-monto"></span></li>
+          <li class="list-group-item"><strong>Método:</strong> <span id="detalle-metodo"></span></li>
+          <li class="list-group-item"><strong>Referencia:</strong> <span id="detalle-referencia"></span></li>
+          <li class="list-group-item"><strong>Banco:</strong> <span id="detalle-banco"></span></li>
+          <li class="list-group-item" id="detalle-captura-li" style="display:none;"><strong>Captura:</strong> <a id="detalle-captura" href="#" target="_blank">Ver Imagen</a></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Modal de detalle de pago
+var modalDetalle = document.getElementById('modalDetallePago');
+modalDetalle.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    document.getElementById('detalle-factura').textContent = button.getAttribute('data-factura');
+    document.getElementById('detalle-fecha').textContent = button.getAttribute('data-fecha');
+    document.getElementById('detalle-monto').textContent = parseFloat(button.getAttribute('data-monto')).toLocaleString('es-ES', {minimumFractionDigits:2});
+    document.getElementById('detalle-metodo').textContent = button.getAttribute('data-metodo').replace('_',' ').toUpperCase();
+    document.getElementById('detalle-referencia').textContent = button.getAttribute('data-referencia') || '-';
+    document.getElementById('detalle-banco').textContent = button.getAttribute('data-banco') || '-';
+    var captura = button.getAttribute('data-captura');
+    if (captura && captura !== 'None') {
+        document.getElementById('detalle-captura-li').style.display = '';
+        document.getElementById('detalle-captura').href = '/static/' + captura;
+    } else {
+        document.getElementById('detalle-captura-li').style.display = 'none';
+    }
+});
+</script>
+{% endblock %} 

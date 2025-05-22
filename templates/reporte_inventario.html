@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Inventario{% endblock %}
+
+{% block content %}
+<style>
+    .reporte-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card.primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+    }
+
+    .stats-card.success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        color: white;
+    }
+
+    .stats-card.info {
+        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+        color: white;
+    }
+
+    .stats-card.warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        color: white;
+    }
+
+    .stats-card .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .stats-card .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .stats-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .table-card .card-header.danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    }
+
+    .table-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: #1a237e;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    }
+
+    .badge-danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+    }
+
+    .company-header {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .company-header img {
+        max-height: 100px;
+        transition: all 0.3s ease;
+    }
+
+    .company-header img:hover {
+        transform: scale(1.05);
+    }
+
+    .company-header h3 {
+        color: #1a237e;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .company-header p {
+        color: #455a64;
+        margin-bottom: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-value {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-label {
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table thead th, .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media print {
+        .btn-group, .navbar {
+            display: none !important;
+        }
+        .card {
+            break-inside: avoid;
+            border: none !important;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+        .table {
+            font-size: 12px;
+        }
+        .table th {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+        }
+        .badge {
+            border: 1px solid #000;
+        }
+        .company-header {
+            border: none !important;
+        }
+        .container-fluid {
+            width: 100% !important;
+            padding: 0 !important;
+        }
+        .row {
+            margin: 0 !important;
+        }
+        .col-md-3 {
+            padding: 0 10px !important;
+        }
+        .stats-value {
+            font-size: 2rem !important;
+        }
+    }
+</style>
+
+<div class="reporte-container">
+    <div class="container">
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-boxes me-2"></i>Reporte de Inventario</h2>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group">
+                        <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Inventario
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="fas fa-print me-2"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encabezado de la Empresa -->
+        <div class="company-header">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
+                </div>
+                <div class="col-md-8 text-center">
+                    <h3>{{ empresa.nombre }}</h3>
+                    <p>RIF: {{ empresa.rif }}</p>
+                    <p>{{ empresa.direccion }}</p>
+                    <p>Teléfono: {{ empresa.telefono }}</p>
+                </div>
+                <div class="col-md-2 text-end">
+                    <p><strong>Fecha:</strong> {{ fecha_actual.strftime('%d/%m/%Y') }}</p>
+                    <p><strong>Tasa BCV:</strong> {{ tasa_bcv }} Bs/USD</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card primary">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stats-value">{{ total_productos|es_number(0) }}</div>
+                        <div class="stats-label">Total Productos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card success">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="stats-value">{{ total_stock|es_number(0) }}</div>
+                        <div class="stats-label">Total Stock</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card info">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stats-value">${{ valor_total|es_number }}</div>
+                        <div class="stats-label">Valor Total USD</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card warning">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-bolivar-sign"></i>
+                        </div>
+                        <div class="stats-value">{{ (valor_total * tasa_bcv)|es_number }}</div>
+                        <div class="stats-label">Valor Total Bs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos por Categoría -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-tags me-2"></i>Productos por Categoría</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">Categoría</th>
+                                <th style="width: 10%">Total Productos</th>
+                                <th style="width: 10%">Stock Total</th>
+                                <th style="width: 12%">Valor Total USD</th>
+                                <th style="width: 12%">Valor Total Bs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for categoria, datos in productos_por_categoria.items() %}
+                            <tr>
+                                <td>{{ categoria }}</td>
+                                <td class="text-end">{{ datos.productos|length }}</td>
+                                <td class="text-end">{{ datos.cantidad|es_number(0) }}</td>
+                                <td class="text-end">${{ datos.valor|es_number }}</td>
+                                <td class="text-end">{{ (datos.valor * tasa_bcv)|es_number }} Bs</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos con Bajo Stock -->
+        <div class="table-card">
+            <div class="card-header danger">
+                <h4><i class="fas fa-exclamation-triangle me-2"></i>Productos con Bajo Stock</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">ID</th>
+                                <th style="width: 25%">Nombre</th>
+                                <th style="width: 15%">Categoría</th>
+                                <th style="width: 10%">Stock</th>
+                                <th style="width: 10%">Precio USD</th>
+                                <th style="width: 10%">Precio Bs</th>
+                                <th style="width: 10%">Valor USD</th>
+                                <th style="width: 10%">Valor Bs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, producto in productos_bajo_stock.items() %}
+                            <tr>
+                                <td>{{ id }}</td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td class="text-end">
+                                    <span class="badge badge-danger">{{ producto.cantidad|es_number(0) }}</span>
+                                </td>
+                                <td class="text-end">${{ producto.precio|es_number }}</td>
+                                <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
+                                <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
+                                <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista Completa de Productos -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-list me-2"></i>Lista Completa de Productos</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%">ID</th>
+                                <th style="width: 22%" class="text-start">Nombre</th>
+                                <th style="width: 13%">Categoría</th>
+                                <th style="width: 8%">Stock</th>
+                                <th style="width: 10%">Precio USD</th>
+                                <th style="width: 10%">Precio Bs</th>
+                                <th style="width: 10%">Valor USD</th>
+                                <th style="width: 10%">Valor Bs</th>
+                                <th style="width: 9%">Última Entrada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, producto in inventario.items() %}
+                            <tr>
+                                <td>{{ id }}</td>
+                                <td class="text-start">{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td class="text-end">
+                                    <span class="badge {% if producto.cantidad > 0 %}badge-success{% else %}badge-danger{% endif %}">
+                                        {{ producto.cantidad|es_number(0) }}
+                                    </span>
+                                </td>
+                                <td class="text-end">${{ producto.precio|es_number }}</td>
+                                <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
+                                <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
+                                <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
+                                <td class="text-center">
+                                    {% if producto.ultima_entrada %}
+                                        {{ producto.ultima_entrada|string|replace('T', ' ')|datetimeformat('%d/%m/%Y') }}
+                                    {% else %}N/A{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if tasa_bcv is not defined or tasa_bcv == 0 %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>¡Advertencia! No se ha podido obtener la tasa BCV actual.
+        </div>
+        {% endif %}
+
+        {% if advertencia_tasa %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ advertencia_tasa }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

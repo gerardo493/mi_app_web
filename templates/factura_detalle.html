@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Factura #{{ factura.numero }}{% endblock %}
+
+{% block content %}
+<div class="container my-4" id="factura">
+    <div class="text-center mb-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="max-height: 100px;">
+        <h4 class="mt-2 mb-0">{{ empresa.nombre }}</h4>
+        <div>RIF: {{ empresa.rif }}</div>
+        <div>{{ empresa.direccion }}</div>
+        <div>Teléfono: {{ empresa.telefono }}</div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-6">
+            <strong>Nro. Factura:</strong> {{ factura.numero }}<br>
+            <strong>Fecha Emisión:</strong> {{ factura.fecha }} {{ factura.hora or '' }}<br>
+            <strong>Condición:</strong> {{ 'CRÉDITO' if factura.condicion_pago == 'credito' else 'CONTADO' }}{% if factura.condicion_pago == 'credito' and factura.fecha_vencimiento %} (Vence: {{ factura.fecha_vencimiento }}){% endif %}<br>
+            <strong>Fecha a Pagar:</strong> {{ factura.fecha_vencimiento if factura.condicion_pago == 'credito' else factura.fecha }}
+        </div>
+        <div class="col-md-6">
+            <strong>Cliente RIF:</strong> {{ clientes[factura.cliente_id].id if factura.cliente_id in clientes else factura.cliente_id }}<br>
+            <strong>Nombre:</strong> {{ clientes[factura.cliente_id].nombre if factura.cliente_id in clientes else '' }}<br>
+            <strong>Dirección:</strong> {{ clientes[factura.cliente_id].direccion if factura.cliente_id in clientes else '' }}<br>
+            <strong>Teléfono:</strong> {{ clientes[factura.cliente_id].telefono if factura.cliente_id in clientes else '' }}
+        </div>
+    </div>
+    <h5 class="text-center my-3">FACTURA</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">Precio Unit. (USD)</th>
+                    <th class="text-end">Precio Unit. (Bs)</th>
+                    <th class="text-end">Total (USD)</th>
+                    <th class="text-end">Total (Bs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
+                <tr>
+                    <td>{{ inventario[prod_id].nombre }}</td>
+                    <td class="text-end">{{ cantidad }}</td>
+                    <td class="text-end">${{ factura.precios[loop.index0]|es_number }}</td>
+                    <td class="text-end">{{ (factura.precios[loop.index0] * factura.tasa_bcv|float)|es_number }} Bs</td>
+                    <td class="text-end">${{ (factura.precios[loop.index0] * cantidad|int)|es_number }}</td>
+                    <td class="text-end">{{ (factura.precios[loop.index0] * cantidad|int * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                    <td class="text-end">${{ factura.subtotal_usd|es_number }}</td>
+                    <td class="text-end">{{ factura.subtotal_bs|es_number }} Bs</td>
+                </tr>
+                {% if factura.descuento_total > 0 %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Descuento:</strong></td>
+                    <td class="text-end">${{ factura.descuento_total|es_number }}</td>
+                    <td class="text-end">{{ (factura.descuento_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endif %}
+                {% if factura.iva_total > 0 %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>IVA ({{ factura.iva }}%):</strong></td>
+                    <td class="text-end">${{ factura.iva_total|es_number }}</td>
+                    <td class="text-end">{{ (factura.iva_total * factura.tasa_bcv|float)|es_number }} Bs</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                    <td class="text-end">${{ factura.total_usd|es_number }}</td>
+                    <td class="text-end">{{ factura.total_bs|es_number }} Bs</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-6"></div>
+        <div class="col-md-6 text-end">
+            <strong>Tasa BCV utilizada:</strong> {{ factura.tasa_bcv|es_number }} Bs/USD
+        </div>
+    </div>
+    <div class="alert alert-info mt-3" style="font-size: 0.95em;">
+        <strong>Nota:</strong> El documento es calculado a la tasa de cambio BCV vigente a la fecha de emisión en Bolívares. Si la factura no es pagada de contado, deberá ser cancelada al valor de la tasa bancaria publicada por el BCV para la fecha de pago de la factura, siempre referido por su fecha de emisión.
+    </div>
+    <div class="text-end mt-3">
+        <a href="{{ url_for('imprimir_factura', id=factura.id) }}" class="btn btn-primary" target="_blank">
+            <i class="fas fa-print me-2"></i>Imprimir / PDF
+        </a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalPago">
+            <i class="fas fa-dollar-sign me-2"></i>Registrar pago
+        </button>
+        <a href="{{ url_for('mostrar_facturas') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Facturas
+        </a>
+    </div>
+
+    <div class="modal fade" id="modalPago" tabindex="-1" aria-labelledby="modalPagoLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('registrar_pago', id=factura.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalPagoLabel">Registrar Pago</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="monto_pago" class="form-label">Monto</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="monto_pago" name="monto_pago" required>
+              </div>
+              <div class="mb-3">
+                <label for="moneda_pago" class="form-label">Moneda</label>
+                <select class="form-select" id="moneda_pago" name="moneda_pago" required>
+                  <option value="USD">USD</option>
+                  <option value="Bs">Bs</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="metodo_pago" class="form-label">Método</label>
+                <select class="form-select" id="metodo_pago" name="metodo_pago" required>
+                  <option value="efectivo_usd">Efectivo USD</option>
+                  <option value="efectivo_bs">Efectivo Bs</option>
+                  <option value="pago_movil">Pago Móvil</option>
+                  <option value="transferencia">Transferencia</option>
+                </select>
+              </div>
+              <div id="banco_container" style="display: none;">
+                <div class="mb-3">
+                  <label for="banco" class="form-label">Banco</label>
+                  <select class="form-select" id="banco" name="banco">
+                    <option value="">Seleccione un banco</option>
+                    <option value="0102">Banco de Venezuela</option>
+                    <option value="0104">Venezolano de Crédito</option>
+                    <option value="0105">Mercantil</option>
+                    <option value="0108">Provincial</option>
+                    <option value="0114">Bancaribe</option>
+                    <option value="0115">Exterior</option>
+                    <option value="0116">Occidental de Descuento</option>
+                    <option value="0128">Banco Caroní</option>
+                    <option value="0134">Banesco</option>
+                    <option value="0137">Sofitasa</option>
+                    <option value="0138">Banco Plaza</option>
+                    <option value="0146">Banco de la Gente Emprendedora</option>
+                    <option value="0151">BFC Banco Fondo Común</option>
+                    <option value="0156">100% Banco</option>
+                    <option value="0157">DelSur</option>
+                    <option value="0163">Banco del Tesoro</option>
+                    <option value="0166">Banco Agrícola de Venezuela</option>
+                    <option value="0168">Bancrecer</option>
+                    <option value="0169">Mi Banco</option>
+                    <option value="0171">Banco Activo</option>
+                    <option value="0172">Bancamiga</option>
+                    <option value="0173">Banco Internacional de Desarrollo</option>
+                    <option value="0174">Banplus</option>
+                    <option value="0175">Bicentenario del Pueblo</option>
+                    <option value="0176">Novo Banco</option>
+                    <option value="0177">Banco de la Fuerza Armada Nacional Bolivariana</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="captura_transaccion" class="form-label">Captura de Transacción</label>
+                  <input type="file" class="form-control" id="captura_transaccion" name="captura_transaccion" accept="image/*">
+                  <small class="text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</small>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="referencia_pago" class="form-label">Referencia</label>
+                <input type="text" class="form-control" id="referencia_pago" name="referencia_pago">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success">Guardar Pago</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Pagos -->
+    {% if factura.pagos %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Historial de Pagos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Banco</th>
+                            <th>Captura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pago in factura.pagos %}
+                        <tr>
+                            <td>{{ pago.fecha }}</td>
+                            <td>${{ pago.monto|es_number }}</td>
+                            <td>
+                                {{ pago.metodo|title }}
+                                {% if pago.referencia %}
+                                  <br><small class="text-muted">Ref: {{ pago.referencia }}</small>
+                                {% endif %}
+                                {% if pago.banco %}
+                                  <br>
+                                  <small class="text-muted">
+                                    {% set bancos = {
+                                        '0102': 'Banco de Venezuela',
+                                        '0104': 'Venezolano de Crédito',
+                                        '0105': 'Mercantil',
+                                        '0108': 'Provincial',
+                                        '0114': 'Bancaribe',
+                                        '0115': 'Exterior',
+                                        '0116': 'Occidental de Descuento',
+                                        '0128': 'Banco Caroní',
+                                        '0134': 'Banesco',
+                                        '0137': 'Sofitasa',
+                                        '0138': 'Banco Plaza',
+                                        '0146': 'Banco de la Gente Emprendedora',
+                                        '0151': 'BFC Banco Fondo Común',
+                                        '0156': '100% Banco',
+                                        '0157': 'DelSur',
+                                        '0163': 'Banco del Tesoro',
+                                        '0166': 'Banco Agrícola de Venezuela',
+                                        '0168': 'Bancrecer',
+                                        '0169': 'Mi Banco',
+                                        '0171': 'Banco Activo',
+                                        '0172': 'Bancamiga',
+                                        '0173': 'Banco Internacional de Desarrollo',
+                                        '0174': 'Banplus',
+                                        '0175': 'Bicentenario del Pueblo',
+                                        '0176': 'Novo Banco',
+                                        '0177': 'Banco de la Fuerza Armada Nacional Bolivariana'
+                                    } %}
+                                    {{ bancos.get(pago.banco, pago.banco) }}
+                                  </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ pago.metodo|title }}
+                                {% if pago.referencia %}
+                                  <br><small class="text-muted">Ref: {{ pago.referencia }}</small>
+                                {% endif %}
+                                {% if pago.banco %}
+                                  <br>
+                                  <small class="text-muted">
+                                    {% set bancos = {
+                                        '0102': 'Banco de Venezuela',
+                                        '0104': 'Venezolano de Crédito',
+                                        '0105': 'Mercantil',
+                                        '0108': 'Provincial',
+                                        '0114': 'Bancaribe',
+                                        '0115': 'Exterior',
+                                        '0116': 'Occidental de Descuento',
+                                        '0128': 'Banco Caroní',
+                                        '0134': 'Banesco',
+                                        '0137': 'Sofitasa',
+                                        '0138': 'Banco Plaza',
+                                        '0146': 'Banco de la Gente Emprendedora',
+                                        '0151': 'BFC Banco Fondo Común',
+                                        '0156': '100% Banco',
+                                        '0157': 'DelSur',
+                                        '0163': 'Banco del Tesoro',
+                                        '0166': 'Banco Agrícola de Venezuela',
+                                        '0168': 'Bancrecer',
+                                        '0169': 'Mi Banco',
+                                        '0171': 'Banco Activo',
+                                        '0172': 'Bancamiga',
+                                        '0173': 'Banco Internacional de Desarrollo',
+                                        '0174': 'Banplus',
+                                        '0175': 'Bicentenario del Pueblo',
+                                        '0176': 'Novo Banco',
+                                        '0177': 'Banco de la Fuerza Armada Nacional Bolivariana'
+                                    } %}
+                                    {{ bancos.get(pago.banco, pago.banco) }}
+                                  </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pago.captura_path %}
+                                    <a href="{{ url_for('static', filename=pago.captura_path) }}" target="_blank" class="btn btn-sm btn-info">
+                                        <i class="fas fa-image"></i> Ver Captura
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<style>
+@media print {
+    .btn, .navbar, .text-end.mt-3 { display: none !important; }
+    #factura { margin: 0 !important; }
+    .container { width: 100% !important; }
+}
+.table th {
+    background: #dff6ff;
+    color: #154360;
+    font-size: 1em;
+}
+.card-header, .alert-info {
+    background: #dff6ff;
+    color: #154360;
+}
+</style>
+
+{% block extra_js %}
+<script>
+document.getElementById('metodo_pago').addEventListener('change', function() {
+    const bancoContainer = document.getElementById('banco_container');
+    const bancoSelect = document.getElementById('banco');
+    const metodo = this.value;
+    if (metodo === 'pago_movil' || metodo === 'transferencia') {
+        bancoContainer.style.display = 'block';
+        bancoSelect.required = true;
+    } else {
+        bancoContainer.style.display = 'none';
+        bancoSelect.required = false;
+    }
+});
+
+// Validar tamaño de archivo antes de enviar
+document.getElementById('captura_transaccion').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+            this.value = '';
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

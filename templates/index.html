@@ -1,0 +1,696 @@
+    {% extends "base.html" %}
+
+    {% block title %}Inicio - Sistema de Facturación{% endblock %}
+
+    {% block content %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(41, 128, 185, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .stats-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover .stats-icon {
+            transform: scale(1.1);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .display-4 {
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .quick-actions .btn {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .quick-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .list-group-item {
+            transition: all 0.3s ease;
+            border-radius: 8px !important;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .list-group-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .list-group-item h6 {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .list-group-item p {
+            color: #34495e;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background-color: rgba(248, 249, 250, 0.95);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        #fecha-hora-actual {
+            font-weight: 500;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .text-muted {
+            color: #7f8c8d !important;
+        }
+
+        .text-danger {
+            color: #e74c3c !important;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .display-4 {
+                font-size: 2rem;
+            }
+
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .quick-actions .btn {
+                margin-bottom: 0.5rem;
+            }
+
+            .list-group-item {
+                padding: 0.75rem;
+            }
+
+            .card-header {
+                padding: 0.75rem;
+            }
+
+            #fecha-hora-actual {
+                font-size: 1rem;
+                min-width: 180px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .display-4 {
+                font-size: 1.5rem;
+            }
+
+            .stats-card .card-body {
+                padding: 1rem;
+            }
+
+            .quick-actions .btn {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .list-group-item {
+                padding: 0.5rem;
+            }
+
+            #fecha-hora-actual {
+                font-size: 0.9rem;
+                min-width: 150px;
+            }
+        }
+
+        .header-container {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            padding: 2rem 0;
+            margin: -1.5rem -1.5rem 2rem -1.5rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .welcome-subtext {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        #fecha-hora-actual {
+            background: rgba(255,255,255,0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header-stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            flex: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .header-stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header-stat-item.cuentas-cobrar {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(200, 35, 51, 0.9));
+        }
+
+        .header-stat-item.pagos-recibidos {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.9), rgba(30, 147, 49, 0.9));
+        }
+
+        .header-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-stat-bs {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+            margin-top: 0.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .tasa-bcv-container {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9));
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .tasa-bcv-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: white;
+            font-weight: 500;
+        }
+
+        .tasa-bcv-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .main-stats {
+            margin-top: 2rem;
+        }
+
+        .main-stats .card {
+            height: 100%;
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .main-stats .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .main-stats .card-body {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-stats .icon-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-stats .icon-container i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .main-stats .stat-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .main-stats .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-stats .stat-subtitle {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quick-actions .btn {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-actions .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            transition: all 0.3s ease;
+        }
+
+        .quick-actions .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .quick-actions .btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .quick-actions .btn i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .main-stats .card.clientes {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .main-stats .card.inventario {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .main-stats .card.facturas {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .main-stats .card.tasa-bcv {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .main-stats .icon-container.clientes {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .main-stats .icon-container.inventario {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .main-stats .icon-container.facturas {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+        }
+
+        .main-stats .icon-container.tasa-bcv {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 1.5rem 0;
+                margin: -1rem -1rem 1.5rem -1rem;
+            }
+
+            .welcome-text {
+                font-size: 1.75rem;
+            }
+
+            .welcome-subtext {
+                font-size: 1rem;
+            }
+
+            .header-stat-item {
+                min-width: 150px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 1rem 0;
+            }
+
+            .welcome-text {
+                font-size: 1.5rem;
+            }
+
+            .header-stat-item {
+                min-width: 100%;
+            }
+
+            #fecha-hora-actual {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+
+    <div class="container-fluid px-4">
+        <div class="header-container">
+            <div class="container">
+                <div class="header-content">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-8">
+                            <h1 class="welcome-text">Bienvenido al Sistema de Facturación</h1>
+                            <p class="welcome-subtext">Panel de Control y Gestión Empresarial</p>
+                            <div class="tasa-bcv-container">
+                                <div class="tasa-bcv-label">Tasa BCV Actual</div>
+                                <div class="d-flex align-items-center">
+                                    <div class="tasa-bcv-value">{{ tasa_bcv|float|es_number }} Bs/USD</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
+                            <div id="fecha-hora-actual"></div>
+                        </div>
+                    </div>
+                    <div class="header-stats">
+                        <div class="header-stat-item cuentas-cobrar">
+                            <div class="header-stat-label">Cuentas por Cobrar</div>
+                            <div class="header-stat-value">${{ total_cobrar_usd|float|es_number }}</div>
+                            <div class="header-stat-bs">{{ total_cobrar_bs|float|es_number }} Bs</div>
+                        </div>
+                        <div class="header-stat-item pagos-recibidos">
+                            <div class="header-stat-label">Pagos Recibidos</div>
+                            <div class="header-stat-value">${{ total_pagos_recibidos_usd|float|es_number }}</div>
+                            <div class="header-stat-bs">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4 main-stats">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card clientes">
+                    <div class="card-body">
+                        <div class="icon-container clientes">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-title">Total Clientes</div>
+                        <div class="stat-value">{{ total_clientes }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card inventario">
+                    <div class="card-body">
+                        <div class="icon-container inventario">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-title">Productos en Inventario</div>
+                        <div class="stat-value">{{ total_productos }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card facturas">
+                    <div class="card-body">
+                        <div class="icon-container facturas">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="stat-title">Facturas del Mes</div>
+                        <div class="stat-value">{{ facturas_mes }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="card tasa-bcv">
+                    <div class="card-body">
+                        <div class="icon-container tasa-bcv">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-title">Tasa BCV</div>
+                        <div class="stat-value">{{ tasa_bcv|float|es_number }}</div>
+                        <div class="stat-subtitle">Bs/USD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/clientes/nuevo" class="btn btn-primary w-100">
+                                    <i class="fas fa-user-plus"></i>Nuevo Cliente
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/inventario/nuevo" class="btn btn-success w-100">
+                                    <i class="fas fa-box-open"></i>Nuevo Producto
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/facturas/nueva" class="btn btn-warning w-100">
+                                    <i class="fas fa-file-invoice-dollar"></i>Nueva Factura
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/cotizaciones/nueva" class="btn btn-info w-100">
+                                    <i class="fas fa-file-alt"></i>Nueva Cotización
+                            </a>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+        <div class="row mt-4 g-4">
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Últimas Facturas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for factura in ultimas_facturas %}
+                        <a href="/facturas/{{ factura.id }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                <h6 class="mb-1">Factura #{{ factura.numero }}</h6>
+                                        <p class="mb-1">{{ factura.cliente }}</p>
+                            </div>
+                                    <div class="text-end">
+                                        <small class="d-block">{{ factura.fecha }}</small>
+                            <small class="text-muted">${{ factura.total }}</small>
+                                    </div>
+                                </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos con Bajo Stock</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for producto in productos_bajo_stock %}
+                        <a href="{{ url_for('ver_producto', id=producto.id if producto.id is defined else loop.index) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                <h6 class="mb-1">{{ producto.nombre }}</h6>
+                                        <p class="mb-1">{{ producto.categoria }}</p>
+                                    </div>
+                                <small class="text-danger">Stock: {{ producto.stock or producto.cantidad }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if advertencia_tasa %}
+    <div class="alert alert-warning mt-3" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ advertencia_tasa }}
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+    function actualizarFechaHora() {
+        const now = new Date();
+        // Fecha: miércoles, 21 de mayo de 2025
+        const fecha = now.toLocaleDateString('es-VE', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Hora manual en 12 horas, con AM/PM en español
+        let horas = now.getHours();
+        const minutos = now.getMinutes().toString().padStart(2, '0');
+        const segundos = now.getSeconds().toString().padStart(2, '0');
+        const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
+        horas = horas % 12;
+        horas = horas ? horas : 12; // el 0 se muestra como 12
+
+        const hora = `${horas.toString().padStart(2, '0')}:${minutos}:${segundos} ${ampm}`;
+
+        document.getElementById('fecha-hora-actual').textContent = `${fecha}, ${hora}`;
+    }
+    actualizarFechaHora();
+    setInterval(actualizarFechaHora, 1000);
+    </script>
+    {% endblock %} 

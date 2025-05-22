@@ -1,0 +1,573 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario{% endblock %}
+
+{% block content %}
+<style>
+    .inventario-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .page-header .badge {
+        font-size: 1.3rem;
+        padding: 0.8rem 1.5rem;
+        margin-left: 1rem;
+        background: #ffd700 !important;
+        color: #000000 !important;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        text-shadow: none;
+        font-weight: 800;
+    }
+
+    .btn-group .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+    }
+
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn-group .btn i {
+        font-size: 1.1rem;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #1a237e;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .form-control::placeholder {
+        color: #7986cb;
+        font-weight: 400;
+    }
+
+    .table thead th {
+        background: #1a237e;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        padding: 1.2rem;
+        border-bottom: none;
+    }
+
+    .table tbody td {
+        padding: 1.2rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+        color: #1a237e;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .btn-group .btn-sm {
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #00bcd4, #0097a7);
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e, #0d47a1);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffa000, #f57c00);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        border: none;
+    }
+
+    .badge {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .badge.bg-success {
+        background: #1b5e20 !important;
+        color: white !important;
+    }
+
+    .badge.bg-warning {
+        background: #f57f17 !important;
+        color: white !important;
+    }
+
+    .badge.bg-danger {
+        background: #b71c1c !important;
+        color: white !important;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        color: #1a237e;
+    }
+
+    .modal-body strong {
+        font-weight: 700;
+        color: #0a1a4a;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.2rem;
+        border: 2px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-check-input:checked {
+        background-color: #1a237e;
+        border-color: #1a237e;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn-group .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    .search-card .input-group {
+        position: relative;
+    }
+
+    .autocomplete-items {
+        position: absolute;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .autocomplete-items div {
+        padding: 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 1.1rem;
+    }
+
+    .autocomplete-items div:hover {
+        background-color: #f8f9fa;
+    }
+
+    .autocomplete-items div strong {
+        color: #1a237e;
+        font-weight: 600;
+    }
+
+    .autocomplete-items div small {
+        font-size: 0.9rem;
+        color: #5c6bc0;
+    }
+
+    .autocomplete-active {
+        background-color: #e8eaf6 !important;
+    }
+
+    .autocomplete-active strong {
+        color: #0a1a4a;
+    }
+</style>
+
+<div class="inventario-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-boxes me-2"></i>Inventario
+            </h2>
+            <div class="btn-group">
+                <a href="{{ url_for('reporte_inventario') }}" class="btn btn-info">
+                    <i class="fas fa-chart-bar me-2"></i>Ver Reporte
+                </a>
+                <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nuevo Producto
+                </a>
+                <a href="{{ url_for('ajustar_stock') }}" class="btn btn-warning">
+                    <i class="fas fa-boxes me-2"></i>Ajustar Stock
+                </a>
+                <button type="button" class="btn btn-danger" id="btnEliminarSeleccionados" style="display: none;">
+                    <i class="fas fa-trash me-2"></i>Eliminar Seleccionados
+                </button>
+            </div>
+        </div>
+
+        <div class="search-card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" name="q" id="searchInput"
+                                   placeholder="Buscar por nombre de producto" value="{{ q or '' }}" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="categoria" class="form-select">
+                            <option value="">Todas las categorías</option>
+                            {% for cat in categorias %}
+                            <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="orden" class="form-select">
+                            <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>Ordenar alfabéticamente</option>
+                            <option value="stock" {% if filtro_orden == 'stock' %}selected{% endif %}>Ordenar por stock</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, producto in inventario.items() %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input producto-check" type="checkbox" value="{{ id }}">
+                                    </div>
+                                </td>
+                                <td>{{ id }}</td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>
+                                    <span class="badge {% if producto.cantidad > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ producto.cantidad }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('ver_producto', id=id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('editar_producto', id=id) }}" class="btn btn-sm btn-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="confirmarEliminacion('{{ id }}', '{{ producto.nombre }}')" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarEliminacion" tabindex="-1" aria-labelledby="confirmarEliminacionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarEliminacionLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar el producto <strong id="nombreProducto"></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación múltiple -->
+<div class="modal fade" id="confirmarEliminacionMultiple" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación Múltiple
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar los <span id="cantidadProductos"></span> productos seleccionados?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminarMultiple" method="POST" action="{{ url_for('eliminar_productos_multiples') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="productos" id="productosSeleccionados">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar Seleccionados
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar todos los modales de Bootstrap
+    var modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+        new bootstrap.Modal(modal);
+    });
+
+    // Manejar selección de todos los productos
+    const selectAll = document.getElementById('selectAll');
+    const productoChecks = document.querySelectorAll('.producto-check');
+    const btnEliminarSeleccionados = document.getElementById('btnEliminarSeleccionados');
+
+    selectAll.addEventListener('change', function() {
+        productoChecks.forEach(check => {
+            check.checked = this.checked;
+        });
+        actualizarBotonEliminar();
+    });
+
+    productoChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            actualizarBotonEliminar();
+            // Actualizar el estado del checkbox "Seleccionar todos"
+            selectAll.checked = Array.from(productoChecks).every(c => c.checked);
+        });
+    });
+
+    function actualizarBotonEliminar() {
+        const seleccionados = document.querySelectorAll('.producto-check:checked');
+        btnEliminarSeleccionados.style.display = seleccionados.length > 0 ? 'inline-block' : 'none';
+    }
+
+    // Manejar eliminación múltiple
+    btnEliminarSeleccionados.addEventListener('click', function() {
+        const seleccionados = Array.from(document.querySelectorAll('.producto-check:checked')).map(cb => cb.value);
+        document.getElementById('cantidadProductos').textContent = seleccionados.length;
+        document.getElementById('productosSeleccionados').value = JSON.stringify(seleccionados);
+        new bootstrap.Modal(document.getElementById('confirmarEliminacionMultiple')).show();
+    });
+
+    // Autocompletado
+    const searchInput = document.getElementById('searchInput');
+    const productos = {{ inventario|tojson|safe }};
+    
+    searchInput.addEventListener('input', function() {
+        const val = this.value.toLowerCase();
+        const autocompleteList = document.getElementById('autocompleteList');
+        
+        // Limpiar lista anterior
+        if (autocompleteList) {
+            autocompleteList.remove();
+        }
+        
+        if (val.length < 2) return;
+        
+        // Crear lista de sugerencias
+        const matches = Object.entries(productos).filter(([id, prod]) => 
+            prod.nombre.toLowerCase().includes(val)
+        ).slice(0, 5); // Limitar a 5 resultados
+        
+        if (matches.length === 0) return;
+        
+        // Crear elemento de lista
+        const list = document.createElement('div');
+        list.id = 'autocompleteList';
+        list.className = 'autocomplete-items';
+        
+        matches.forEach(([id, prod]) => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <strong>${prod.nombre}</strong>
+                <small class="text-muted ms-2">ID: ${id}</small>
+                <small class="text-muted ms-2">Stock: ${prod.cantidad}</small>
+            `;
+            div.addEventListener('click', function() {
+                searchInput.value = prod.nombre;
+                list.remove();
+            });
+            list.appendChild(div);
+        });
+        
+        // Insertar lista después del input
+        searchInput.parentNode.appendChild(list);
+    });
+    
+    // Cerrar la lista al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        const list = document.getElementById('autocompleteList');
+        if (list && !searchInput.contains(e.target) && !list.contains(e.target)) {
+            list.remove();
+        }
+    });
+});
+
+function confirmarEliminacion(id, nombre) {
+    // Actualizar el nombre del producto en el modal
+    document.getElementById('nombreProducto').textContent = nombre;
+    
+    // Actualizar la acción del formulario
+    var form = document.getElementById('formEliminar');
+    form.action = "{{ url_for('eliminar_producto', id=0) }}".replace('0', id);
+    
+    // Mostrar el modal
+    var modal = new bootstrap.Modal(document.getElementById('confirmarEliminacion'));
+    modal.show();
+}
+</script>
+{% endblock %}

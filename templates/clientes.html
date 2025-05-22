@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<style>
+    .clientes-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-group .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn-group .btn i {
+        font-size: 1.1rem;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: #1a237e;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+        color: #2c3e50;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .btn-group .btn-sm {
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #00bcd4, #0097a7);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107, #ffa000);
+        border: none;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        border: none;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .modal-footer .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn-group .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="clientes-container">
+<div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-users me-2"></i>Gestión de Clientes</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('reporte_clientes') }}" class="btn btn-info">
+                <i class="fas fa-chart-bar me-2"></i>Ver Reporte
+            </a>
+            <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Cliente
+            </a>
+        </div>
+    </div>
+
+        <div class="search-card">
+        <div class="card-body">
+                <form method="get" class="row g-3">
+                <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" name="q" 
+                                   placeholder="Buscar por nombre o RIF" value="{{ q or '' }}">
+                        </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="orden" class="form-select">
+                        <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>Ordenar por Nombre</option>
+                        <option value="rif" {% if filtro_orden == 'rif' %}selected{% endif %}>Ordenar por RIF</option>
+                    </select>
+                </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                </div>
+            </form>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                            <th>RIF</th>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th style="max-width: 180px; min-width: 120px; width: 18%;">Email</th>
+                            <th style="max-width: 200px; min-width: 120px; width: 22%;">Dirección</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, cliente in clientes.items() %}
+                        <tr>
+                            <td>{{ id }}</td>
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                                <td style="max-width: 180px; min-width: 120px; width: 18%; white-space: normal; word-break: break-all;" 
+                                    title="{{ cliente.email }}">{{ cliente.email }}</td>
+                                <td style="max-width: 200px; min-width: 120px; width: 22%; white-space: normal; word-break: break-all;">
+                                    {{ cliente.direccion }}
+                                </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('historial_cliente', id=id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_cliente', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
+                                            onclick="confirmarEliminacion('{{ id }}', '{{ cliente.nombre }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar al cliente <strong id="nombreCliente"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id, nombre) {
+    document.getElementById('nombreCliente').textContent = nombre;
+    document.getElementById('formEliminar').action = "{{ url_for('eliminar_cliente', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('modalConfirmacion')).show();
+}
+</script>
+{% endblock %}

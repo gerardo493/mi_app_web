@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Producto' if producto else 'Nuevo Producto' }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ 'Editar Producto' if producto else 'Nuevo Producto' }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% if producto %}{{ url_for('editar_producto', id=producto.id) }}{% else %}{{ url_for('nuevo_producto') }}{% endif %}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del producto</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ producto.nombre if producto else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="categoria" class="form-label">Categoría</label>
+                        <select class="form-select" id="categoria" name="categoria" required>
+                            <option value="">Seleccione una categoría</option>
+                            {% for categoria in ['Via Respiratoria', 'Adelgazante-Laxante', 'Antitumorales - anticancerigeno', 
+                                               'Protector Ocular', 'Bactericida', 'Protector Hepatico', 
+                                               'Vitaminas y Minerales', 'Circulación Insuficiencia Venosa', 
+                                               'Adelgazante-Diuretico', 'Calculo Renal', 'Regenerador osio', 
+                                               'Limpieza De colon', 'Anti-inflamatorio', 
+                                               'Oxigenante/ Energizante', 'Oxigenante Cerebral'] %}
+                            <option value="{{ categoria }}" {% if producto and producto.categoria == categoria %}selected{% endif %}>
+                                {{ categoria }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="precio" class="form-label">Precio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="precio" name="precio" step="0.01" min="0" value="{{ producto.precio if producto else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stock" class="form-label">Stock Inicial</label>
+                        <input type="number" class="form-control" id="stock" name="stock" min="0" value="{{ producto.cantidad if producto else '' }}" required {% if producto %}readonly{% endif %}>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ 'Actualizar Producto' if producto else 'Guardar Producto' }}
+                        </button>
+                        <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cotización #{{ cotizacion.numero_cotizacion }}</title>
+    <style>
+        body, html {
+            height: 100%;
+            width: 100%;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            position: relative;
+            background: #fff;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.18;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .watermark-content {
+            text-align: center;
+            font-size: 8em;
+            font-weight: bold;
+            color: #154360;
+            white-space: pre-line;
+        }
+        .watermark-content img {
+            max-width: 90%;
+            max-height: 90%;
+            opacity: 0.32;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .factura-content {
+            position: relative;
+            z-index: 1;
+            width: 750px;
+            margin: 40px auto 0 auto;
+            padding: 30px 30px 20px 30px;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .logo-col {
+            width: 180px;
+            min-width: 180px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-col img {
+            max-width: 120px;
+            max-height: 120px;
+            margin: 0 auto;
+            display: block;
+        }
+        .empresa-col {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.15em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .factura-title {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 10px 0 18px 0;
+            letter-spacing: 2px;
+        }
+        .datos-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .datos-box {
+            width: 48%;
+            font-weight: bold;
+        }
+        .datos-box-right {
+            text-align: right;
+        }
+        .bold { font-weight: bold; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1.5px solid #d1d5db;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            background-color: #f5f6fa;
+        }
+        th {
+            background-color: #e3f0ff;
+            color: #1976d2;
+            border: 1.5px solid #d1d5db;
+        }
+        .text-end { text-align: right; }
+        .text-center { text-align: center; }
+        .total-row { font-weight: bold; }
+        .totales {
+            margin-top: 18px;
+            margin-bottom: 18px;
+            font-weight: bold;
+            text-align: right;
+            width: 100%;
+        }
+        .totales .total-label {
+            font-size: 1.25em;
+            font-weight: bold;
+        }
+        .totales .total-main {
+            font-size: 2em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-top: 0.2em;
+        }
+        .totales .total-secondary {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .totales .tasa {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1976d2;
+            margin-top: 0.5em;
+        }
+        .notas {
+            background:#dff6ff; color:#154360; padding:8px 12px; border-radius:6px; font-size:0.95em; margin-bottom:20px; font-weight: bold;
+            text-align: center;
+        }
+        @media print {
+            .no-print { display: none; }
+            .watermark { opacity: 0.15; }
+            .factura-content { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">
+        <div class="watermark-content">
+            <img src="{{ url_for('static', filename='logo.png') }}" style="max-width: 1200px; max-height: 1200px; opacity:0.32; display:block; margin:0 auto 10px auto;">
+        </div>
+    </div>
+    <div class="factura-content">
+        <div class="header-row">
+            <div class="logo-col">
+                <img src="{{ url_for('static', filename='logo.png') }}">
+            </div>
+            <div class="empresa-col">
+                {{ empresa.nombre }}<br>
+                RIF: {{ empresa.rif }}<br>
+                Teléfono: {{ empresa.telefono }}<br>
+                {{ empresa.direccion }}
+            </div>
+        </div>
+        <div class="factura-title">COTIZACIÓN</div>
+        <div class="datos-row">
+            <div class="datos-box">
+                <span class="bold">Nombre:</span> {{ cotizacion.cliente.nombre if cotizacion.cliente.nombre else '' }}<br>
+                <span class="bold">RIF:</span> {{ cotizacion.cliente.rif if cotizacion.cliente.rif else cotizacion.cliente.id if cotizacion.cliente.id else '' }}<br>
+                Dirección: {{ cotizacion.cliente.direccion if cotizacion.cliente.direccion else '' }}<br>
+                Teléfono: {{ cotizacion.cliente.telefono if cotizacion.cliente.telefono else '' }}<br>
+                Validez (días): {{ cotizacion.validez_dias }}<br>
+            </div>
+            <div class="datos-box datos-box-right">
+                Nro. Cotización: {{ cotizacion.numero_cotizacion }}<br>
+                Fecha Emisión: {{ cotizacion.fecha }}<br>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr style="background: #e6ffe6; border-top: 2px solid #bfa43a; border-bottom: 2px solid #27ae60;">
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Cant.</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Descripción</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">P. Unit USD</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">P. Unit Bs</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Subtotal Bs.</th>
+                    <th style="border: 2px solid #bfa43a; color: #154360;">Subtotal USD</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod_id, cantidad in zip(cotizacion.productos, cotizacion.cantidades) %}
+                {% set precio = cotizacion.precios[loop.index0]|default(0)|float %}
+                {% set cant = cantidad|default(0)|int %}
+                {% set tasa = cotizacion.tasa_bcv|default(0)|float %}
+                {% set subtotal_usd = precio * cant %}
+                {% set subtotal_bs = subtotal_usd * tasa %}
+                <tr>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ cant }}</td>
+                    <td style="border: 2px solid #bfa43a;">{{ inventario[prod_id].nombre if prod_id in inventario else prod_id }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ precio|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ (precio * tasa)|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ subtotal_bs|es_number }}</td>
+                    <td style="border: 2px solid #bfa43a; text-align: right;">{{ subtotal_usd|es_number }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="totales">
+            <span class="total-label">Total Exento:</span> Bs. {{ total_bs|es_number }}<br>
+            <span class="total-label">USD {{ total_usd|es_number }}</span><br>
+            {% if cotizacion.iva_total|default(0)|float > 0 %}
+            <span class="total-label">IVA ({{ cotizacion.iva|default(0) }}%):</span> Bs. {{ (cotizacion.iva_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float)|es_number }}<br>
+            <span class="total-label">USD {{ cotizacion.iva_total|default(0)|float|es_number }}</span><br>
+            {% endif %}
+            {% if cotizacion.descuento_total|default(0)|float > 0 %}
+            <span class="total-label">Descuento:</span> Bs. {{ (cotizacion.descuento_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float)|es_number }}<br>
+            <span class="total-label">USD {{ cotizacion.descuento_total|default(0)|float|es_number }}</span><br>
+            {% endif %}
+            <br>
+            <span class="total-label">Total a Pagar:</span><br>
+            <span class="total-main">Bs. {{ (total_bs - (cotizacion.descuento_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float) + (cotizacion.iva_total|default(0)|float * cotizacion.tasa_bcv|default(0)|float))|es_number }}</span><br>
+            <span class="total-secondary">USD {{ (total_usd - cotizacion.descuento_total|default(0)|float + cotizacion.iva_total|default(0)|float)|es_number }}</span><br>
+            <span class="tasa">Tasa de cambio utilizada: {{ cotizacion.tasa_bcv|default(0)|float|es_number }} Bs./USD</span>
+        </div>
+        <div class="notas">
+            Nota: Este documento es una cotización y no constituye un documento fiscal ni compromiso de venta. Precios sujetos a cambio sin previo aviso. Vigencia según validez indicada.<br>
+            Si la cotización se convierte en factura, se aplicará la tasa BCV vigente a la fecha de pago.
+        </div>
+    </div>
+</body>
+</html>

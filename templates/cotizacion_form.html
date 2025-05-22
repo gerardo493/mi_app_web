@@ -1,0 +1,621 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Cotización' if cotizacion else 'Nueva Cotización' }}{% endblock %}
+
+{% block content %}
+<style>
+    .cotizacion-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+    .form-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1a237e;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .input-group .btn {
+        border-radius: 0 10px 10px 0;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .input-group .form-control {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        border: none;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+        border: none;
+    }
+
+    .productos-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .productos-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+    .productos-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .productos-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .producto-row {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .producto-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .totales-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .totales-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #1a237e;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: none;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #e65100;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .producto-row {
+            padding: 0.75rem;
+        }
+
+        .input-group-text {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+</style>
+
+<div class="cotizacion-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-file-alt me-2"></i>{{ 'Editar Cotización' if cotizacion else 'Nueva Cotización' }}</h2>
+            <a href="{{ url_for('mostrar_cotizaciones') }}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Cotizaciones
+            </a>
+        </div>
+
+        <form method="POST" action="" id="cotizacionForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-info-circle me-2"></i>Información General</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="numero_cotizacion" class="form-label">Número de Cotización</label>
+                            <input type="text" class="form-control" id="numero_cotizacion" name="numero_cotizacion" value="{{ cotizacion.numero_cotizacion if cotizacion and cotizacion.numero_cotizacion is defined else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" value="{{ cotizacion.fecha if cotizacion else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="hora" name="hora" value="{{ cotizacion.hora if cotizacion else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-8">
+                            <label for="cliente_id" class="form-label">Cliente</label>
+                            <select class="form-select" id="cliente_id" name="cliente_id" required>
+                                <option value="">Seleccione un cliente</option>
+                                {% for id, cliente in clientes.items() %}
+                                <option value="{{ id }}" {% if cotizacion and cotizacion.cliente_id == id %}selected{% endif %}>
+                                    {{ cliente.nombre }} — {{ id }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validez" class="form-label">Validez (días)</label>
+                            <input type="number" class="form-control" id="validez" name="validez" min="1" value="{{ cotizacion.validez if cotizacion else '3' }}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="productos-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-box me-2"></i>Productos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Producto</label>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Cantidad</label>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Precio (USD)</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Total (USD)</label>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label fw-bold">Acción</label>
+                        </div>
+                    </div>
+                    <div id="productos-container">
+                        {% if cotizacion and cotizacion.productos and cotizacion.cantidades %}
+                            {% for prod_id, cantidad in zip(cotizacion.productos, cotizacion.cantidades) %}
+                            <div class="row mb-3 producto-item">
+                                <div class="col-md-4">
+                                    <select class="form-select producto-select" name="productos[]" required>
+                                        <option value="">Seleccione un producto</option>
+                                        {% for id, producto in inventario.items() %}
+                                        <option value="{{ id }}" data-precio="{{ producto.precio }}" {% if id == prod_id %}selected{% endif %}>
+                                            {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="{{ cantidad }}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" value="{{ cotizacion.precios[loop.index0] if cotizacion.precios else (inventario[prod_id].precio if prod_id in inventario else '') }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control subtotal" readonly>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="row mb-3 producto-item">
+                            <div class="col-md-4">
+                                <select class="form-select producto-select" name="productos[]" required>
+                                    <option value="">Seleccione un producto</option>
+                                    {% for id, producto in inventario.items() %}
+                                    <option value="{{ id }}" data-precio="{{ producto.precio }}">
+                                        {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="1" required>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control subtotal" readonly>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm remove-producto"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-success" id="agregar-producto">
+                        <i class="fas fa-plus me-2"></i>Agregar Producto
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-calculator me-2"></i>Cálculos y Totales</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="descuento" class="form-label">Descuento</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="descuento" name="descuento" min="0" value="{{ cotizacion.descuento if cotizacion and cotizacion.descuento else '0' }}">
+                                <select class="form-select" id="tipo_descuento" name="tipo_descuento">
+                                    <option value="bs" {% if cotizacion and cotizacion.tipo_descuento == 'bs' %}selected{% endif %}>Bs</option>
+                                    <option value="porc" {% if cotizacion and cotizacion.tipo_descuento == 'porc' %}selected{% endif %}>%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="iva" class="form-label">IVA (%)</label>
+                            <input type="number" class="form-control" id="iva" name="iva" min="0" max="100" value="{{ cotizacion.iva if cotizacion and cotizacion.iva else '16' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tasa_bcv" class="form-label">Tasa BCV (Bs/USD)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control" id="tasa_bcv" name="tasa_bcv" value="{{ cotizacion.tasa_bcv if cotizacion and cotizacion.tasa_bcv else '' }}" required>
+                                <button type="button" class="btn btn-outline-primary" id="obtenerTasa">
+                                    <i class="fas fa-sync-alt me-2"></i>Obtener BCV
+                                </button>
+                            </div>
+                            <div id="advertencia-tasa" class="alert alert-warning mt-2" style="display:none; font-size:0.95em;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="mensaje-tasa">No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la cotización.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="totales-card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">Subtotal USD</span>
+                                                <input type="text" class="form-control" id="subtotal_usd" name="subtotal_usd" readonly>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">Subtotal Bs</span>
+                                                <input type="text" class="form-control" id="subtotal_bs" name="subtotal_bs" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">Descuento</span>
+                                                <input type="text" class="form-control" id="descuento_total" name="descuento_total" readonly>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">IVA</span>
+                                                <input type="text" class="form-control" id="iva_total" name="iva_total" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <span class="input-group-text">Total USD</span>
+                                                <input type="text" class="form-control" id="total_usd" name="total_usd" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <span class="input-group-text">Total Bs</span>
+                                                <input type="text" class="form-control" id="total_bs" name="total_bs" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>{{ 'Actualizar Cotización' if cotizacion else 'Guardar Cotización' }}
+                </button>
+                <a href="{{ url_for('mostrar_cotizaciones') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productosContainer = document.getElementById('productos-container');
+    const agregarProductoBtn = document.getElementById('agregar-producto');
+    const cotizacionForm = document.getElementById('cotizacionForm');
+
+    // Establecer fecha y hora actual
+    function establecerFechaHoraActual() {
+        const ahora = new Date();
+        const fecha = ahora.toISOString().split('T')[0];
+        const hora = ahora.toTimeString().slice(0, 5);
+        
+        document.getElementById('fecha').value = fecha;
+        document.getElementById('hora').value = hora;
+    }
+
+    // Obtener tasa BCV automáticamente
+    function obtenerTasaBCV() {
+        const button = document.getElementById('obtenerTasa');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo...';
+        
+        fetch('/api/tasa-bcv')
+            .then(response => response.json())
+            .then(data => {
+                if (data.tasa) {
+                    const tasa = parseFloat(data.tasa).toFixed(2);
+                    document.getElementById('tasa_bcv').value = tasa;
+                    calcularTotales();
+                    mostrarAdvertenciaTasa(data.advertencia, 'No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la cotización.');
+                } else {
+                    document.getElementById('tasa_bcv').value = '';
+                    mostrarAdvertenciaTasa(true, 'No hay tasa registrada. Ingrésala manualmente.');
+                }
+            })
+            .catch(() => {
+                document.getElementById('tasa_bcv').value = '';
+                mostrarAdvertenciaTasa(true, 'No hay tasa registrada. Ingrésala manualmente.');
+                alert('No se pudo obtener la tasa BCV automáticamente. Ingrésala manualmente.');
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Obtener BCV';
+            });
+    }
+
+    function mostrarAdvertenciaTasa(mostrar, mensaje) {
+        const adv = document.getElementById('advertencia-tasa');
+        const msg = document.getElementById('mensaje-tasa');
+        adv.style.display = mostrar ? '' : 'none';
+        if (mensaje) msg.textContent = mensaje;
+    }
+
+    // Inicializar fecha, hora y tasa BCV
+    if (!document.getElementById('fecha').value) {
+        establecerFechaHoraActual();
+    }
+    
+    if (!document.getElementById('tasa_bcv').value) {
+        obtenerTasaBCV();
+    }
+
+    // Evento para obtener tasa BCV manualmente
+    document.getElementById('obtenerTasa').addEventListener('click', obtenerTasaBCV);
+
+    // Validar y formatear tasa BCV al cambiar
+    document.getElementById('tasa_bcv').addEventListener('change', function() {
+        let valor = this.value.replace(',', '.');
+        if (isNaN(valor) || parseFloat(valor) <= 0) {
+            alert('Por favor ingrese una tasa BCV válida');
+            this.value = '36.00';
+        } else {
+            this.value = parseFloat(valor).toFixed(2);
+        }
+        calcularTotales();
+    });
+
+    // Función para calcular subtotales y total
+    function calcularTotales() {
+        let subtotal = 0;
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const precio = parseFloat(item.querySelector('.precio-input').value || 0);
+            const cantidad = parseInt(item.querySelector('.cantidad-input').value || 0);
+            const subtotalItem = precio * cantidad;
+            item.querySelector('.subtotal').value = `$${subtotalItem.toFixed(2)}`;
+            subtotal += subtotalItem;
+        });
+
+        const tasaBCV = parseFloat(document.getElementById('tasa_bcv').value || 0);
+        const descuento = parseFloat(document.getElementById('descuento').value || 0);
+        const tipoDescuento = document.getElementById('tipo_descuento').value;
+        const iva = parseFloat(document.getElementById('iva').value || 0);
+
+        let descuentoTotal = 0;
+        if (tipoDescuento === 'porc') {
+            descuentoTotal = subtotal * (descuento / 100);
+        } else {
+            descuentoTotal = descuento / tasaBCV;
+        }
+
+        const subtotalConDescuento = subtotal - descuentoTotal;
+        const ivaTotal = subtotalConDescuento * (iva / 100);
+        const total = subtotalConDescuento + ivaTotal;
+
+        document.getElementById('subtotal_usd').value = `$${subtotal.toFixed(2)}`;
+        document.getElementById('subtotal_bs').value = `Bs ${(subtotal * tasaBCV).toFixed(2)}`;
+        document.getElementById('descuento_total').value = `$${descuentoTotal.toFixed(2)}`;
+        document.getElementById('iva_total').value = `$${ivaTotal.toFixed(2)}`;
+        document.getElementById('total_usd').value = `$${total.toFixed(2)}`;
+        document.getElementById('total_bs').value = `Bs ${(total * tasaBCV).toFixed(2)}`;
+    }
+
+    // Agregar producto
+    function agregarProducto() {
+        const template = document.querySelector('.producto-item').cloneNode(true);
+        template.querySelectorAll('input').forEach(input => input.value = '');
+        template.querySelector('select').selectedIndex = 0;
+        productosContainer.appendChild(template);
+        actualizarEventos();
+    }
+
+    // Actualizar eventos
+    function actualizarEventos() {
+        document.querySelectorAll('.producto-item').forEach(item => {
+            const select = item.querySelector('.producto-select');
+            const cantidadInput = item.querySelector('.cantidad-input');
+            const precioInput = item.querySelector('.precio-input');
+            const removeBtn = item.querySelector('.remove-producto');
+
+            select.addEventListener('change', function() {
+                const option = this.options[this.selectedIndex];
+                if (option.value) {
+                    precioInput.value = option.dataset.precio;
+                    calcularTotales();
+                }
+            });
+
+            cantidadInput.addEventListener('input', calcularTotales);
+            precioInput.addEventListener('input', calcularTotales);
+
+            removeBtn.addEventListener('click', function() {
+                if (document.querySelectorAll('.producto-item').length > 1) {
+                    item.remove();
+                    calcularTotales();
+                } else {
+                    alert('Debe haber al menos un producto en la cotización');
+                }
+            });
+        });
+    }
+
+    // Eventos iniciales
+    agregarProductoBtn.addEventListener('click', agregarProducto);
+    document.getElementById('descuento').addEventListener('input', calcularTotales);
+    document.getElementById('tipo_descuento').addEventListener('change', calcularTotales);
+    document.getElementById('iva').addEventListener('input', calcularTotales);
+
+    // Inicializar eventos y cálculos
+    actualizarEventos();
+    calcularTotales();
+});
+</script>
+{% endblock %} 
