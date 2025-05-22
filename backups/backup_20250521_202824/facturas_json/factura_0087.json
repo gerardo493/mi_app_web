@@ -1,0 +1,43 @@
+{
+    "numero_factura": "0087",
+    "fecha": "2025-05-10T02:38:13.591079",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "J-504304604",
+        "nombre": "T/N VARIEDADES ANDREA ADREALUZ",
+        "direccion": "VILLA DE CURA  EDO ARAGUA",
+        "telefono": ""
+    },
+    "items": [
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 80,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "39",
+            "nombre": "QUIEBRA GRASA FACIL X 60 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 25650.0,
+    "iva_bs": 0.0,
+    "total_bs": 25650.0,
+    "subtotal_usd": 270.0,
+    "iva_usd": 0.0,
+    "total_usd": 270.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}

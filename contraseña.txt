@@ -1,0 +1,47 @@
+   CREADOR DE CONTRASEÑA
+
+from werkzeug.security import generate_password_hash
+   print(generate_password_hash('gerardo123*'))
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Cambia 'NUEVA_CONTRASEÑA' por la contraseña que quieras.
+Copia el hash que te muestra.
+Abre el archivo usuarios.json y reemplaza el valor "password" del usuario que quieras cambiar:
+
+   {
+     "admin": {
+       "password": "hash_que_copiaste"
+     }
+   }
+
+
+2. Cambiar el nombre de usuario
+No puedes cambiar el nombre directamente. Debes:
+Agregar un nuevo usuario con el nombre y contraseña que quieras (usando el hash como arriba).
+(Opcional) Borrar el usuario anterior si ya no lo necesitas.
+Ejemplo para agregar un usuario llamado juan
+
+{
+  "admin": {
+    "password": "hash_admin"
+  },
+  "juan": {
+    "password": "hash_de_juan"
+  }
+}
+
+
+3. Crear un usuario nuevo
+Genera el hash de la contraseña como en el paso 1.
+Agrega una nueva entrada en usuarios.json con el nombre de usuario y el hash.
+
+
+. Resumen visual de usuarios.json:
+
+{
+  "admin": {
+    "password": "hash_admin"
+  },
+  "juan": {
+    "password": "hash_de_juan"
+  }
+}

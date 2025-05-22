@@ -1,0 +1,31 @@
+{
+    "numero_factura": "0053",
+    "fecha": "2025-05-09T22:29:26.634695",
+    "tasa_cambio": 85.0,
+    "cliente": {
+        "rif": "V-23298746",
+        "nombre": "JACKELINE DE GUEDEZ",
+        "direccion": "EL PASEO DEL LIMON",
+        "telefono": ""
+    },
+    "items": [
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 91,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 255.0,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 23205.0,
+    "iva_bs": 0.0,
+    "total_bs": 23205.0,
+    "subtotal_usd": 273.0,
+    "iva_usd": 0.0,
+    "total_usd": 273.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}
