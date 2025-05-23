@@ -3,190 +3,482 @@
 {% block title %}Historial de {{ cliente.nombre }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Historial de {{ cliente.nombre }}</h2>
-        <div class="btn-group">
-            <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
-            </a>
-            <button onclick="window.print()" class="btn btn-primary">
-                <i class="fas fa-print me-2"></i>Imprimir Historial
-            </button>
-        </div>
-    </div>
+<style>
+    .historial-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-    <!-- Filtro por año y mes -->
-    <form method="get" class="row g-2 mb-3">
-        <div class="col-auto">
-            <select name="anio" class="form-select" id="filtroAnio">
-                {% for anio in anios_disponibles %}
-                <option value="{{ anio }}" {% if anio == filtro_anio %}selected{% endif %}>{{ anio }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-auto">
-            <select name="mes" class="form-select" id="filtroMes">
-                <option value="">Todos los meses</option>
-                {% for m in range(1, 13) %}
-                <option value="{{ m }}" {% if m == filtro_mes|int %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-        </div>
-        <div class="col-auto align-self-center">
-            <span class="text-muted">Mes actual: {{ now.strftime('%B %Y') }}</span>
-        </div>
-    </form>
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
 
-    <!-- Resumen de Facturación del Cliente -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h6 class="card-title mb-1">Total Facturado (Filtrado)</h6>
-                    <div><strong>${{ total_compras|es_number }}</strong></div>
-                    <div><strong>{{ total_bs|es_number }} Bs</strong></div>
+    .page-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stats-card.primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+    }
+
+    .stats-card.success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        color: white;
+    }
+
+    .stats-card.info {
+        background: linear-gradient(135deg, #0277bd 0%, #01579b 100%);
+        color: white;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .card-header h4 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-card .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .h4 {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card .h5 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        z-index: 0;
+    }
+
+    .stats-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+    }
+
+    .table th {
+        background-color: #1a237e;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        letter-spacing: 0.8px;
+        padding: 1rem;
+    }
+
+    .table td {
+        font-size: 1.15rem;
+        color: #1a237e;
+        padding: 1rem;
+        vertical-align: middle;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .badge {
+        font-size: 1.1rem;
+        padding: 0.6em 1em;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    }
+
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #f57f17 0%, #ff6f00 100%);
+    }
+
+    .btn {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0.5rem 1rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #37474f 100%);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #37474f 0%, #455a64 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .form-select {
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        color: #1a237e;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 8px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+        border-color: #1a237e;
+    }
+
+    .cliente-info p {
+        font-size: 1.15rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        margin-bottom: 1rem;
+    }
+
+    .cliente-info strong {
+        font-weight: 700;
+        color: #1a237e;
+    }
+
+    .text-danger {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-sm {
+        font-size: 1.1rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .credito-info {
+        font-size: 1.05rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        line-height: 1.4;
+    }
+
+    @media print {
+        .btn-group, .navbar {
+            display: none !important;
+        }
+        .card {
+            break-inside: avoid;
+        }
+        .page-header {
+            background: none !important;
+            color: #1a237e !important;
+            box-shadow: none !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.8rem;
+        }
+        .stats-card .card-title {
+            font-size: 1.1rem;
+        }
+        .stats-card .h4 {
+            font-size: 1.8rem;
+        }
+        .stats-card .h5 {
+            font-size: 1.3rem;
+        }
+        .table td, .table th {
+            font-size: 1rem;
+        }
+        .btn {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="historial-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-history me-2"></i>Historial de {{ cliente.nombre }}</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+                </a>
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="fas fa-print me-2"></i>Imprimir Historial
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtro por año y mes -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <select name="anio" class="form-select" id="filtroAnio">
+                            {% for anio in anios_disponibles %}
+                            <option value="{{ anio }}" {% if anio == filtro_anio %}selected{% endif %}>{{ anio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="mes" class="form-select" id="filtroMes">
+                            <option value="">Todos los meses</option>
+                            {% for m in range(1, 13) %}
+                            <option value="{{ m }}" {% if m == filtro_mes|int %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen de Facturación del Cliente -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card primary">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-filter me-2"></i>Total Facturado (Filtrado)
+                        </h6>
+                        <div class="h4 mb-2">${{ total_compras|es_number }}</div>
+                        <div class="h5">{{ total_bs|es_number }} Bs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card success">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-calendar-alt me-2"></i>Total Facturado (Año Actual)
+                        </h6>
+                        <div class="h4 mb-2">${{ total_anual_usd|es_number }}</div>
+                        <div class="h5">{{ total_anual_bs|es_number }} Bs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card info">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-calendar-day me-2"></i>Total Facturado (Mes Actual)
+                        </h6>
+                        <div class="h4 mb-2">${{ (total_mensual_usd or 0)|es_number }}</div>
+                        <div class="h5">{{ (total_mensual_bs or 0)|es_number }} Bs</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h6 class="card-title mb-1">Total Facturado (Año Actual)</h6>
-                    <div><strong>${{ total_anual_usd|es_number }}</strong></div>
-                    <div><strong>{{ total_anual_bs|es_number }} Bs</strong></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h6 class="card-title mb-1">Total Facturado (Mes Actual)</h6>
-                    <div><strong>${{ (total_mensual_usd or 0)|es_number }}</strong></div>
-                    <div><strong>{{ (total_mensual_bs or 0)|es_number }} Bs</strong></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Información del Cliente -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h4 class="mb-0">Información del Cliente</h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
-                    <p><strong>Email:</strong> {{ cliente.email or 'No disponible' }}</p>
-                    <p><strong>Teléfono:</strong> {{ cliente.telefono or 'No disponible' }}</p>
-                    <p><strong>Dirección:</strong> <span style="white-space: normal; word-break: break-all;">{{ cliente.direccion or 'No disponible' }}</span></p>
+        <!-- Información del Cliente -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-user me-2"></i>Información del Cliente</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-3"><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+                        <p class="mb-3"><strong>Email:</strong> {{ cliente.email or 'No disponible' }}</p>
+                        <p class="mb-3"><strong>Teléfono:</strong> {{ cliente.telefono or 'No disponible' }}</p>
+                        <p class="mb-3"><strong>Dirección:</strong> <span style="white-space: normal; word-break: break-all;">{{ cliente.direccion or 'No disponible' }}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-3"><strong>Total Compras:</strong> ${{ (total_compras or 0)|es_number }}</p>
+                        <p class="mb-3"><strong>Total Facturas:</strong> {{ facturas|length }}</p>
+                        {% if cuenta %}
+                        <p class="mb-3 text-danger"><strong>Cuenta por Cobrar:</strong> ${{ (cuenta.monto or 0)|es_number }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <p><strong>Total Compras:</strong> ${{ (total_compras or 0)|es_number }}</p>
-                    <p><strong>Total Facturas:</strong> {{ facturas|length }}</p>
-                    {% if cuenta %}
-                    <p class="text-danger"><strong>Cuenta por Cobrar:</strong> ${{ (cuenta.monto or 0)|es_number }}</p>
+                <div class="mt-3">
+                    {% if cliente.email %}
+                    <a href="mailto:{{ cliente.email }}" class="btn btn-success me-2">
+                        <i class="fas fa-envelope me-2"></i>Enviar Email
+                    </a>
+                    {% endif %}
+                    {% if cliente.telefono %}
+                    <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" class="btn btn-success">
+                        <i class="fab fa-whatsapp me-2"></i>Enviar WhatsApp
+                    </a>
                     {% endif %}
                 </div>
             </div>
-            <div class="mt-3">
-                {% if cliente.email %}
-                <a href="mailto:{{ cliente.email }}" class="btn btn-success me-2">
-                    <i class="fas fa-envelope me-2"></i>Enviar Email
-                </a>
-                {% endif %}
-                {% if cliente.telefono %}
-                <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" class="btn btn-success">
-                    <i class="fab fa-whatsapp me-2"></i>Enviar WhatsApp
-                </a>
-                {% endif %}
+        </div>
+
+        <!-- Productos Comprados -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Productos Comprados</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad Total</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, stats in productos_comprados.items() %}
+                            <tr>
+                                <td>{{ stats.nombre }}</td>
+                                <td>{{ stats.cantidad }}</td>
+                                <td>${{ stats.valor|es_number }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Productos Comprados -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h4 class="mb-0">Productos Comprados</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad Total</th>
-                            <th>Valor Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for id, stats in productos_comprados.items() %}
-                        <tr>
-                            <td>{{ stats.nombre }}</td>
-                            <td>{{ stats.cantidad }}</td>
-                            <td>${{ stats.valor|es_number }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- Historial de Facturas -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Historial de Facturas</h4>
             </div>
-        </div>
-    </div>
-
-    <!-- Historial de Facturas -->
-    <div class="card">
-        <div class="card-header">
-            <h4 class="mb-0">Historial de Facturas</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Fecha</th>
-                            <th>Total (USD $)</th>
-                            <th>Total (Bs)</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for factura in facturas|sort(attribute='fecha', reverse=true) %}
-                        <tr>
-                            <td>{{ factura.id }}</td>
-                            <td>{{ factura.fecha }}</td>
-                            <td>${{ (factura.total_usd or 0)|es_number }}</td>
-                            <td>{{ (factura.total_bs or 0)|es_number }} Bs</td>
-                            <td>
-                                {% if factura.estado == 'pagada' %}
-                                <span class="badge bg-success">Pagada</span>
-                                {% else %}
-                                <span class="badge bg-warning">Pendiente</span>
-                                {% endif %}
-                                {% if factura.condicion_pago == 'credito' %}
-                                    <div style="font-size:0.95em;">
-                                        Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
-                                        Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Total (USD $)</th>
+                                <th>Total (Bs)</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for factura in facturas|sort(attribute='fecha', reverse=true) %}
+                            <tr>
+                                <td>{{ factura.id }}</td>
+                                <td>{{ factura.fecha }}</td>
+                                <td>${{ (factura.total_usd or 0)|es_number }}</td>
+                                <td>{{ (factura.total_bs or 0)|es_number }} Bs</td>
+                                <td>
+                                    {% if factura.estado == 'pagada' %}
+                                    <span class="badge bg-success">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    {% endif %}
+                                    {% if factura.condicion_pago == 'credito' %}
+                                        <div class="credito-info">
+                                            Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
+                                            Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('ver_factura', id=factura.id) }}" class="btn btn-info btn-sm" title="Ver factura">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('editar_factura', id=factura.id) }}" class="btn btn-warning btn-sm" title="Editar factura">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                     </div>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{{ url_for('ver_factura', id=factura.id) }}" class="btn btn-sm btn-info" title="Ver factura">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ url_for('editar_factura', id=factura.id) }}" class="btn btn-sm btn-warning" title="Editar factura">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -199,15 +491,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
-<style>
-@media print {
-    .btn-group, .navbar {
-        display: none !important;
-    }
-    .card {
-        break-inside: avoid;
-    }
-}
-</style>
 {% endblock %} 

@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Ajustes Masivos de Stock{% endblock %}
+
+{% block content %}
+<style>
+.page-header-ajustes {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 6px 24px rgba(34,74,190,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.page-header-ajustes h2 {
+    font-size: 2.1rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 1px 2px 8px rgba(0,0,0,0.08);
+}
+.resumen-ajustes {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.resumen-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(34,74,190,0.06);
+    padding: 1.2rem 2rem;
+    min-width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.resumen-card .icono-resumen {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+.resumen-card.entrada .icono-resumen { color: #1cc88a; }
+.resumen-card.salida .icono-resumen { color: #e74a3b; }
+.resumen-card.total .icono-resumen { color: #224abe; }
+.resumen-card .resumen-titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #224abe;
+    margin-bottom: 0.2rem;
+}
+.resumen-card .resumen-valor {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #222;
+}
+.filtros-ajustes {
+    background: #f8f9fc;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.filtros-ajustes label {
+    font-weight: 600;
+    color: #224abe;
+}
+.ajustes-table th {
+    background: #4e73df;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1rem;
+    border-top: none;
+}
+.ajustes-table td {
+    vertical-align: middle;
+    font-size: 1.05rem;
+}
+.ajustes-table tbody tr:nth-child(even) {
+    background: #f4f8fc;
+}
+.ajustes-table tbody tr:hover {
+    background: #e9ecef;
+}
+.badge-entrada {
+    background: #1cc88a;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(28,200,138,0.08);
+}
+.badge-salida {
+    background: #e74a3b;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(231,74,59,0.08);
+}
+.export-btn {
+    background: #1cc88a;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(28,200,138,0.08);
+}
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(28,200,138,0.18);
+    color: white;
+}
+.btn-secondary {
+    font-weight: 600;
+    border-radius: 50px;
+    font-size: 1.1rem;
+}
+.table-responsive {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 1rem;
+}
+@media (max-width: 900px) {
+    .resumen-ajustes { flex-direction: column; gap: 1rem; }
+    .page-header-ajustes { flex-direction: column; gap: 1rem; }
+}
+</style>
+
+<div class="container-fluid">
+    <div class="page-header-ajustes">
+        <h2><i class="fas fa-sliders-h me-2"></i>Historial de Ajustes Masivos de Stock</h2>
+        <div class="d-flex gap-2">
+            <button onclick="exportarExcel()" class="export-btn">
+                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+            </button>
+            <button onclick="exportarPDF()" class="export-btn" style="background:#e74a3b;">
+                <i class="fas fa-file-pdf me-2"></i>Exportar a PDF
+            </button>
+            <a href="{{ url_for('reporte_inventario') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al Reporte
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjetas resumen -->
+    <div class="resumen-ajustes">
+        <div class="resumen-card entrada">
+            <span class="icono-resumen">➕</span>
+            <div>
+                <div class="resumen-titulo">Entradas</div>
+                <div class="resumen-valor">{{ ajustes|selectattr('tipo', 'equalto', 'entrada')|map(attribute='ingreso')|sum }}</div>
+            </div>
+        </div>
+        <div class="resumen-card salida">
+            <span class="icono-resumen">➖</span>
+            <div>
+                <div class="resumen-titulo">Salidas</div>
+                <div class="resumen-valor">{{ ajustes|selectattr('tipo', 'equalto', 'salida')|map(attribute='salida')|sum }}</div>
+            </div>
+        </div>
+        <div class="resumen-card total">
+            <span class="icono-resumen"><i class="fas fa-exchange-alt"></i></span>
+            <div>
+                <div class="resumen-titulo">Total Ajustes</div>
+                <div class="resumen-valor">{{ ajustes|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="busquedaRapida" class="form-control" placeholder="Buscar en historial...">
+        </div>
+    </div>
+
+    <form method="get" class="row filtros-ajustes g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="fecha">Fecha</label>
+            <input type="date" class="form-control" id="fecha" name="fecha" value="{{ filtro_fecha }}">
+        </div>
+        <div class="col-md-3">
+            <label for="producto">Producto</label>
+            <select class="form-select" id="producto" name="producto">
+                <option value="">Todos</option>
+                {% for prod in productos %}
+                <option value="{{ prod }}" {% if filtro_producto == prod.lower() %}selected{% endif %}>{{ prod }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="usuario">Usuario</label>
+            <select class="form-select" id="usuario" name="usuario">
+                <option value="">Todos</option>
+                {% for user in usuarios %}
+                <option value="{{ user }}" {% if filtro_usuario == user.lower() %}selected{% endif %}>{{ user }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="tipo">Tipo</label>
+            <select class="form-select" id="tipo" name="tipo">
+                <option value="">Todos</option>
+                <option value="entrada" {% if filtro_tipo == 'entrada' %}selected{% endif %}>Entrada</option>
+                <option value="salida" {% if filtro_tipo == 'salida' %}selected{% endif %}>Salida</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-2"></i>Filtrar</button>
+        </div>
+    </form>
+
+    <!-- Gráficas -->
+    <div class="row mb-4">
+        <div class="col-md-7 mb-3">
+            <div class="card p-3">
+                <canvas id="graficaBarras"></canvas>
+            </div>
+        </div>
+        <div class="col-md-5 mb-3">
+            <div class="card p-3">
+                <canvas id="graficaPastel"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered ajustes-table align-middle" id="tablaAjustes">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto</th>
+                    <th>Tipo</th>
+                    <th>Cantidad</th>
+                    <th>Motivo</th>
+                    <th>Usuario</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if ajustes and ajustes|length > 0 %}
+                    {% for a in ajustes %}
+                    <tr>
+                        <td>{{ a.fecha }}</td>
+                        <td>{{ a.producto }}</td>
+                        <td>
+                            {% if a.tipo == 'entrada' %}
+                                <span class="badge badge-entrada">➕ Entrada</span>
+                            {% elif a.tipo == 'salida' %}
+                                <span class="badge badge-salida">➖ Salida</span>
+                            {% else %}
+                                {{ a.tipo }}
+                            {% endif %}
+                        </td>
+                        <td>{{ a.ingreso if a.tipo == 'entrada' else a.salida }}</td>
+                        <td>{{ a.motivo }}</td>
+                        <td>{{ a.usuario }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="6" class="text-center">No hay ajustes registrados.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="ajustes-data" type="application/json">
+[
+{% for a in ajustes %}
+    {"fecha": "{{ a.fecha.split(' ')[0] }}", "tipo": "{{ a.tipo }}", "cantidad": {{ a.ingreso if a.tipo == 'entrada' else a.salida }}}{% if not loop.last %},{% endif %}
+{% endfor %}
+]
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function exportarExcel() {
+    const tabla = document.getElementById('tablaAjustes');
+    // Crear un array de datos con iconos y colores
+    const data = [];
+    // Encabezados
+    const headers = [
+        'Fecha', 'Producto', 'Tipo', 'Cantidad', 'Motivo', 'Usuario'
+    ];
+    data.push(headers);
+    // Filas
+    for (let i = 1; i < tabla.rows.length; i++) {
+        const row = tabla.rows[i];
+        if (row.style.display === 'none') continue; // Saltar filas ocultas por filtro
+        let tipo = row.cells[2].innerText.trim();
+        let icono = '';
+        if (tipo === 'Entrada') icono = '➕';
+        else if (tipo === 'Salida') icono = '➖';
+        else icono = '';
+        data.push([
+            row.cells[0].innerText,
+            row.cells[1].innerText,
+            icono + ' ' + tipo,
+            row.cells[3].innerText,
+            row.cells[4].innerText,
+            row.cells[5].innerText
+        ]);
+    }
+    // Crear hoja y libro
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    // Estilos: encabezado azul, negrita, texto blanco
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
+        cell.s = {
+            fill: { fgColor: { rgb: '4E73DF' } },
+            font: { bold: true, color: { rgb: 'FFFFFF' } },
+            alignment: { horizontal: 'center' },
+            border: { top: {style:'thin'}, bottom: {style:'thin'}, left: {style:'thin'}, right: {style:'thin'} }
+        };
+    }
+    // Colorear filas según tipo
+    for (let R = 1; R <= range.e.r; ++R) {
+        const tipo = ws[XLSX.utils.encode_cell({r:R, c:2})].v;
+        let color = null;
+        if (tipo.startsWith('➕')) color = 'D4EFDF'; // Verde claro
+        if (tipo.startsWith('➖')) color = 'FADBD8'; // Rojo claro
+        if (color) {
+            for (let C = 0; C <= range.e.c; ++C) {
+                const cell = ws[XLSX.utils.encode_cell({r:R, c:C})];
+                if (!cell.s) cell.s = {};
+                cell.s.fill = { fgColor: { rgb: color } };
+            }
+        }
+    }
+    ws['!cols'] = [
+        {wch: 20}, {wch: 30}, {wch: 15}, {wch: 15}, {wch: 50}, {wch: 20}
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ajustes de Stock");
+    XLSX.writeFile(wb, "historial_ajustes_stock.xlsx");
+}
+
+function exportarPDF() {
+    const doc = new jspdf.jsPDF('l', 'pt', 'a4');
+    // Selecciona el contenedor principal que quieres exportar
+    const container = document.querySelector('.container-fluid');
+    html2canvas(container, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        // Ajustar la imagen al ancho de la página
+        const imgWidth = pageWidth - 40;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        doc.addImage(imgData, 'PNG', 20, 20, imgWidth, imgHeight);
+        doc.save('historial_ajustes_stock.pdf');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('busquedaRapida');
+    const tabla = document.getElementById('tablaAjustes');
+    input.addEventListener('input', function() {
+        const texto = input.value.toLowerCase();
+        for (let i = 1; i < tabla.rows.length; i++) {
+            const row = tabla.rows[i];
+            let visible = false;
+            for (let j = 0; j < row.cells.length; j++) {
+                if (row.cells[j].innerText.toLowerCase().includes(texto)) visible = true;
+            }
+            row.style.display = visible ? '' : 'none';
+        }
+    });
+});
+
+// --- Leer datos para gráficas desde JSON embebido ---
+const ajustes = JSON.parse(document.getElementById('ajustes-data').textContent);
+// Agrupar por fecha
+const fechas = [...new Set(ajustes.map(a => a.fecha))].sort();
+const entradasPorFecha = fechas.map(f => ajustes.filter(a => a.fecha === f && a.tipo === 'entrada').reduce((s, a) => s + a.cantidad, 0));
+const salidasPorFecha = fechas.map(f => ajustes.filter(a => a.fecha === f && a.tipo === 'salida').reduce((s, a) => s + a.cantidad, 0));
+// Datos pastel
+const totalEntradas = ajustes.filter(a => a.tipo === 'entrada').reduce((s, a) => s + a.cantidad, 0);
+const totalSalidas = ajustes.filter(a => a.tipo === 'salida').reduce((s, a) => s + a.cantidad, 0);
+// Gráfica de barras
+const ctxBarras = document.getElementById('graficaBarras').getContext('2d');
+new Chart(ctxBarras, {
+    type: 'bar',
+    data: {
+        labels: fechas,
+        datasets: [
+            {
+                label: 'Entradas',
+                data: entradasPorFecha,
+                backgroundColor: '#1cc88a',
+            },
+            {
+                label: 'Salidas',
+                data: salidasPorFecha,
+                backgroundColor: '#e74a3b',
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Entradas vs Salidas por Día' }
+        },
+        scales: {
+            x: { title: { display: true, text: 'Fecha' } },
+            y: { title: { display: true, text: 'Cantidad' }, beginAtZero: true }
+        }
+    }
+});
+// Gráfica de pastel
+const ctxPastel = document.getElementById('graficaPastel').getContext('2d');
+new Chart(ctxPastel, {
+    type: 'pie',
+    data: {
+        labels: ['Entradas', 'Salidas'],
+        datasets: [{
+            data: [totalEntradas, totalSalidas],
+            backgroundColor: ['#1cc88a', '#e74a3b']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Proporción Entradas/Salidas' }
+        }
+    }
+});
+</script>
+{% endblock %} 

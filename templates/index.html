@@ -5,25 +5,41 @@
     {% block content %}
     <style>
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
             position: relative;
             overflow-x: hidden;
         }
-
-        body::before {
+        body::before, body::after {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(41, 128, 185, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            z-index: 0;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.45;
             pointer-events: none;
-            z-index: -1;
+            animation: blobMove 18s ease-in-out infinite alternate;
         }
-
+        body::before {
+            width: 480px;
+            height: 480px;
+            top: -120px;
+            left: -120px;
+            background: radial-gradient(circle at 30% 30%, #ffe082 0%, #bfa43a 80%);
+            animation-delay: 0s;
+        }
+        body::after {
+            width: 420px;
+            height: 420px;
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle at 70% 70%, #81c784 0%, #388e3c 80%);
+            animation-delay: 6s;
+        }
+        @keyframes blobMove {
+            0% { transform: scale(1) translateY(0) translateX(0); }
+            50% { transform: scale(1.08) translateY(30px) translateX(40px); }
+            100% { transform: scale(0.95) translateY(-20px) translateX(-30px); }
+        }
         .stats-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
@@ -197,20 +213,32 @@
             position: relative;
             overflow: hidden;
         }
-
         .header-container::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
-            pointer-events: none;
+            top: -60px;
+            right: -80px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 60% 40%, #ffe082 0%, #bfa43a 80%);
+            opacity: 0.25;
+            filter: blur(20px);
+            z-index: 0;
+            animation: blobMove 14s ease-in-out infinite alternate;
         }
-
+        .header-container::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -80px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle at 40% 60%, #81c784 0%, #388e3c 80%);
+            opacity: 0.22;
+            filter: blur(18px);
+            z-index: 0;
+            animation: blobMove 16s ease-in-out infinite alternate-reverse;
+        }
         .header-content {
             position: relative;
             z-index: 1;
@@ -489,16 +517,13 @@
         <div class="header-container">
             <div class="container">
                 <div class="header-content">
-                    <div class="row align-items-center">
-                        <div class="col-12 col-md-8">
-                            <h1 class="welcome-text">Bienvenido al Sistema de Facturación</h1>
-                            <p class="welcome-subtext">Panel de Control y Gestión Empresarial</p>
-                            <div class="tasa-bcv-container">
-                                <div class="tasa-bcv-label">Tasa BCV Actual</div>
-                                <div class="d-flex align-items-center">
-                                    <div class="tasa-bcv-value">{{ tasa_bcv|float|es_number }} Bs/USD</div>
-                                </div>
-                            </div>
+                    <div class="row align-items-center g-3">
+                        <div class="col-auto d-flex align-items-center justify-content-center" style="min-width:120px;">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Empresa" style="max-height:90px; max-width:110px; border-radius:18px; box-shadow:0 2px 8px rgba(0,0,0,0.08); background:#fff; padding:8px;">
+                        </div>
+                        <div class="col ps-0 ps-md-3">
+                            <h1 class="welcome-text mb-1" style="font-size:2.1rem; font-weight:800; color:#fff; text-shadow:1px 2px 8px #0d47a1a0;">Bienvenido al Sistema de Facturación</h1>
+                            <p class="welcome-subtext mb-0" style="font-size:1.2rem; color:#e3e3e3; font-weight:500;">Panel de Control y Gestión Empresarial</p>
                         </div>
                         <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
                             <div id="fecha-hora-actual"></div>

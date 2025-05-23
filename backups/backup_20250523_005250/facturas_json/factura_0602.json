@@ -1,0 +1,256 @@
+{
+    "numero_factura": "0602",
+    "fecha": "2025-04-29T22:29:02.945741",
+    "tasa_cambio": 86.65,
+    "cliente": {
+        "rif": "J-312239761",
+        "nombre": "FARMACIA PALO NEGRO",
+        "direccion": "PALO NEGRO EDO - ARAGUA",
+        "telefono": ""
+    },
+    "items": [
+        {
+            "id": "4",
+            "nombre": "ARANDANO NEGRO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Protector Ocular",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "7",
+            "nombre": "CALCIO MAG-ZINC X 50 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 363.93000000000006,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "8",
+            "nombre": "CARDO LECHOZO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "9",
+            "nombre": "CARDO MARIANO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "10",
+            "nombre": "CASTAÑA DE INDIA X 60  CAP",
+            "cantidad": 4,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "11",
+            "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "12",
+            "nombre": "CENTELLA ASIATICA X 60 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "13",
+            "nombre": "CHANCA PIEDRA X 60 CAP",
+            "cantidad": 4,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Calculo Renal",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "16",
+            "nombre": "COLON CLEANSER X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Limpieza De colon",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "18",
+            "nombre": "DIENTE DE LEON X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "19",
+            "nombre": "ESCOBA DE CARNICERO X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "21",
+            "nombre": "GINKGO LOCHITA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Oxigenante Cerebral",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "20",
+            "nombre": "GINKGO C/ GINSENG X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Oxigenante/ Energizante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "22",
+            "nombre": "GINKGOBILOBA X 60 CAP",
+            "cantidad": 4,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Oxigenate Cerebral",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "27",
+            "nombre": "MACA X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Repontesiador Sexsual",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "28",
+            "nombre": "MAPURITE X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "30",
+            "nombre": "OMEGA 3 X 30 UND",
+            "cantidad": 6,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 363.93000000000006,
+            "categoria": "Cardiovascular",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "33",
+            "nombre": "SABILAX-6 X 12 SOBRES X 12 UNDS",
+            "cantidad": 1,
+            "precio_unitario_usd": 8.5,
+            "precio_unitario_bs": 736.5250000000001,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "34",
+            "nombre": "SAW PALMETO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "hiperplasia prostatica",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "36",
+            "nombre": "VENA CLEASNER X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "37",
+            "nombre": "VITAMINA E C/SELENIUM X 50 CAP",
+            "cantidad": 4,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 363.93000000000006,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "38",
+            "nombre": "ZARZAPARRILLA X 60CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Depurativo Desintoxicante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "35",
+            "nombre": "UÑA DE GATO C/MAPURITE X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 259.95000000000005,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "14",
+            "nombre": "CLORURO DE MAGNESIO X 33 GR",
+            "cantidad": 10,
+            "precio_unitario_usd": 1.2,
+            "precio_unitario_bs": 103.98,
+            "categoria": "Regenerador osio",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 19400.935000000005,
+    "iva_bs": 0.0,
+    "total_bs": 19400.935000000005,
+    "subtotal_usd": 223.9,
+    "iva_usd": 0.0,
+    "total_usd": 223.90000000000003,
+    "condicion_pago": "Credito",
+    "dias_credito": 15,
+    "tasa_iva_aplicada": 0.0
+}

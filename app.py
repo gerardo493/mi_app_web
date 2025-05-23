@@ -466,101 +466,151 @@ def nuevo_cliente():
 @app.route('/inventario')
 @login_required
 def mostrar_inventario():
-    """Muestra lista de inventario con filtros y orden."""
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    # Filtros y orden
-    q = request.args.get('q', '').strip().lower()
-    filtro_categoria = request.args.get('categoria', '').strip().lower()
+    q = request.args.get('q', '')
+    filtro_categoria = request.args.get('categoria', '')
     filtro_orden = request.args.get('orden', 'nombre')
-    # Filtrar por búsqueda
-    if q:
-        inventario = {k: v for k, v in inventario.items() if q in v.get('nombre', '').lower()}
-    # Filtrar por categoría
-    if filtro_categoria:
-        inventario = {k: v for k, v in inventario.items() if filtro_categoria in v.get('categoria', '').lower()}
-    # Ordenar
+    
+    # Obtener categorías únicas
+    categorias = []
+    for producto in inventario.values():
+        if producto.get('categoria') and producto['categoria'] not in categorias:
+            categorias.append(producto['categoria'])
+    
+    # Filtrar productos
+    productos_filtrados = {}
+    for id, producto in inventario.items():
+        if q and q.lower() not in producto['nombre'].lower():
+            continue
+        if filtro_categoria and producto.get('categoria') != filtro_categoria:
+            continue
+        productos_filtrados[id] = producto
+    
+    # Ordenar productos
     if filtro_orden == 'nombre':
-        inventario = dict(sorted(inventario.items(), key=lambda item: item[1].get('nombre', '').lower()))
+        productos_filtrados = dict(sorted(productos_filtrados.items(), key=lambda x: x[1]['nombre']))
     elif filtro_orden == 'stock':
-        inventario = dict(sorted(inventario.items(), key=lambda item: int(item[1].get('cantidad', 0)), reverse=True))
-    # Lista de categorías únicas para el select
-    categorias = sorted(set(v.get('categoria', '') for v in cargar_datos(ARCHIVO_INVENTARIO).values() if v.get('categoria', '')))
-    return render_template('inventario.html', inventario=inventario, q=q, filtro_categoria=filtro_categoria, filtro_orden=filtro_orden, categorias=categorias)
+        productos_filtrados = dict(sorted(productos_filtrados.items(), key=lambda x: x[1]['cantidad']))
+    
+    return render_template('inventario.html', 
+                         inventario=productos_filtrados,
+                         categorias=categorias,
+                         q=q,
+                         filtro_categoria=filtro_categoria,
+                         filtro_orden=filtro_orden)
 
 @app.route('/inventario/nuevo', methods=['GET', 'POST'])
 @login_required
 def nuevo_producto():
-    """Formulario para nuevo producto."""
+    # Cargar el inventario
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
     if request.method == 'POST':
-        inventario = cargar_datos(ARCHIVO_INVENTARIO)
-        nuevo_id = str(len(inventario) + 1)
+        nombre = request.form.get('nombre')
+        categoria = request.form.get('categoria')
+        precio = float(request.form.get('precio', 0))
+        cantidad = int(request.form.get('cantidad', 0))
         
-        producto = {
-            'nombre': request.form['nombre'],
-            'precio': float(request.form['precio']),
-            'cantidad': int(request.form['stock']),
-            'categoria': request.form['categoria'],
-            'ruta_imagen': "",
-            'ultima_entrada': None,
-            'ultima_salida': None
+        if not nombre or not categoria:
+            flash('El nombre y la categoría son requeridos', 'danger')
+            return redirect(url_for('nuevo_producto'))
+        
+        # Generar nuevo ID
+        nuevo_id = str(max([int(k) for k in inventario.keys()]) + 1) if inventario else '1'
+        
+        # Crear nuevo producto
+        inventario[nuevo_id] = {
+            'nombre': nombre,
+            'categoria': categoria,
+            'precio': precio,
+            'cantidad': cantidad,
+            'ultima_entrada': datetime.now().isoformat()
         }
         
-        inventario[nuevo_id] = producto
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
-            flash('Producto agregado exitosamente', 'success')
-            registrar_bitacora(session['usuario'], 'Nuevo producto', f"Nombre: {request.form.get('nombre','')}")
-            return redirect(url_for('mostrar_inventario'))
+            flash('Producto creado exitosamente', 'success')
         else:
-            flash('Error al guardar el producto', 'danger')
+            flash('Error al crear el producto', 'danger')
+        
+        return redirect(url_for('mostrar_inventario'))
     
-    return render_template('producto_form.html')
+    # Obtener categorías para el formulario
+    categorias = []
+    for producto in inventario.values():
+        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in categorias]:
+            categorias.append({
+                'id': len(categorias) + 1,
+                'nombre': producto['categoria']
+            })
+    
+    return render_template('producto_form.html', categorias=categorias)
 
 @app.route('/inventario/<id>/editar', methods=['GET', 'POST'])
 @login_required
 def editar_producto(id):
-    """Formulario para editar un producto."""
+    # Cargar el inventario
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
     if id not in inventario:
         flash('Producto no encontrado', 'danger')
         return redirect(url_for('mostrar_inventario'))
     
     if request.method == 'POST':
-        producto = {
-            'id': id,  # Agregamos el ID al producto
-            'nombre': request.form['nombre'],
-            'precio': float(request.form['precio']),
-            'cantidad': int(request.form['stock']),
-            'categoria': request.form['categoria'],
-            'ruta_imagen': inventario[id].get('ruta_imagen', ""),
-            'ultima_entrada': inventario[id].get('ultima_entrada'),
-            'ultima_salida': inventario[id].get('ultima_salida')
-        }
-        inventario[id] = producto
+        nombre = request.form.get('nombre')
+        categoria = request.form.get('categoria')
+        precio = float(request.form.get('precio', 0))
+        cantidad = int(request.form.get('cantidad', 0))
+        
+        if not nombre or not categoria:
+            flash('El nombre y la categoría son requeridos', 'danger')
+            return redirect(url_for('editar_producto', id=id))
+        
+        # Actualizar producto
+        inventario[id].update({
+            'nombre': nombre,
+            'categoria': categoria,
+            'precio': precio,
+            'cantidad': cantidad
+        })
+        
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
             flash('Producto actualizado exitosamente', 'success')
-            registrar_bitacora(session['usuario'], 'Editar producto', f"ID: {id}, Nombre: {request.form.get('nombre','')}")
-            return redirect(url_for('mostrar_inventario'))
         else:
             flash('Error al actualizar el producto', 'danger')
+        
+        return redirect(url_for('mostrar_inventario'))
     
-    producto = inventario[id]
-    producto['id'] = id  # Agregamos el ID al producto antes de pasarlo a la plantilla
-    return render_template('producto_form.html', producto=producto)
+    # Obtener categorías para el formulario
+    categorias = []
+    for producto in inventario.values():
+        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in categorias]:
+            categorias.append({
+                'id': len(categorias) + 1,
+                'nombre': producto['categoria']
+            })
+    
+    # Agregar el ID al producto para el template
+    producto = inventario[id].copy()
+    producto['id'] = id
+    
+    return render_template('producto_form.html', producto=producto, categorias=categorias)
 
 @app.route('/inventario/<id>/eliminar', methods=['POST'])
 @login_required
 def eliminar_producto(id):
-    """Elimina un producto."""
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    if id in inventario:
-        del inventario[id]
-        if guardar_datos(ARCHIVO_INVENTARIO, inventario):
-            flash('Producto eliminado exitosamente', 'success')
-            registrar_bitacora(session['usuario'], 'Eliminar producto', f"ID: {id}")
-        else:
-            flash('Error al eliminar el producto', 'danger')
-    else:
+    
+    if id not in inventario:
         flash('Producto no encontrado', 'danger')
+        return redirect(url_for('mostrar_inventario'))
+    
+    del inventario[id]
+    
+    if guardar_datos(ARCHIVO_INVENTARIO, inventario):
+        flash('Producto eliminado exitosamente', 'success')
+    else:
+        flash('Error al eliminar el producto', 'danger')
+    
     return redirect(url_for('mostrar_inventario'))
 
 @app.route('/inventario/<id>')
@@ -709,6 +759,9 @@ def editar_factura(id):
     if request.method == 'POST':
         try:
             factura = facturas[id]
+            # Guardar cantidades antiguas para comparar
+            cantidades_antiguas = dict(zip(factura['productos'], factura['cantidades']))
+            
             # Obtener y validar datos básicos
             factura['cliente_id'] = request.form['cliente_id']
             factura['fecha'] = request.form['fecha']
@@ -717,19 +770,51 @@ def editar_factura(id):
             factura['condicion_pago'] = request.form.get('condicion_pago', 'contado')
             factura['dias_credito'] = request.form.get('dias_credito', '30')
             factura['fecha_vencimiento'] = request.form.get('fecha_vencimiento', '') if request.form.get('condicion_pago') == 'credito' else ''
+            
             # Obtener productos, cantidades y precios
             productos = request.form.getlist('productos[]')
             cantidades = request.form.getlist('cantidades[]')
             precios = request.form.getlist('precios[]')
             precios = [float(p) for p in precios]
+            
+            # Registrar cambios en el stock
+            for prod_id, nueva_cantidad in zip(productos, cantidades):
+                nueva_cantidad = int(nueva_cantidad)
+                cantidad_antigua = int(cantidades_antiguas.get(prod_id, 0))
+                
+                if nueva_cantidad != cantidad_antigua:
+                    # Calcular la diferencia
+                    diferencia = nueva_cantidad - cantidad_antigua
+                    
+                    # Actualizar el stock
+                    inventario[prod_id]['cantidad'] -= diferencia
+                    
+                    # Registrar el movimiento en historial_ajustes
+                    if 'historial_ajustes' not in inventario[prod_id]:
+                        inventario[prod_id]['historial_ajustes'] = []
+                    
+                    tipo = 'entrada' if diferencia < 0 else 'salida'
+                    cantidad_abs = abs(diferencia)
+                    
+                    inventario[prod_id]['historial_ajustes'].append({
+                        'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        'tipo': tipo,
+                        'cantidad': cantidad_abs,
+                        'motivo': f'Ajuste por edición de factura N°{factura["numero"]}',
+                        'usuario': session.get('usuario', ''),
+                        'observaciones': f'Cantidad anterior: {cantidad_antigua}, Nueva cantidad: {nueva_cantidad}'
+                    })
+            
             factura['productos'] = productos
             factura['cantidades'] = cantidades
             factura['precios'] = precios
+            
             # Obtener y validar tasa BCV
             tasa_bcv = limpiar_valor_monetario(request.form.get('tasa_bcv', '36.00'))
             if tasa_bcv <= 0:
                 tasa_bcv = 36.00
             factura['tasa_bcv'] = tasa_bcv
+            
             # Calcular subtotales y totales
             subtotal_usd = sum(precios[i] * int(cantidades[i]) for i in range(len(precios)))
             subtotal_bs = subtotal_usd * tasa_bcv
@@ -743,6 +828,7 @@ def editar_factura(id):
             iva_total = (subtotal_usd - descuento_total) * (iva / 100)
             total_usd = subtotal_usd - descuento_total + iva_total
             total_bs = total_usd * tasa_bcv
+            
             factura['descuento'] = descuento
             factura['tipo_descuento'] = tipo_descuento
             factura['iva'] = iva
@@ -752,6 +838,7 @@ def editar_factura(id):
             factura['iva_total'] = iva_total
             factura['total_usd'] = total_usd
             factura['total_bs'] = total_bs
+            
             # Procesar pagos
             pagos_json = request.form.get('pagos_json', '[]')
             try:
@@ -762,6 +849,7 @@ def editar_factura(id):
                 factura['pagos'] = pagos
             except Exception:
                 factura['pagos'] = []
+            
             # Calcular total abonado y saldo pendiente
             total_abonado = sum(float(p['monto']) for p in factura['pagos'])
             factura['total_abonado'] = total_abonado
@@ -776,6 +864,12 @@ def editar_factura(id):
             
             factura['saldo_pendiente'] = saldo_pendiente
             facturas[id] = factura
+            
+            # Guardar cambios en el inventario
+            if not guardar_datos(ARCHIVO_INVENTARIO, inventario):
+                flash('Error al actualizar el inventario', 'danger')
+                return redirect(url_for('editar_factura', id=id))
+            
             if guardar_datos(ARCHIVO_FACTURAS, facturas):
                 flash('Factura actualizada exitosamente', 'success')
                 registrar_bitacora(session['usuario'], 'Editar factura', f"ID: {id}")
@@ -886,9 +980,20 @@ def nueva_factura():
                     if int(cantidad) > int(inventario[prod_id]['cantidad']):
                         flash(f'No hay suficiente stock para {inventario[prod_id]["nombre"]}', 'danger')
                         return redirect(url_for('nueva_factura'))
-            # Descontar stock
+            # Descontar stock y registrar salida en historial_ajustes
             for prod_id, cantidad in zip(productos, cantidades):
                 inventario[prod_id]['cantidad'] -= int(cantidad)
+                # Registrar salida en historial_ajustes
+                if 'historial_ajustes' not in inventario[prod_id]:
+                    inventario[prod_id]['historial_ajustes'] = []
+                inventario[prod_id]['historial_ajustes'].append({
+                    'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'tipo': 'salida',
+                    'cantidad': int(cantidad),
+                    'motivo': f'Venta por factura N°{numero}',
+                    'usuario': session.get('usuario', ''),
+                    'observaciones': f'Venta por factura N°{numero}'
+                })
             if not guardar_datos(ARCHIVO_INVENTARIO, inventario):
                 flash('Error al actualizar el inventario', 'danger')
                 return redirect(url_for('nueva_factura'))
@@ -1238,6 +1343,7 @@ def ajustar_stock():
         tipo_ajuste = request.form.get('tipo_ajuste')
         cantidad = int(request.form.get('cantidad'))
         motivo = request.form.get('motivo')
+        usuario = session.get('usuario', '')
         if not productos:
             flash('Debe seleccionar al menos un producto', 'danger')
             return redirect(url_for('ajustar_stock'))
@@ -1262,7 +1368,8 @@ def ajustar_stock():
                     'fecha': fecha_actual,
                     'tipo': tipo_ajuste,
                     'cantidad': cantidad,
-                    'motivo': motivo
+                    'motivo': motivo,
+                    'usuario': usuario
                 })
         guardar_datos(ARCHIVO_INVENTARIO, inventario)
         flash(f'Ajuste de stock realizado para {len(productos)} producto(s)', 'success')
@@ -1325,6 +1432,29 @@ def reporte_inventario():
             id: producto for id, producto in inventario.items() 
             if producto['cantidad'] < 10
         }
+        # --- Historial de ajustes masivos ---
+        ajustes_masivos = []
+        for producto in inventario.values():
+            nombre_producto = producto.get('nombre', '')
+            if 'historial_ajustes' in producto:
+                for ajuste in producto['historial_ajustes']:
+                    ajustes_masivos.append({
+                        'fecha': ajuste.get('fecha', ''),
+                        'motivo': ajuste.get('motivo', ''),
+                        'producto': nombre_producto,
+                        'ingreso': ajuste['cantidad'] if ajuste.get('tipo') == 'entrada' else 0,
+                        'salida': ajuste['cantidad'] if ajuste.get('tipo') == 'salida' else 0,
+                        'usuario': '',
+                        'observaciones': ajuste.get('motivo', '')
+                    })
+        # Ordenar por fecha descendente
+        from datetime import datetime as dt
+        def parse_fecha(f):
+            try:
+                return dt.strptime(f['fecha'], '%Y-%m-%d %H:%M:%S')
+            except:
+                return dt.min
+        ajustes_masivos = sorted(ajustes_masivos, key=parse_fecha, reverse=True)
         return render_template('reporte_inventario.html',
                              inventario=inventario,
                              total_productos=total_productos,
@@ -1335,7 +1465,8 @@ def reporte_inventario():
                              empresa=empresa,
                              tasa_bcv=tasa_bcv,
                              fecha_actual=fecha_actual,
-                             advertencia_tasa=advertencia_tasa)
+                             advertencia_tasa=advertencia_tasa,
+                             ajustes_masivos=ajustes_masivos)
     except Exception as e:
         flash(f'Error al generar el reporte: {str(e)}', 'danger')
         return redirect(url_for('mostrar_inventario'))
@@ -1884,7 +2015,21 @@ def mostrar_pagos_recibidos():
     pagos = []
     total_usd = 0
     total_bs = 0
-    tasa_bcv = obtener_tasa_bcv() or 1.0
+    # Obtener tasas de Monitor Dólar
+    tasa_bcv = None
+    tasa_paralelo = None
+    tasa_bcv_eur = None
+    try:
+        r = requests.get('https://s3.amazonaws.com/dolartoday/data.json', timeout=5)
+        data = r.json()
+        tasa_bcv = float(data['USD']['bcv']) if 'USD' in data and 'bcv' in data['USD'] else None
+        tasa_paralelo = float(data['USD']['promedio']) if 'USD' in data and 'promedio' in data['USD'] else None
+        tasa_bcv_eur = float(data['EUR']['promedio']) if 'EUR' in data and 'promedio' in data['EUR'] else None
+    except Exception:
+        # Si falla, usar la tasa BCV local
+        tasa_bcv = obtener_tasa_bcv() or 1.0
+        tasa_paralelo = tasa_bcv
+        tasa_bcv_eur = 0
     for f in facturas.values():
         if 'pagos' in f and f['pagos']:
             for pago in f['pagos']:
@@ -1895,10 +2040,13 @@ def mostrar_pagos_recibidos():
                     'monto': pago.get('monto', 0),
                     'metodo': pago.get('metodo', ''),
                     'tasa_bcv': float(f.get('tasa_bcv', tasa_bcv)),
+                    'referencia': pago.get('referencia', ''),
+                    'banco': pago.get('banco', ''),
+                    'captura_path': pago.get('captura_path', None)
                 })
                 total_usd += float(pago.get('monto', 0))
                 total_bs += float(pago.get('monto', 0)) * float(f.get('tasa_bcv', tasa_bcv))
-    return render_template('pagos_recibidos.html', pagos=pagos, clientes=clientes, total_usd=total_usd, total_bs=total_bs, tasa_bcv=tasa_bcv)
+    return render_template('pagos_recibidos.html', pagos=pagos, clientes=clientes, total_usd=total_usd, total_bs=total_bs, tasa_bcv=tasa_bcv, tasa_paralelo=tasa_paralelo, tasa_bcv_eur=tasa_bcv_eur)
 
 @app.template_filter('split')
 def split_filter(value, delimiter=' '):
@@ -2453,6 +2601,277 @@ def actualizar_tasa_bcv():
         return jsonify({
             'success': False,
             'error': f'Error al actualizar la tasa BCV: {str(e)}'
+        })
+
+# Rutas para gestión de categorías
+@app.route('/categorias')
+@login_required
+def gestionar_categorias():
+    # Cargar el inventario
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
+    # Obtener categorías únicas
+    categorias = []
+    for id, producto in inventario.items():
+        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in categorias]:
+            categorias.append({
+                'id': len(categorias) + 1,
+                'nombre': producto['categoria']
+            })
+    
+    return render_template('gestionar_categorias.html', categorias=categorias)
+
+@app.route('/categorias', methods=['POST'])
+@login_required
+def crear_categoria():
+    nombre = request.form.get('nombre')
+    if not nombre:
+        flash('El nombre de la categoría es requerido', 'danger')
+        return redirect(url_for('gestionar_categorias'))
+    
+    # Cargar el inventario
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
+    # Verificar si la categoría ya existe
+    for producto in inventario.values():
+        if producto.get('categoria') == nombre:
+            flash('Esta categoría ya existe', 'danger')
+            return redirect(url_for('gestionar_categorias'))
+    
+    # Crear un nuevo producto con la categoría para mantenerla en el sistema
+    nuevo_id = str(max([int(k) for k in inventario.keys()]) + 1) if inventario else '1'
+    inventario[nuevo_id] = {
+        'nombre': f'Producto de categoría {nombre}',
+        'categoria': nombre,
+        'precio': 0,
+        'cantidad': 0,
+        'ultima_entrada': datetime.now().isoformat()
+    }
+    
+    if guardar_datos(ARCHIVO_INVENTARIO, inventario):
+        flash('Categoría creada exitosamente', 'success')
+    else:
+        flash('Error al crear la categoría', 'danger')
+    
+    return redirect(url_for('gestionar_categorias'))
+
+@app.route('/categorias/<int:id>/editar', methods=['POST'])
+@login_required
+def editar_categoria(id):
+    nuevo_nombre = request.form.get('nuevo_nombre')
+    if not nuevo_nombre:
+        flash('El nuevo nombre de la categoría es requerido', 'danger')
+        return redirect(url_for('gestionar_categorias'))
+    
+    # Cargar el inventario
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
+    # Verificar si el nuevo nombre ya existe
+    for producto in inventario.values():
+        if producto.get('categoria') == nuevo_nombre:
+            flash('Ya existe una categoría con ese nombre', 'danger')
+            return redirect(url_for('gestionar_categorias'))
+    
+    # Encontrar la categoría actual
+    categoria_actual = None
+    for producto in inventario.values():
+        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in [{'nombre': p.get('categoria')} for p in inventario.values() if p.get('categoria')]]:
+            categoria_actual = producto['categoria']
+            break
+    
+    if not categoria_actual:
+        flash('Categoría no encontrada', 'danger')
+        return redirect(url_for('gestionar_categorias'))
+    
+    # Actualizar la categoría en todos los productos
+    for producto in inventario.values():
+        if producto.get('categoria') == categoria_actual:
+            producto['categoria'] = nuevo_nombre
+    
+    if guardar_datos(ARCHIVO_INVENTARIO, inventario):
+        flash('Categoría actualizada exitosamente', 'success')
+    else:
+        flash('Error al actualizar la categoría', 'danger')
+    
+    return redirect(url_for('gestionar_categorias'))
+
+@app.route('/categorias/<int:id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_categoria(id):
+    # Cargar el inventario
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    
+    # Encontrar la categoría
+    categoria = None
+    for producto in inventario.values():
+        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in [{'nombre': p.get('categoria')} for p in inventario.values() if p.get('categoria')]]:
+            categoria = producto['categoria']
+            break
+    
+    if not categoria:
+        flash('Categoría no encontrada', 'danger')
+        return redirect(url_for('gestionar_categorias'))
+    
+    # Verificar si hay productos asociados
+    productos_asociados = [p for p in inventario.values() if p.get('categoria') == categoria]
+    if len(productos_asociados) > 1:  # Más de 1 porque uno es el producto de la categoría
+        flash('No se puede eliminar la categoría porque tiene productos asociados', 'danger')
+        return redirect(url_for('gestionar_categorias'))
+    
+    # Eliminar el producto de la categoría
+    for id_producto, producto in list(inventario.items()):
+        if producto.get('categoria') == categoria:
+            del inventario[id_producto]
+            break
+    
+    if guardar_datos(ARCHIVO_INVENTARIO, inventario):
+        flash('Categoría eliminada exitosamente', 'success')
+    else:
+        flash('Error al eliminar la categoría', 'danger')
+    
+    return redirect(url_for('gestionar_categorias'))
+
+@app.route('/inventario/ajustes-masivos')
+@login_required
+def ajustes_masivos():
+    inventario = cargar_datos('inventario.json')
+    # Recolectar todos los ajustes
+    ajustes = []
+    for producto in inventario.values():
+        nombre_producto = producto.get('nombre', '')
+        if 'historial_ajustes' in producto:
+            for ajuste in producto['historial_ajustes']:
+                ajustes.append({
+                    'fecha': ajuste.get('fecha', ''),
+                    'motivo': ajuste.get('motivo', ''),
+                    'producto': nombre_producto,
+                    'ingreso': ajuste['cantidad'] if ajuste.get('tipo') == 'entrada' else 0,
+                    'salida': ajuste['cantidad'] if ajuste.get('tipo') == 'salida' else 0,
+                    'usuario': '',
+                    'observaciones': ajuste.get('motivo', '')
+                })
+    # Obtener filtros
+    filtro_fecha = request.args.get('fecha', '')
+    filtro_producto = request.args.get('producto', '').lower()
+    filtro_usuario = request.args.get('usuario', '').lower()
+    filtro_tipo = request.args.get('tipo', '')
+    # Aplicar filtros
+    if filtro_fecha:
+        ajustes = [a for a in ajustes if a['fecha'][:10] == filtro_fecha]
+    if filtro_producto:
+        ajustes = [a for a in ajustes if filtro_producto in a['producto'].lower()]
+    if filtro_usuario:
+        ajustes = [a for a in ajustes if filtro_usuario in a['usuario'].lower()]
+    if filtro_tipo:
+        ajustes = [a for a in ajustes if a['tipo'] == filtro_tipo]
+    # Ordenar por fecha descendente
+    ajustes.sort(key=lambda x: x['fecha'], reverse=True)
+    # Obtener listas para filtros
+    productos = sorted(list(set(a['producto'] for a in ajustes)))
+    usuarios = sorted(list(set(a['usuario'] for a in ajustes)))
+    return render_template('ajustes_masivos.html', 
+                         ajustes=ajustes,
+                         productos=productos,
+                         usuarios=usuarios,
+                         filtro_fecha=filtro_fecha,
+                         filtro_producto=filtro_producto,
+                         filtro_usuario=filtro_usuario,
+                         filtro_tipo=filtro_tipo)
+
+@app.route('/api/tasas')
+def api_tasas():
+    try:
+        r = requests.get('https://s3.amazonaws.com/dolartoday/data.json', timeout=5)
+        data = r.json()
+        tasa_bcv = float(data['USD']['bcv']) if 'USD' in data and 'bcv' in data['USD'] else None
+        tasa_paralelo = float(data['USD']['promedio']) if 'USD' in data and 'promedio' in data['USD'] else None
+        tasa_bcv_eur = float(data['EUR']['promedio']) if 'EUR' in data and 'promedio' in data['EUR'] else None
+        return jsonify({
+            'tasa_bcv': tasa_bcv,
+            'tasa_paralelo': tasa_paralelo,
+            'tasa_bcv_eur': tasa_bcv_eur
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/tasas-actualizadas')
+def api_tasas_actualizadas():
+    try:
+        # 1. Obtener tasa BCV (USD/BS) desde Monitor Dólar
+        tasa_bcv = None
+        try:
+            r = requests.get('https://s3.amazonaws.com/dolartoday/data.json', timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                if 'USD' in data and 'bcv' in data['USD']:
+                    tasa_bcv = float(str(data['USD']['bcv']).replace(',', '.'))
+        except Exception as e:
+            print(f"Error obteniendo BCV de Monitor Dólar: {e}")
+            tasa_bcv = None
+
+        # 2. Tasa paralela: manual (no scraping ni API)
+        tasa_paralelo = 0  # Puedes cambiar esto si quieres pasarla manualmente
+        fuente_paralelo = 'manual'
+
+        # 3. Obtener tasa EUR/BS desde la página oficial del BCV (scraping solo por <strong>)
+        tasa_bcv_eur = None
+        try:
+            url_bcv = 'https://www.bcv.org.ve/'
+            resp = requests.get(url_bcv, timeout=10, verify=False)
+            if resp.status_code == 200:
+                from bs4 import BeautifulSoup
+                import re
+                soup = BeautifulSoup(resp.text, 'html.parser')
+                # Buscar todos los <strong> que contengan un número con coma decimal
+                for strong in soup.find_all('strong'):
+                    txt = strong.get_text(strip=True)
+                    valor_limpio = re.sub(r'[^\d,\.]', '', txt)
+                    valor_limpio = valor_limpio.replace('.', '').replace(',', '.')
+                    try:
+                        posible = float(valor_limpio)
+                        if 10 < posible < 500:
+                            tasa_bcv_eur = posible
+                            break
+                    except Exception as e:
+                        continue
+            if tasa_bcv_eur is None:
+                print('No se encontró la tasa EUR en <strong> en el HTML del BCV. Primeros 2000 caracteres:')
+                print(resp.text[:2000])
+                tasa_bcv_eur = 0
+        except Exception as e:
+            print(f"Error obteniendo EUR/BS de BCV: {e}")
+            tasa_bcv_eur = 0
+
+        # Fallbacks
+        if tasa_bcv is None:
+            tasa_bcv = cargar_ultima_tasa_bcv() or 1.0
+        if tasa_paralelo is None:
+            tasa_paralelo = tasa_bcv
+        if tasa_bcv_eur is None:
+            tasa_bcv_eur = 0
+
+        # Guardar la última tasa BCV
+        if tasa_bcv:
+            guardar_ultima_tasa_bcv(tasa_bcv)
+
+        return jsonify({
+            'success': True,
+            'tasa_bcv': tasa_bcv,
+            'tasa_paralelo': tasa_paralelo,
+            'tasa_bcv_eur': tasa_bcv_eur,
+            'fuente_paralelo': fuente_paralelo,
+            'fecha_actualizacion': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+    except Exception as e:
+        # En caso de error, devolver las últimas tasas guardadas
+        ultima_tasa = cargar_ultima_tasa_bcv() or 1.0
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'tasa_bcv': ultima_tasa,
+            'tasa_paralelo': ultima_tasa,
+            'tasa_bcv_eur': 0,
+            'fecha_actualizacion': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
 
 # --- Bloque para Ejecutar la Aplicación ---

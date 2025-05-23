@@ -49,6 +49,9 @@ def subir_cambios():
         # Crear backup antes de subir cambios
         backup_path = crear_backup()
         
+        # Asegurarse de estar en la rama maestro
+        subprocess.run(["git", "checkout", "maestro"], check=True)
+        
         # Agregar todos los cambios
         subprocess.run(["git", "add", "."], check=True)
         
@@ -57,10 +60,10 @@ def subir_cambios():
         mensaje = f"Actualización automática: {fecha}"
         subprocess.run(["git", "commit", "-m", mensaje], check=True)
         
-        # Subir cambios
-        subprocess.run(["git", "push"], check=True)
+        # Subir cambios a la rama maestro
+        subprocess.run(["git", "push", "origin", "maestro"], check=True)
         
-        print("Cambios subidos exitosamente a GitHub")
+        print("Cambios subidos exitosamente a GitHub en la rama maestro")
         print(f"Backup local creado en: {backup_path}")
         
     except subprocess.CalledProcessError as e:

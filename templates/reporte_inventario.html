@@ -4,19 +4,75 @@
 
 {% block content %}
 <style>
+    @media print {
+        html, body {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+        }
+        body * {
+            visibility: hidden !important;
+        }
+        .reporte-container, .reporte-container * {
+            visibility: visible !important;
+        }
+        .reporte-container {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        .no-print, .sidebar, .navbar, .main-sidebar, .main-header, .footer, .btn, .btn-print {
+            display: none !important;
+        }
+        .page-header {
+            background: none !important;
+            color: #222 !important;
+            box-shadow: none !important;
+            padding: 0.5rem 0 1rem 0 !important;
+            margin-bottom: 1rem !important;
+        }
+        .categoria-section {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            page-break-inside: avoid !important;
+        }
+        .stats-card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+        .table th, .table td {
+            background: white !important;
+            color: #222 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
     .reporte-container {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        min-height: 100vh;
-        padding: 2rem 0;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        margin-left: 250px;
+        margin-top: 70px;
     }
 
     .page-header {
-        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
         color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .page-header h2 {
@@ -28,406 +84,270 @@
 
     .stats-card {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        border: none;
-        margin-bottom: 2rem;
-        transition: all 0.3s ease;
-        overflow: hidden;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e3e6f0;
     }
 
     .stats-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
 
-    .stats-card .card-body {
-        padding: 1.5rem;
-    }
-
-    .stats-card.primary {
-        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-        color: white;
-    }
-
-    .stats-card.success {
-        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-        color: white;
-    }
-
-    .stats-card.info {
-        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
-        color: white;
-    }
-
-    .stats-card.warning {
-        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
-        color: white;
-    }
-
-    .stats-card .stats-icon {
-        font-size: 2.5rem;
+    .stats-card .card-title {
+        color: #5a5c69;
+        font-size: 1.1rem;
+        font-weight: 600;
         margin-bottom: 1rem;
-        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .stats-card .stats-value {
+    .stats-card .card-value {
         font-size: 2rem;
         font-weight: 700;
+        color: #4e73df;
         margin-bottom: 0.5rem;
     }
 
-    .stats-card .stats-label {
-        font-size: 1.1rem;
-        font-weight: 600;
-        opacity: 0.9;
+    .stats-card .card-subtitle {
+        color: #858796;
+        font-size: 0.9rem;
     }
 
-    .table-card {
+    .categoria-section {
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        border: none;
-        margin-bottom: 2rem;
-        overflow: hidden;
-    }
-
-    .table-card .card-header {
-        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-        color: white;
+        border-radius: 10px;
         padding: 1.5rem;
-        border-bottom: none;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e3e6f0;
     }
 
-    .table-card .card-header.danger {
-        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    .categoria-header {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
     }
 
-    .table-card .card-header h4 {
+    .categoria-header h3 {
         margin: 0;
+        font-size: 1.3rem;
         font-weight: 600;
-        font-size: 1.2rem;
     }
 
     .table {
         margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
-    .table thead th {
-        background: #f8f9fa;
-        color: #1a237e;
+    .table th {
+        background: #f8f9fc;
+        color: #4e73df;
         font-weight: 600;
-        border-bottom: 2px solid #dee2e6;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
         padding: 1rem;
+        border-bottom: 2px solid #e3e6f0;
     }
 
-    .table tbody td {
+    .table td {
         padding: 1rem;
         vertical-align: middle;
-    }
-
-    .table tbody tr {
-        transition: all 0.3s ease;
+        border-bottom: 1px solid #e3e6f0;
     }
 
     .table tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.01);
+        background-color: #f8f9fc;
     }
 
-    .badge {
+    .badge-stock {
         padding: 0.5rem 1rem;
+        border-radius: 50px;
         font-weight: 600;
-        border-radius: 8px;
+        font-size: 0.85rem;
     }
 
-    .badge-success {
-        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    .badge-stock.bajo {
+        background: #f6c23e;
+        color: #fff;
     }
 
-    .badge-danger {
-        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    .badge-stock.critico {
+        background: #e74a3b;
+        color: #fff;
     }
 
-    .btn {
+    .badge-stock.normal {
+        background: #1cc88a;
+        color: #fff;
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        border: none;
         padding: 0.75rem 1.5rem;
+        border-radius: 50px;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-radius: 10px;
         transition: all 0.3s ease;
     }
 
-    .btn:hover {
+    .btn-print:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
     }
 
-    .btn i {
-        font-size: 1.1rem;
+    .advertencia-tasa {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f5c6cb;
     }
 
-    .btn-secondary {
-        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
-        border: none;
+    .table tfoot tr {
+        background-color: #f8f9fc;
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-        border: none;
-    }
-
-    .company-header {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        padding: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .company-header img {
-        max-height: 100px;
-        transition: all 0.3s ease;
-    }
-
-    .company-header img:hover {
-        transform: scale(1.05);
-    }
-
-    .company-header h3 {
-        color: #1a237e;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .company-header p {
-        color: #455a64;
-        margin-bottom: 0.25rem;
+    .table tfoot td {
+        font-weight: 600;
+        color: #4e73df;
     }
 
     @media (max-width: 768px) {
-        .page-header {
-            padding: 1.5rem;
+        .reporte-container {
+            margin-left: 0;
+            padding: 1rem;
         }
-
+        
         .page-header h2 {
             font-size: 1.5rem;
         }
-
-        .stats-card .stats-value {
+        
+        .stats-card .card-value {
             font-size: 1.5rem;
         }
-
-        .stats-card .stats-label {
-            font-size: 1rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        .table thead th, .table tbody td {
+        
+        .table th, .table td {
             padding: 0.75rem;
             font-size: 0.9rem;
         }
     }
-
-    @media print {
-        .btn-group, .navbar {
-            display: none !important;
-        }
-        .card {
-            break-inside: avoid;
-            border: none !important;
-        }
-        .card-header {
-            background-color: #f8f9fa !important;
-            color: #000 !important;
-            border-bottom: 2px solid #dee2e6 !important;
-        }
-        .table {
-            font-size: 12px;
-        }
-        .table th {
-            background-color: #f8f9fa !important;
-            color: #000 !important;
-        }
-        .badge {
-            border: 1px solid #000;
-        }
-        .company-header {
-            border: none !important;
-        }
-        .container-fluid {
-            width: 100% !important;
-            padding: 0 !important;
-        }
-        .row {
-            margin: 0 !important;
-        }
-        .col-md-3 {
-            padding: 0 10px !important;
-        }
-        .stats-value {
-            font-size: 2rem !important;
-        }
-    }
 </style>
 
-<div class="reporte-container">
-    <div class="container">
-        <div class="page-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2><i class="fas fa-boxes me-2"></i>Reporte de Inventario</h2>
-                </div>
-                <div class="col-md-4 text-end">
-                    <div class="btn-group">
-                        <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Volver al Inventario
-                        </a>
-                        <button onclick="window.print()" class="btn btn-primary">
-                            <i class="fas fa-print me-2"></i>Imprimir
-                        </button>
-                    </div>
+<div class="container-fluid reporte-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h2>
+                    <i class="fas fa-boxes me-2"></i>
+                    Reporte de Inventario
+                </h2>
+                <div class="no-print d-flex gap-2">
+                    <button onclick="window.print()" class="btn btn-print">
+                        <i class="fas fa-print me-2"></i>Imprimir Reporte
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
+    <!-- Barra de búsqueda y filtro -->
+    <div class="row mb-3 no-print">
+        <div class="col-md-6 mb-2">
+            <input type="text" id="busquedaProducto" class="form-control" placeholder="Buscar producto...">
+        </div>
+        <div class="col-md-6 mb-2">
+            <select id="filtroCategoria" class="form-control">
+                <option value="">Todas las categorías</option>
+                {% for categoria, datos in productos_por_categoria.items() %}
+                <option value="{{ categoria }}">{{ categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 
-        <!-- Encabezado de la Empresa -->
-        <div class="company-header">
-            <div class="row align-items-center">
-                <div class="col-md-2 text-center">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="img-fluid">
-                </div>
-                <div class="col-md-8 text-center">
-                    <h3>{{ empresa.nombre }}</h3>
-                    <p>RIF: {{ empresa.rif }}</p>
-                    <p>{{ empresa.direccion }}</p>
-                    <p>Teléfono: {{ empresa.telefono }}</p>
-                </div>
-                <div class="col-md-2 text-end">
-                    <p><strong>Fecha:</strong> {{ fecha_actual.strftime('%d/%m/%Y') }}</p>
-                    <p><strong>Tasa BCV:</strong> {{ tasa_bcv }} Bs/USD</p>
-                </div>
+    {% if advertencia_tasa %}
+    <div class="row">
+        <div class="col-12">
+            <div class="advertencia-tasa">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ advertencia_tasa }}
             </div>
         </div>
+    </div>
+    {% endif %}
 
-        <!-- Resumen General -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card primary">
-                    <div class="card-body">
-                        <div class="stats-icon">
-                            <i class="fas fa-boxes"></i>
-                        </div>
-                        <div class="stats-value">{{ total_productos|es_number(0) }}</div>
-                        <div class="stats-label">Total Productos</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card success">
-                    <div class="card-body">
-                        <div class="stats-icon">
-                            <i class="fas fa-cubes"></i>
-                        </div>
-                        <div class="stats-value">{{ total_stock|es_number(0) }}</div>
-                        <div class="stats-label">Total Stock</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card info">
-                    <div class="card-body">
-                        <div class="stats-icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="stats-value">${{ valor_total|es_number }}</div>
-                        <div class="stats-label">Valor Total USD</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card warning">
-                    <div class="card-body">
-                        <div class="stats-icon">
-                            <i class="fas fa-bolivar-sign"></i>
-                        </div>
-                        <div class="stats-value">{{ (valor_total * tasa_bcv)|es_number }}</div>
-                        <div class="stats-label">Valor Total Bs</div>
-                    </div>
-                </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Total Productos</div>
+                <div class="card-value">{{ total_productos }}</div>
+                <div class="card-subtitle">Productos en inventario</div>
             </div>
         </div>
-
-        <!-- Productos por Categoría -->
-        <div class="table-card">
-            <div class="card-header">
-                <h4><i class="fas fa-tags me-2"></i>Productos por Categoría</h4>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Total Stock</div>
+                <div class="card-value">{{ total_stock }}</div>
+                <div class="card-subtitle">Unidades disponibles</div>
             </div>
-            <div class="card-body">
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Valor Total USD</div>
+                <div class="card-value">${{ "%.2f"|format(valor_total) }}</div>
+                <div class="card-subtitle">Valor del inventario</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Valor Total Bs</div>
+                <div class="card-value">Bs. {{ "%.2f"|format(valor_total * tasa_bcv) }}</div>
+                <div class="card-subtitle">Tasa BCV: {{ "%.2f"|format(tasa_bcv) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="categoria-section">
+                <div class="categoria-header">
+                    <h3><i class="fas fa-exclamation-triangle me-2"></i>Productos con Bajo Stock</h3>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th style="width: 18%">Categoría</th>
-                                <th style="width: 10%">Total Productos</th>
-                                <th style="width: 10%">Stock Total</th>
-                                <th style="width: 12%">Valor Total USD</th>
-                                <th style="width: 12%">Valor Total Bs</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for categoria, datos in productos_por_categoria.items() %}
-                            <tr>
-                                <td>{{ categoria }}</td>
-                                <td class="text-end">{{ datos.productos|length }}</td>
-                                <td class="text-end">{{ datos.cantidad|es_number(0) }}</td>
-                                <td class="text-end">${{ datos.valor|es_number }}</td>
-                                <td class="text-end">{{ (datos.valor * tasa_bcv)|es_number }} Bs</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Productos con Bajo Stock -->
-        <div class="table-card">
-            <div class="card-header danger">
-                <h4><i class="fas fa-exclamation-triangle me-2"></i>Productos con Bajo Stock</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th style="width: 10%">ID</th>
-                                <th style="width: 25%">Nombre</th>
-                                <th style="width: 15%">Categoría</th>
-                                <th style="width: 10%">Stock</th>
-                                <th style="width: 10%">Precio USD</th>
-                                <th style="width: 10%">Precio Bs</th>
-                                <th style="width: 10%">Valor USD</th>
-                                <th style="width: 10%">Valor Bs</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Precio</th>
+                                <th>Valor Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for id, producto in productos_bajo_stock.items() %}
                             <tr>
-                                <td>{{ id }}</td>
                                 <td>{{ producto.nombre }}</td>
                                 <td>{{ producto.categoria }}</td>
-                                <td class="text-end">
-                                    <span class="badge badge-danger">{{ producto.cantidad|es_number(0) }}</span>
+                                <td>
+                                    <span class="badge-stock {% if producto.cantidad < 5 %}critico{% else %}bajo{% endif %}">
+                                        {{ producto.cantidad }} unidades
+                                    </span>
                                 </td>
-                                <td class="text-end">${{ producto.precio|es_number }}</td>
-                                <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
-                                <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
-                                <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio * producto.cantidad) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -435,67 +355,136 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Lista Completa de Productos -->
-        <div class="table-card">
-            <div class="card-header">
-                <h4><i class="fas fa-list me-2"></i>Lista Completa de Productos</h4>
-            </div>
-            <div class="card-body">
+    {% for categoria, datos in productos_por_categoria.items() %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="categoria-section">
+                <div class="categoria-header">
+                    <h3>{{ categoria }}</h3>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th style="width: 8%">ID</th>
-                                <th style="width: 22%" class="text-start">Nombre</th>
-                                <th style="width: 13%">Categoría</th>
-                                <th style="width: 8%">Stock</th>
-                                <th style="width: 10%">Precio USD</th>
-                                <th style="width: 10%">Precio Bs</th>
-                                <th style="width: 10%">Valor USD</th>
-                                <th style="width: 10%">Valor Bs</th>
-                                <th style="width: 9%">Última Entrada</th>
+                                <th>Producto</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Valor Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for id, producto in inventario.items() %}
+                            {% for producto in datos.productos %}
                             <tr>
-                                <td>{{ id }}</td>
-                                <td class="text-start">{{ producto.nombre }}</td>
-                                <td>{{ producto.categoria }}</td>
-                                <td class="text-end">
-                                    <span class="badge {% if producto.cantidad > 0 %}badge-success{% else %}badge-danger{% endif %}">
-                                        {{ producto.cantidad|es_number(0) }}
+                                <td>{{ producto.nombre }}</td>
+                                <td>
+                                    <span class="badge-stock {% if producto.cantidad < 5 %}critico{% elif producto.cantidad < 10 %}bajo{% else %}normal{% endif %}">
+                                        {{ producto.cantidad }} unidades
                                     </span>
                                 </td>
-                                <td class="text-end">${{ producto.precio|es_number }}</td>
-                                <td class="text-end">{{ (producto.precio * tasa_bcv)|es_number }} Bs</td>
-                                <td class="text-end">${{ (producto.cantidad * producto.precio)|es_number }}</td>
-                                <td class="text-end">{{ (producto.cantidad * producto.precio * tasa_bcv)|es_number }} Bs</td>
-                                <td class="text-center">
-                                    {% if producto.ultima_entrada %}
-                                        {{ producto.ultima_entrada|string|replace('T', ' ')|datetimeformat('%d/%m/%Y') }}
-                                    {% else %}N/A{% endif %}
-                                </td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio * producto.cantidad) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td colspan="2"><strong>Total {{ categoria }}</strong></td>
+                                <td><strong>Stock: {{ datos.cantidad }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(datos.valor) }}</strong></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
         </div>
-
-        {% if tasa_bcv is not defined or tasa_bcv == 0 %}
-        <div class="alert alert-warning mt-3" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>¡Advertencia! No se ha podido obtener la tasa BCV actual.
-        </div>
-        {% endif %}
-
-        {% if advertencia_tasa %}
-        <div class="alert alert-warning mt-3" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>{{ advertencia_tasa }}
-        </div>
-        {% endif %}
     </div>
+    {% endfor %}
 </div>
+
+<!-- Modal Ajuste Masivo de Stock -->
+<div class="modal fade" id="modalAjustesMasivos" tabindex="-1" aria-labelledby="modalAjustesMasivosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="modalAjustesMasivosLabel"><i class="fas fa-sliders-h me-2"></i>Historial de Ajustes Masivos de Stock</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-warning">
+              <tr>
+                <th>Fecha</th>
+                <th>Motivo</th>
+                <th>Producto</th>
+                <th>Ingreso</th>
+                <th>Salida</th>
+                <th>Usuario</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if ajustes_masivos and ajustes_masivos|length > 0 %}
+                {% for ajuste in ajustes_masivos %}
+                <tr>
+                  <td>{{ ajuste.fecha }}</td>
+                  <td>{{ ajuste.motivo }}</td>
+                  <td>{{ ajuste.producto }}</td>
+                  <td>{% if ajuste.ingreso %}{{ ajuste.ingreso }}{% else %}0{% endif %}</td>
+                  <td>{% if ajuste.salida %}{{ ajuste.salida }}{% else %}0{% endif %}</td>
+                  <td>{{ ajuste.usuario }}</td>
+                  <td>{{ ajuste.observaciones }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="7" class="text-center">No hay ajustes registrados.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filtrado en tiempo real por producto y categoría
+function normalizarTexto(txt) {
+    return txt.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const inputBusqueda = document.getElementById('busquedaProducto');
+    const selectCategoria = document.getElementById('filtroCategoria');
+    const secciones = document.querySelectorAll('.categoria-section');
+
+    function filtrar() {
+        const texto = normalizarTexto(inputBusqueda.value.trim());
+        const categoria = selectCategoria.value;
+        secciones.forEach(section => {
+            // Filtrar por categoría
+            const header = section.querySelector('.categoria-header h3');
+            const esCategoria = !categoria || (header && header.textContent === categoria);
+            // Filtrar por producto
+            let hayCoincidencia = false;
+            const filas = section.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+                const nombre = normalizarTexto(fila.querySelector('td').textContent);
+                const coincide = nombre.includes(texto);
+                fila.style.display = (coincide && esCategoria) ? '' : 'none';
+                if (coincide && esCategoria) hayCoincidencia = true;
+            });
+            // Mostrar u ocultar la sección según si hay coincidencias
+            section.style.display = hayCoincidencia ? '' : 'none';
+        });
+    }
+    inputBusqueda.addEventListener('input', filtrar);
+    selectCategoria.addEventListener('change', filtrar);
+});
+</script>
 {% endblock %} 
