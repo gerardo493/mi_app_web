@@ -5,4 +5,6 @@ Jinja2==3.0.1
 beautifulsoup4==4.9.3
 pdfkit==1.0.0
 requests==2.26.0
-gunicorn 
+gunicorn
+py_webauthn
+Flask-SQLAlchemy 

@@ -171,7 +171,15 @@
     <div class="sidebar-tab" id="sidebarTab" title="Mostrar menú"><i class="fas fa-angle-right"></i></div>
     <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     <aside class="sidebar" id="sidebar">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo de la Empresa" class="logo">
+        <div class="logo user-logo" style="
+            width: 80px; height: 80px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; box-shadow: 0 4px 16px rgba(26,35,126,0.10); border: 2px solid #b8c1ec;">
+            <span style="font-size:2.5rem; font-weight:800; color:#1A237E; text-transform:uppercase; letter-spacing:1px;">
+                {{ session.get('nombre', 'U')[0] }}{{ session.get('apellido', 'S')[0] }}
+            </span>
+        </div>
+        <div style="color:#fff; font-weight:600; font-size:1.1rem; margin-bottom:2rem; text-align:center; word-break:break-word;">
+            {{ session['usuario'] }}
+        </div>
         <nav class="nav flex-column">
             <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"><i class="fas fa-home"></i> Inicio</a>
             <a class="nav-link {% if '/clientes' in request.path %}active{% endif %}" href="/clientes"><i class="fas fa-users"></i> Clientes</a>

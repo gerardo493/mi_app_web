@@ -6,7 +6,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file, session, abort
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,6 +19,8 @@ from functools import wraps
 import re
 import uuid
 from uuid import uuid4
+from flask_sqlalchemy import SQLAlchemy
+import base64
 
 # --- Inicializar la Aplicación Flask ---
 app = Flask(__name__)
@@ -341,15 +343,23 @@ def login_required(f):
 @login_required
 def index():
     stats = obtener_estadisticas()
+    # Calcular total facturado y promedio por factura
+    facturas = cargar_datos(ARCHIVO_FACTURAS)
+    total_facturado_usd = sum(float(f.get('total_usd', 0)) for f in facturas.values())
+    cantidad_facturas = len(facturas)
+    promedio_factura_usd = total_facturado_usd / cantidad_facturas if cantidad_facturas > 0 else 0
+    # Obtener tasa euro igual que antes
     try:
-        tasa_bcv = float(stats.get('tasa_bcv', 0))
+        r = requests.get('https://s3.amazonaws.com/dolartoday/data.json', timeout=5)
+        data = r.json()
+        tasa_bcv_eur = float(data['EUR']['promedio']) if 'EUR' in data and 'promedio' in data['EUR'] else None
     except Exception:
-        tasa_bcv = 0
+        tasa_bcv_eur = 0
     advertencia_tasa = None
-    if not tasa_bcv or tasa_bcv < 1:
+    if not stats.get('tasa_bcv') or stats.get('tasa_bcv', 0) < 1:
         advertencia_tasa = '¡Advertencia! No se ha podido obtener la tasa BCV actual.'
-    stats['tasa_bcv'] = tasa_bcv
-    return render_template('index.html', **stats, advertencia_tasa=advertencia_tasa)
+    stats['tasa_bcv_eur'] = tasa_bcv_eur
+    return render_template('index.html', **stats, advertencia_tasa=advertencia_tasa, total_facturado_usd=total_facturado_usd, promedio_factura_usd=promedio_factura_usd)
 
 @app.route('/clientes')
 @login_required
@@ -2877,3 +2887,92 @@ def api_tasas_actualizadas():
 # --- Bloque para Ejecutar la Aplicación ---
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/initdb')
+@admin_required
+def initdb():
+    db.create_all()
+    return 'Base de datos inicializada correctamente.'
+
+@app.route('/webauthn/register/options', methods=['POST'])
+def webauthn_register_options():
+    username = request.json.get('username')
+    if not username:
+        return jsonify({'error': 'Usuario requerido'}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    options = generate_registration_options(user)
+    session['webauthn_registration_challenge'] = options.challenge
+    return jsonify(options.registration_dict)
+
+@app.route('/webauthn/register/verify', methods=['POST'])
+def webauthn_register_verify():
+    username = request.json.get('username')
+    credential = request.json.get('credential')
+    if not username or not credential:
+        return jsonify({'error': 'Datos incompletos'}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    challenge = session.get('webauthn_registration_challenge')
+    if not challenge:
+        return jsonify({'error': 'Challenge no encontrado'}), 400
+    try:
+        response = WebAuthnRegistrationResponse(
+            rp_id=os.environ.get('WEBAUTHN_RP_ID', 'localhost'),
+            origin=os.environ.get('WEBAUTHN_ORIGIN', 'http://localhost:5000'),
+            registration_response=credential,
+            challenge=challenge,
+            uv_required=False
+        )
+        cred = response.verify()
+        user.credential_id = cred.credential_id
+        user.public_key = cred.public_key
+        user.sign_count = cred.sign_count
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/webauthn/authenticate/options', methods=['POST'])
+def webauthn_authenticate_options():
+    username = request.json.get('username')
+    if not username:
+        return jsonify({'error': 'Usuario requerido'}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.credential_id:
+        return jsonify({'error': 'Usuario o credencial no encontrada'}), 404
+    options = generate_assertion_options(user)
+    session['webauthn_authenticate_challenge'] = options.challenge
+    return jsonify(options.assertion_dict)
+
+@app.route('/webauthn/authenticate/verify', methods=['POST'])
+def webauthn_authenticate_verify():
+    username = request.json.get('username')
+    credential = request.json.get('credential')
+    if not username or not credential:
+        return jsonify({'error': 'Datos incompletos'}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.credential_id:
+        return jsonify({'error': 'Usuario o credencial no encontrada'}), 404
+    challenge = session.get('webauthn_authenticate_challenge')
+    if not challenge:
+        return jsonify({'error': 'Challenge no encontrado'}), 400
+    try:
+        response = WebAuthnAssertionResponse(
+            rp_id=os.environ.get('WEBAUTHN_RP_ID', 'localhost'),
+            origin=os.environ.get('WEBAUTHN_ORIGIN', 'http://localhost:5000'),
+            assertion_response=credential,
+            challenge=challenge,
+            credential_public_key=user.public_key,
+            credential_current_sign_count=user.sign_count,
+            uv_required=False
+        )
+        sign_count = response.verify()
+        user.sign_count = sign_count
+        db.session.commit()
+        session['usuario'] = username
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400

@@ -1,0 +1,40 @@
+{
+    "numero_factura": "0609",
+    "fecha": "2025-08-10T10:15:35",
+    "tasa_cambio": 91.92,
+    "cliente": {
+        "rif": "J-503178575",
+        "nombre": "T/N FARMA BOTICA",
+        "direccion": "TERMINAL PASAJEROS MARACAY- ARAGUA",
+        "telefono": "0424-338-3334"
+    },
+    "items": [
+        {
+            "id": "55",
+            "nombre": "SABILAX-6 X 30 CAP",
+            "cantidad": 24,
+            "precio_unitario_usd": 1.5,
+            "precio_unitario_bs": 137.88,
+            "categoria": "LAXANTE",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "14",
+            "nombre": "CLORURO DE MAGNESIO X 33 GR",
+            "cantidad": 12,
+            "precio_unitario_usd": 1.0,
+            "precio_unitario_bs": 91.92,
+            "categoria": "Regenerador osio",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 4412.16,
+    "iva_bs": 0.0,
+    "total_bs": 4412.16,
+    "subtotal_usd": 48.0,
+    "iva_usd": 0.0,
+    "total_usd": 48.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}

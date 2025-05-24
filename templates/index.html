@@ -5,40 +5,21 @@
     {% block content %}
     <style>
         body {
-            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
-            position: relative;
-            overflow-x: hidden;
+            background: linear-gradient(120deg, #1a237e 0%, #4f8cff 100%);
+            min-height: 100vh;
         }
-        body::before, body::after {
-            content: '';
-            position: fixed;
+        .main-bg-blur {
+            background: rgba(255,255,255,0.05);
+            min-height: 100vh;
+            width: 100%;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             z-index: 0;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.45;
-            pointer-events: none;
-            animation: blobMove 18s ease-in-out infinite alternate;
+            backdrop-filter: blur(8px);
         }
-        body::before {
-            width: 480px;
-            height: 480px;
-            top: -120px;
-            left: -120px;
-            background: radial-gradient(circle at 30% 30%, #ffe082 0%, #bfa43a 80%);
-            animation-delay: 0s;
-        }
-        body::after {
-            width: 420px;
-            height: 420px;
-            bottom: -100px;
-            right: -100px;
-            background: radial-gradient(circle at 70% 70%, #81c784 0%, #388e3c 80%);
-            animation-delay: 6s;
-        }
-        @keyframes blobMove {
-            0% { transform: scale(1) translateY(0) translateX(0); }
-            50% { transform: scale(1.08) translateY(30px) translateX(40px); }
-            100% { transform: scale(0.95) translateY(-20px) translateX(-30px); }
+        .container-fluid.px-4 {
+            position: relative;
+            z-index: 1;
         }
         .stats-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -46,15 +27,13 @@
             border: none;
             border-radius: 15px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .stats-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
-
         .stats-icon {
             transition: transform 0.3s ease;
         }
@@ -76,40 +55,89 @@
         }
 
         .quick-actions .btn {
-            transition: all 0.3s ease;
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
+            border: none;
+            border-radius: 18px;
+            padding: 1.2rem 0.7rem;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.8px;
+            box-shadow: 0 10px 36px rgba(26,35,126,0.16), 0 2px 8px #fff8 inset;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(40px) scale(0.98);
+            animation: card-fade-in 0.8s cubic-bezier(.4,2,.6,1) forwards;
+            font-size: 1.08rem;
+            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
+        .quick-actions .btn-primary {
+            background: linear-gradient(90deg, rgba(58, 134, 255, 0.3) 60%, rgba(67, 97, 238, 0.3) 100%);
+        }
+        .quick-actions .btn-success {
+            background: linear-gradient(90deg, rgba(6, 214, 160, 0.3) 60%, rgba(67, 170, 139, 0.3) 100%);
+        }
+        .quick-actions .btn-warning {
+            background: linear-gradient(90deg, rgba(255, 209, 102, 0.3) 60%, rgba(249, 199, 79, 0.3) 100%);
+            color: rgba(0, 0, 0, 0.8);
+        }
+        .quick-actions .btn-info {
+            background: linear-gradient(90deg, rgba(95, 108, 175, 0.3) 60%, rgba(181, 23, 158, 0.3) 100%);
+        }
         .quick-actions .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-10px) scale(1.07) rotate(-2deg);
+            box-shadow: 0 24px 56px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
+            filter: brightness(1.08) saturate(1.1);
+            background: rgba(255, 255, 255, 0.25);
         }
-
+        .quick-actions .btn-primary:hover {
+            background: linear-gradient(90deg, rgba(67, 97, 238, 0.8) 60%, rgba(58, 134, 255, 0.8) 100%);
+        }
+        .quick-actions .btn-success:hover {
+            background: linear-gradient(90deg, rgba(67, 170, 139, 0.8) 60%, rgba(6, 214, 160, 0.8) 100%);
+        }
+        .quick-actions .btn-warning:hover {
+            background: linear-gradient(90deg, rgba(249, 199, 79, 0.8) 60%, rgba(255, 209, 102, 0.8) 100%);
+            color: rgba(0, 0, 0, 0.8);
+        }
+        .quick-actions .btn-info:hover {
+            background: linear-gradient(90deg, rgba(181, 23, 158, 0.8) 60%, rgba(95, 108, 175, 0.8) 100%);
+        }
+        .quick-actions .btn i {
+            font-size: 1.5rem;
+            margin-right: 0.7rem;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .quick-actions .btn:hover i {
+            color: #fff700;
+            text-shadow: 0 2px 8px #43aa8b88, 0 1px 0 #fff;
+            animation: icon-pulse 0.7s;
+        }
         .list-group-item {
             transition: all 0.3s ease;
             border-radius: 8px !important;
             margin-bottom: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
         }
 
         .list-group-item:hover {
             transform: translateX(5px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .list-group-item h6 {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
         .list-group-item p {
-            color: #34495e;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .card {
@@ -117,31 +145,52 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .card:hover {
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .card-header {
-            background-color: rgba(248, 249, 250, 0.95);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            background-color: rgba(248, 249, 250, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px 15px 0 0 !important;
             padding: 1rem;
+            backdrop-filter: blur(5px);
         }
 
         .card-header h5 {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             margin: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
         #fecha-hora-actual {
+            background: rgba(255,255,255,0.15);
+            padding: 0.9rem 1.7rem;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
-            color: #2c3e50;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            font-size: 1.08rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px rgba(26,35,126,0.10);
+            text-align: center;
+            margin-left: 0;
+            white-space: normal;
+            word-break: break-word;
+            backdrop-filter: blur(8px);
+        }
+
+        #fecha-hora-actual:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
         }
 
         .text-muted {
@@ -176,7 +225,9 @@
 
             #fecha-hora-actual {
                 font-size: 1rem;
-                min-width: 180px;
+                padding: 0.8rem 1.2rem;
+                max-width: 100%;
+                margin: 1rem 0;
             }
         }
 
@@ -205,340 +256,657 @@
         }
 
         .header-container {
-            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-            padding: 2rem 0;
-            margin: -1.5rem -1.5rem 2rem -1.5rem;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(120deg, rgba(26, 35, 126, 0.8) 0%, rgba(79, 140, 255, 0.8) 100%);
+            padding: 2.5rem 0 2rem 0;
+            margin: -1.5rem -1.5rem 0 -1.5rem;
+            border-radius: 0 0 40px 40px;
+            box-shadow: 0 12px 32px rgba(26,35,126,0.18);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .header-container::before {
-            content: '';
-            position: absolute;
-            top: -60px;
-            right: -80px;
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle at 60% 40%, #ffe082 0%, #bfa43a 80%);
-            opacity: 0.25;
-            filter: blur(20px);
-            z-index: 0;
-            animation: blobMove 14s ease-in-out infinite alternate;
-        }
-        .header-container::after {
-            content: '';
-            position: absolute;
-            bottom: -60px;
-            left: -80px;
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle at 40% 60%, #81c784 0%, #388e3c 80%);
-            opacity: 0.22;
-            filter: blur(18px);
-            z-index: 0;
-            animation: blobMove 16s ease-in-out infinite alternate-reverse;
-        }
+
         .header-content {
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .welcome-text {
-            color: white;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .welcome-subtext {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.1rem;
-            margin-bottom: 0;
-        }
-
-        #fecha-hora-actual {
-            background: rgba(255,255,255,0.1);
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            color: white;
-            font-weight: 500;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .header-stat-item {
-            background: rgba(255,255,255,0.1);
-            padding: 1rem 1.5rem;
-            border-radius: 15px;
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            flex: 1;
-            min-width: 200px;
-            transition: all 0.3s ease;
-        }
-
-        .header-stat-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .header-stat-item.cuentas-cobrar {
-            background: linear-gradient(135deg, rgba(220, 53, 69, 0.9), rgba(200, 35, 51, 0.9));
-        }
-
-        .header-stat-item.pagos-recibidos {
-            background: linear-gradient(135deg, rgba(40, 167, 69, 0.9), rgba(30, 147, 49, 0.9));
-        }
-
-        .header-stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 0.25rem;
-        }
-
-        .header-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .header-stat-bs {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff !important;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
-            margin-top: 0.2rem;
-            letter-spacing: 0.5px;
-        }
-
-        .tasa-bcv-container {
-            background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9));
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            margin-top: 1rem;
-            display: inline-block;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .tasa-bcv-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            color: white;
-            font-weight: 500;
-        }
-
-        .tasa-bcv-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .main-stats {
-            margin-top: 2rem;
-        }
-
-        .main-stats .card {
-            height: 100%;
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .main-stats .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .main-stats .card-body {
-            padding: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .main-stats .icon-container {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
+        .header-logo {
+            background: rgba(255,255,255,0.15);
+            padding: 22px;
+            border-radius: 30px;
+            box-shadow: 0 8px 32px rgba(26,35,126,0.13);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(8px);
         }
 
-        .main-stats .icon-container i {
-            font-size: 2rem;
-            color: white;
+        .header-logo:hover {
+            transform: scale(1.06) rotate(-2deg);
+            box-shadow: 0 16px 48px rgba(26,35,126,0.18);
+            background: rgba(255,255,255,0.2);
         }
 
-        .main-stats .stat-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.75rem;
-            letter-spacing: 0.5px;
+        .header-logo img {
+            max-width: 120px;
+            max-height: 90px;
+            border-radius: 18px;
         }
 
-        .main-stats .stat-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
+        .welcome-text {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 2.3rem;
+            font-weight: 900;
             margin-bottom: 0.5rem;
+            text-shadow: 1px 2px 8px rgba(13, 71, 161, 0.6);
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .welcome-subtext {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-stats {
+            margin-top: 2.5rem;
+        }
+        .main-stats .card {
+            min-width: 180px;
+            max-width: 240px;
+            border-radius: 22px;
+            box-shadow: 0 6px 24px rgba(26,35,126,0.10);
+            background: rgba(255,255,255,0.15);
+            border: 1.5px solid #e0e7ff;
+            margin-bottom: 0;
+            transition: transform 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.35s, border 0.3s, background 0.5s;
+            position: relative;
+            backdrop-filter: blur(4px);
+            height: auto;
+            opacity: 0;
+            transform: translateY(40px) scale(0.98);
+            animation: card-fade-in 0.8s cubic-bezier(.4,2,.6,1) forwards;
+        }
+        .main-stats .card:nth-child(2) { animation-delay: 0.12s; }
+        .main-stats .card:nth-child(3) { animation-delay: 0.24s; }
+        .main-stats .card:nth-child(4) { animation-delay: 0.36s; }
+        @keyframes card-fade-in {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .main-stats .card:hover {
+            transform: translateY(-14px) scale(1.06) rotate(-1deg);
+            box-shadow: 0 20px 48px rgba(26,35,126,0.18), 0 4px 16px #fff8 inset;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .main-stats .icon-container {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            font-size: 2.1rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(26,35,126,0.10);
+            background: linear-gradient(135deg, #e0e7ff 0%, #fff 100%);
+            transition: background 0.5s, box-shadow 0.3s, transform 0.3s;
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .main-stats .card:hover .icon-container {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        @keyframes icon-bounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.18) rotate(-8deg); }
+            60% { transform: scale(0.92) rotate(6deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .main-stats .icon-container i {
+            font-size: 2.1rem;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .main-stats .card:hover .icon-container i {
+            color: #fff700;
+            text-shadow: 0 2px 8px #43aa8b88, 0 1px 0 #fff;
+            animation: icon-pulse 0.7s;
+        }
+        @keyframes icon-pulse {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 8px #fff700); }
+            100% { filter: brightness(1); }
+        }
+        .main-stats .stat-title {
+            font-size: 0.97rem;
+            margin-bottom: 0.15rem;
+            color: #232946;
+            font-weight: 900;
+            letter-spacing: 0.7px;
+            text-shadow: 0 1px 3px rgba(26,35,126,0.08);
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .main-stats .stat-value {
+            font-size: 1.13rem;
+            margin-bottom: 0.08rem;
+            color: #1a237e;
+            font-weight: 900;
+            text-shadow: 0 2px 8px #b8c1ec55, 0 1px 0 #fff;
+            letter-spacing: 0.5px;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .main-stats .stat-subtitle {
+            font-size: 0.78rem;
+            margin-top: 0.07rem;
+            color: #5f6caf;
+            font-weight: 800;
+            text-shadow: 0 1px 2px #fff8, 0 1px 0 #b8c1ec44;
+            opacity: 0.92;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .main-stats .card:hover .stat-title {
+            color: #4361ee;
+            text-shadow: 0 2px 8px #b8c1ec55, 0 1px 0 #fff;
+            transform: scale(1.06);
+        }
+        .main-stats .card:hover .stat-value {
+            color: #ff006e;
+            text-shadow: 0 4px 16px #8338ec44, 0 1px 0 #fff;
+            transform: scale(1.09);
+        }
+        .main-stats .card:hover .stat-subtitle {
+            color: #8338ec;
+            text-shadow: 0 2px 8px #fff8, 0 1px 0 #b8c1ec44;
+            transform: scale(1.04);
+        }
+        @media (max-width: 991px) {
+            .header-logo img {
+                max-width: 80px;
+                max-height: 60px;
+            }
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            .header-container {
+                padding: 1.2rem 0 1.2rem 0;
+                border-radius: 0 0 24px 24px;
+            }
+            .main-stats {
+                margin-top: 1.2rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-logo img {
+                max-width: 60px;
+                max-height: 40px;
+            }
+            .welcome-text {
+                font-size: 1.1rem;
+            }
+            .header-container {
+                padding: 0.7rem 0 0.7rem 0;
+                border-radius: 0 0 14px 14px;
+            }
+            .main-stats {
+                margin-top: 0.7rem;
+            }
+        }
+        .main-stats-carousel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+        }
+        .main-stats .card {
+            flex: 1 1 0;
+            min-width: 180px;
+            max-width: 260px;
+            margin: 0;
+        }
+        @media (max-width: 991px) {
+            .main-stats-carousel {
+                gap: 1rem;
+            }
+            .main-stats .card {
+                min-width: 160px;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 768px) {
+            .main-stats-carousel {
+                flex-direction: column;
+                gap: 0.7rem;
+            }
+            .main-stats .card {
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+        .header-stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(26,35,126,0.18), 0 2px 8px #fff8 inset;
+            padding: 1.1rem 1.5rem 1rem 1.5rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-stat-card.cobranza {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(244, 67, 54, 0.15) 100%);
+            border-left: 7px solid #F44336;
+        }
+
+        .header-stat-card.pagos {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(67, 170, 139, 0.15) 100%);
+            border-left: 7px solid #43aa8b;
+        }
+
+        .header-stat-card.facturado {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(108, 92, 231, 0.15) 100%);
+            border-left: 7px solid #6C5CE7;
+        }
+
+        .header-stat-card.promedio {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 217, 61, 0.15) 100%);
+            border-left: 7px solid #FFD93D;
+        }
+
+        .header-stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .header-stat-card .icon {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header-stat-card:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .header-stat-card .icon i {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-stat-card .icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: currentColor;
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header-stat-card:hover .icon::after {
+            transform: scale(1.5);
+        }
+
+        .header-stat-card.cobranza .icon {
+            color: #F44336;
+            animation: pulse-red 2s infinite;
+        }
+
+        .header-stat-card.pagos .icon {
+            color: #43aa8b;
+            animation: pulse-green 2s infinite;
+        }
+
+        .header-stat-card.facturado .icon {
+            color: #6C5CE7;
+            animation: pulse-purple 2s infinite;
+        }
+
+        .header-stat-card.promedio .icon {
+            color: #FFD93D;
+            animation: pulse-yellow 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(244,67,54,0.4)); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(67,170,139,0.4)); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-purple {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(108,92,231,0.4)); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-yellow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,217,61,0.4)); }
+            100% { transform: scale(1); }
+        }
+
+        .header-stat-label {
+            font-size: 1.18rem;
+            font-weight: 900;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.7px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .header-stat-card.cobranza .header-stat-label {
+            color: #d32f2f;
+        }
+
+        .header-stat-card.pagos .header-stat-label {
+            color: #2e7d32;
+        }
+
+        .header-stat-card.facturado .header-stat-label {
+            color: #5e35b1;
+        }
+
+        .header-stat-card.promedio .header-stat-label {
+            color: #f57f17;
+        }
+
+        .header-stat-value {
+            font-size: 1.55rem;
+            font-weight: 900;
+            margin-bottom: 0.1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-stat-card.cobranza .header-stat-value {
+            color: #b71c1c;
+        }
+
+        .header-stat-card.pagos .header-stat-value {
+            color: #1b5e20;
+        }
+
+        .header-stat-card.facturado .header-stat-value {
+            color: #4527a0;
+        }
+
+        .header-stat-card.promedio .header-stat-value {
+            color: #ff6f00;
+        }
+
+        .header-stat-bs {
+            font-size: 1.13rem;
+            font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .header-stat-card.cobranza .header-stat-bs {
+            color: #c62828;
+        }
+
+        .header-stat-card.pagos .header-stat-bs {
+            color: #2e7d32;
+        }
+
+        .header-stat-card.facturado .header-stat-bs {
+            color: #5e35b1;
+        }
+
+        .header-stat-card.promedio .header-stat-bs {
+            color: #f57f17;
+        }
+
+        .header-stat-card:hover .header-stat-label,
+        .header-stat-card:hover .header-stat-value,
+        .header-stat-card:hover .header-stat-bs {
+            transform: translateX(5px);
+        }
+
+        .header-stat-refresh {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .header-stat-card.cobranza .header-stat-refresh {
+            color: #F44336;
+        }
+
+        .header-stat-card.pagos .header-stat-refresh {
+            color: #43aa8b;
+        }
+
+        .header-stat-card:hover .header-stat-refresh {
+            opacity: 1;
+            transform: scale(1.15) rotate(20deg);
+        }
+
+        .main-stats .stat-value.text-secondary {
+            color: rgba(0, 0, 0, 0.9) !important;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
         }
 
         .main-stats .stat-subtitle {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-top: 0.5rem;
-            font-weight: 500;
+            color: rgba(0, 0, 0, 0.8);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
         }
 
-        .quick-actions .btn {
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            padding: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
+        .carousel-control-prev,
+        .carousel-control-next {
+            color: rgba(0, 0, 0, 0.9);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
         }
 
-        .quick-actions .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-            transition: all 0.3s ease;
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            padding: 1.5rem;
         }
 
-        .quick-actions .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        .badge {
+            color: rgba(0, 0, 0, 0.9);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
         }
 
-        .quick-actions .btn:hover::before {
-            transform: translateX(100%);
+        .badge.bg-warning {
+            background-color: rgba(255, 193, 7, 0.9) !important;
         }
 
-        .quick-actions .btn i {
-            font-size: 1.2rem;
-            margin-right: 0.5rem;
+        .badge.bg-primary {
+            background-color: rgba(13, 110, 253, 0.9) !important;
         }
 
-        .main-stats .card.clientes {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        #ultima-actualizacion-dashboard {
+            color: #111;
+            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
+            font-weight: 900;
         }
 
-        .main-stats .card.inventario {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        #ultima-actualizacion-dashboard i,
+        #ultima-actualizacion-dashboard .text-success,
+        #ultima-actualizacion-dashboard .text-danger,
+        #ultima-actualizacion-dashboard .text-muted,
+        #ultima-actualizacion-dashboard .fa-sync-alt,
+        #ultima-actualizacion-dashboard .fa-check-circle,
+        #ultima-actualizacion-dashboard .fa-exclamation-circle,
+        #ultima-actualizacion-dashboard .fa-clock {
+            color: #111 !important;
+            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
+            font-weight: 900;
         }
 
-        .main-stats .card.facturas {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        .card.clientes .icon-container {
+            background: linear-gradient(135deg, #e0e7ff 0%, #4f8cff 100%);
+            color: #1976d2;
+            animation: pulse-blue 2s infinite;
         }
-
-        .main-stats .card.tasa-bcv {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        .card.inventario .icon-container {
+            background: linear-gradient(135deg, #e0ffe7 0%, #43aa8b 100%);
+            color: #43aa8b;
+            animation: pulse-green 2s infinite;
         }
-
-        .main-stats .icon-container.clientes {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+        .card.facturas .icon-container {
+            background: linear-gradient(135deg, #ede7ff 0%, #6C5CE7 100%);
+            color: #6C5CE7;
+            animation: pulse-purple 2s infinite;
         }
-
-        .main-stats .icon-container.inventario {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        @keyframes pulse-blue {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #1976d2aa); }
+            100% { transform: scale(1); }
         }
-
-        .main-stats .icon-container.facturas {
-            background: linear-gradient(135deg, #f1c40f, #f39c12);
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #43aa8baa); }
+            100% { transform: scale(1); }
         }
-
-        .main-stats .icon-container.tasa-bcv {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        @keyframes pulse-purple {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #6C5CE7aa); }
+            100% { transform: scale(1); }
         }
-
-        @media (max-width: 768px) {
-            .header-container {
-                padding: 1.5rem 0;
-                margin: -1rem -1rem 1.5rem -1rem;
-            }
-
-            .welcome-text {
-                font-size: 1.75rem;
-            }
-
-            .welcome-subtext {
-                font-size: 1rem;
-            }
-
-            .header-stat-item {
-                min-width: 150px;
-            }
+        .card.clientes .stat-title,
+        .card.inventario .stat-title,
+        .card.facturas .stat-title,
+        .card.clientes .stat-value,
+        .card.inventario .stat-value,
+        .card.facturas .stat-value {
+            color: #111 !important;
+            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
+            font-weight: 900;
         }
-
-        @media (max-width: 576px) {
-            .header-container {
-                padding: 1rem 0;
-            }
-
-            .welcome-text {
-                font-size: 1.5rem;
-            }
-
-            .header-stat-item {
-                min-width: 100%;
-            }
-
-            #fecha-hora-actual {
-                font-size: 0.9rem;
-                padding: 0.5rem 1rem;
-            }
+        .card.clientes .icon-container i,
+        .card.inventario .icon-container i,
+        .card.facturas .icon-container i {
+            font-size: 2.1rem;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .card.clientes:hover .icon-container,
+        .card.inventario:hover .icon-container,
+        .card.facturas:hover .icon-container {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.08) rotate(-4deg);
+        }
+        .card.clientes:hover .icon-container i {
+            color: #1565c0;
+            text-shadow: 0 2px 8px #1976d2aa, 0 1px 0 #fff;
+        }
+        .card.inventario:hover .icon-container i {
+            color: #388e3c;
+            text-shadow: 0 2px 8px #43aa8baa, 0 1px 0 #fff;
+        }
+        .card.facturas:hover .icon-container i {
+            color: #512da8;
+            text-shadow: 0 2px 8px #6C5CE7aa, 0 1px 0 #fff;
         }
     </style>
-
+    <div class="main-bg-blur"></div>
     <div class="container-fluid px-4">
         <div class="header-container">
             <div class="container">
                 <div class="header-content">
                     <div class="row align-items-center g-3">
                         <div class="col-auto d-flex align-items-center justify-content-center" style="min-width:120px;">
-                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Empresa" style="max-height:90px; max-width:110px; border-radius:18px; box-shadow:0 2px 8px rgba(0,0,0,0.08); background:#fff; padding:8px;">
+                            <div class="header-logo">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Empresa">
+                            </div>
                         </div>
                         <div class="col ps-0 ps-md-3">
-                            <h1 class="welcome-text mb-1" style="font-size:2.1rem; font-weight:800; color:#fff; text-shadow:1px 2px 8px #0d47a1a0;">Bienvenido al Sistema de Facturación</h1>
-                            <p class="welcome-subtext mb-0" style="font-size:1.2rem; color:#e3e3e3; font-weight:500;">Panel de Control y Gestión Empresarial</p>
+                            <h1 class="welcome-text mb-1">Bienvenido al Sistema de Facturación</h1>
+                            <p class="welcome-subtext mb-0">Panel de Control y Gestión Empresarial</p>
                         </div>
-                        <div class="col-12 col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="col-12 col-md-auto text-md-start mt-3 mt-md-0">
                             <div id="fecha-hora-actual"></div>
                         </div>
                     </div>
-                    <div class="header-stats">
-                        <div class="header-stat-item cuentas-cobrar">
+                    <div class="col-12 mt-3">
+                        <div id="headerStatsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                          <div class="carousel-inner">
+                            <div class="carousel-item active">
+                              <div class="row g-3 justify-content-center">
+                                <div class="col-md-6 col-lg-3">
+                                  <div class="header-stat-card cobranza d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#F44336;"><i class="fas fa-hand-holding-usd"></i></span>
+                                    <i class="fas fa-sync-alt header-stat-refresh" id="refresh-cobranza" title="Actualizando datos..."></i>
                             <div class="header-stat-label">Cuentas por Cobrar</div>
                             <div class="header-stat-value">${{ total_cobrar_usd|float|es_number }}</div>
                             <div class="header-stat-bs">{{ total_cobrar_bs|float|es_number }} Bs</div>
                         </div>
-                        <div class="header-stat-item pagos-recibidos">
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                  <div class="header-stat-card pagos d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#43aa8b;"><i class="fas fa-money-check-alt"></i></span>
+                                    <i class="fas fa-sync-alt header-stat-refresh" id="refresh-pagos" title="Actualizando datos..."></i>
                             <div class="header-stat-label">Pagos Recibidos</div>
                             <div class="header-stat-value">${{ total_pagos_recibidos_usd|float|es_number }}</div>
                             <div class="header-stat-bs">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
+                        </div>
+                    </div>
+                                <div class="col-md-6 col-lg-3">
+                                  <div class="header-stat-card facturado d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#6C5CE7;"><i class="fas fa-file-invoice-dollar"></i></span>
+                                    <div class="header-stat-label">Facturado</div>
+                                    <div class="header-stat-value">${{ total_facturado_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">Total USD</div>
+                                  </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                  <div class="header-stat-card promedio d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#FFD93D;"><i class="fas fa-receipt"></i></span>
+                                    <div class="header-stat-label">Promedio por Factura</div>
+                                    <div class="header-stat-value">${{ promedio_factura_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">Promedio USD</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <button class="carousel-control-prev" type="button" data-bs-target="#headerStatsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                          </button>
+                          <button class="carousel-control-next" type="button" data-bs-target="#headerStatsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                          </button>
                         </div>
                     </div>
                 </div>
@@ -546,9 +914,9 @@
         </div>
         
         <div class="row g-4 main-stats">
-            <div class="col-12 col-sm-6 col-md-3">
+            <div class="main-stats-carousel w-100">
                 <div class="card clientes">
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <div class="icon-container clientes">
                             <i class="fas fa-users"></i>
                         </div>
@@ -556,11 +924,8 @@
                         <div class="stat-value">{{ total_clientes }}</div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-12 col-sm-6 col-md-3">
                 <div class="card inventario">
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <div class="icon-container inventario">
                             <i class="fas fa-boxes"></i>
                         </div>
@@ -568,11 +933,8 @@
                         <div class="stat-value">{{ total_productos }}</div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-12 col-sm-6 col-md-3">
                 <div class="card facturas">
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <div class="icon-container facturas">
                             <i class="fas fa-file-invoice-dollar"></i>
                         </div>
@@ -580,17 +942,38 @@
                         <div class="stat-value">{{ facturas_mes }}</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="col-12 col-sm-6 col-md-3">
                 <div class="card tasa-bcv">
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <div class="icon-container tasa-bcv">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="stat-title">Tasa BCV</div>
-                        <div class="stat-value">{{ tasa_bcv|float|es_number }}</div>
+                        <div id="tasasCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                          <div class="carousel-inner">
+                            <div class="carousel-item active">
+                              <div class="stat-value text-secondary" style="font-size:2.1rem;">
+                                <span id="tasa-bcv-valor">{{ tasa_bcv|default('Cargando...', true)|es_number }}</span> <span class="badge bg-warning text-dark">BCV</span>
+                              </div>
                         <div class="stat-subtitle">Bs/USD</div>
+                    </div>
+                            <div class="carousel-item">
+                              <div class="stat-value text-secondary" style="font-size:2.1rem;">
+                                <span id="tasa-eur-valor">{{ tasa_bcv_eur|default('Cargando...', true)|es_number }}</span> <span class="badge bg-primary">Euro</span>
+                              </div>
+                              <div class="stat-subtitle">Bs/EUR</div>
+                            </div>
+                          </div>
+                          <button class="carousel-control-prev" type="button" data-bs-target="#tasasCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                          </button>
+                          <button class="carousel-control-next" type="button" data-bs-target="#tasasCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                          </button>
+                        </div>
+                        <small class="d-block text-muted" style="font-size:0.8rem;" id="ultima-actualizacion-dashboard">
+                            <i class="fas fa-sync-alt fa-spin"></i> Actualizando...
+                        </small>
                     </div>
                 </div>
             </div>
@@ -717,5 +1100,60 @@
     }
     actualizarFechaHora();
     setInterval(actualizarFechaHora, 1000);
+    </script>
+
+    <script>
+    function actualizarTasasDashboard() {
+        const ultimaActualizacion = document.getElementById('ultima-actualizacion-dashboard');
+        if (ultimaActualizacion) {
+            ultimaActualizacion.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Actualizando...';
+        }
+        fetch('/api/tasas-actualizadas')
+            .then(r => r.json())
+            .then(data => {
+                if (!data || typeof data !== 'object') return;
+                const tasa_bcv = parseFloat(data.tasa_bcv);
+                const tasa_bcv_eur = parseFloat(data.tasa_bcv_eur);
+                if (!isNaN(tasa_bcv)) {
+                    const el = document.getElementById('tasa-bcv-valor');
+                    if (el) el.textContent = tasa_bcv.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+                }
+                if (!isNaN(tasa_bcv_eur)) {
+                    const el = document.getElementById('tasa-eur-valor');
+                    if (el) el.textContent = tasa_bcv_eur.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+                }
+                if (ultimaActualizacion) {
+                    const fecha = data.fecha_actualizacion ? new Date(data.fecha_actualizacion).toLocaleString() : '';
+                    ultimaActualizacion.innerHTML = `<i class='fas fa-check-circle text-success'></i> Actualizado: ${fecha}`;
+                    setTimeout(() => {
+                        ultimaActualizacion.innerHTML = `<i class='fas fa-clock text-muted'></i> Última actualización: ${fecha}`;
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                if (ultimaActualizacion) {
+                    ultimaActualizacion.innerHTML = `<i class='fas fa-exclamation-circle text-danger'></i> Error: ${error.message}`;
+                }
+            });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarTasasDashboard();
+        setInterval(actualizarTasasDashboard, 5 * 60 * 1000);
+    });
+    </script>
+
+    <script>
+    // Animar la rueda de actualización cada 3 minutos
+    function spinHeaderRefresh() {
+        document.getElementById('refresh-cobranza').classList.add('spin');
+        document.getElementById('refresh-pagos').classList.add('spin');
+        setTimeout(() => {
+            document.getElementById('refresh-cobranza').classList.remove('spin');
+            document.getElementById('refresh-pagos').classList.remove('spin');
+        }, 1800);
+    }
+    setInterval(spinHeaderRefresh, 3 * 60 * 1000);
+    // Animación inicial al cargar
+    spinHeaderRefresh();
     </script>
     {% endblock %} 

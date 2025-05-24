@@ -1,0 +1,31 @@
+{
+    "numero_factura": "0060",
+    "fecha": "2025-05-10T00:48:45.974126",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "J-412047842",
+        "nombre": "CASA NATURISTA VALLE VERDE",
+        "direccion": "EL CHAPARRO EDO - ANZOATEGUI",
+        "telefono": ""
+    },
+    "items": [
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 39,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 11115.0,
+    "iva_bs": 0.0,
+    "total_bs": 11115.0,
+    "subtotal_usd": 117.0,
+    "iva_usd": 0.0,
+    "total_usd": 117.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}
