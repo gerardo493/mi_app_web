@@ -27,7 +27,7 @@
             border: none;
             border-radius: 15px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .stats-card:hover {
@@ -44,14 +44,15 @@
 
         .card-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: #1a237e;
             margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .display-4 {
             font-weight: 700;
-            color: #2c3e50;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            color: #1a237e;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
         }
 
         .quick-actions .btn {
@@ -70,27 +71,28 @@
             animation: card-fade-in 0.8s cubic-bezier(.4,2,.6,1) forwards;
             font-size: 1.08rem;
             backdrop-filter: blur(2px);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(26, 35, 126, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
         }
         .quick-actions .btn-primary {
-            background: linear-gradient(90deg, rgba(58, 134, 255, 0.3) 60%, rgba(67, 97, 238, 0.3) 100%);
+            background: linear-gradient(90deg, rgba(58, 134, 255, 0.4) 60%, rgba(67, 97, 238, 0.4) 100%);
         }
         .quick-actions .btn-success {
-            background: linear-gradient(90deg, rgba(6, 214, 160, 0.3) 60%, rgba(67, 170, 139, 0.3) 100%);
+            background: linear-gradient(90deg, rgba(6, 214, 160, 0.4) 60%, rgba(67, 170, 139, 0.4) 100%);
         }
         .quick-actions .btn-warning {
-            background: linear-gradient(90deg, rgba(255, 209, 102, 0.3) 60%, rgba(249, 199, 79, 0.3) 100%);
-            color: rgba(0, 0, 0, 0.8);
+            background: linear-gradient(90deg, rgba(255, 209, 102, 0.4) 60%, rgba(249, 199, 79, 0.4) 100%);
         }
         .quick-actions .btn-info {
-            background: linear-gradient(90deg, rgba(95, 108, 175, 0.3) 60%, rgba(181, 23, 158, 0.3) 100%);
+            background: linear-gradient(90deg, rgba(95, 108, 175, 0.4) 60%, rgba(181, 23, 158, 0.4) 100%);
         }
         .quick-actions .btn:hover {
             transform: translateY(-10px) scale(1.07) rotate(-2deg);
             box-shadow: 0 24px 56px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
             filter: brightness(1.08) saturate(1.1);
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(26, 35, 126, 0.3);
+            color: rgba(255, 255, 255, 1);
         }
         .quick-actions .btn-primary:hover {
             background: linear-gradient(90deg, rgba(67, 97, 238, 0.8) 60%, rgba(58, 134, 255, 0.8) 100%);
@@ -120,14 +122,14 @@
             border-radius: 8px !important;
             margin-bottom: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(26, 35, 126, 0.2);
             backdrop-filter: blur(5px);
         }
 
         .list-group-item:hover {
             transform: translateX(5px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(26, 35, 126, 0.3);
         }
 
         .list-group-item h6 {
@@ -140,12 +142,21 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        .list-group-item small {
+            color: rgba(255, 255, 255, 0.9) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .list-group-item .text-muted {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
         .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(26, 35, 126, 0.2);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -153,11 +164,11 @@
         .card:hover {
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(26, 35, 126, 0.3);
         }
 
         .card-header {
-            background-color: rgba(248, 249, 250, 0.15);
+            background-color: rgba(26, 35, 126, 0.3);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px 15px 0 0 !important;
             padding: 1rem;
@@ -321,34 +332,21 @@
             margin-top: 2.5rem;
         }
         .main-stats .card {
+            flex: 1 1 0;
             min-width: 180px;
-            max-width: 240px;
-            border-radius: 22px;
-            box-shadow: 0 6px 24px rgba(26,35,126,0.10);
-            background: rgba(255,255,255,0.15);
-            border: 1.5px solid #e0e7ff;
-            margin-bottom: 0;
-            transition: transform 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.35s, border 0.3s, background 0.5s;
-            position: relative;
-            backdrop-filter: blur(4px);
-            height: auto;
-            opacity: 0;
-            transform: translateY(40px) scale(0.98);
-            animation: card-fade-in 0.8s cubic-bezier(.4,2,.6,1) forwards;
-        }
-        .main-stats .card:nth-child(2) { animation-delay: 0.12s; }
-        .main-stats .card:nth-child(3) { animation-delay: 0.24s; }
-        .main-stats .card:nth-child(4) { animation-delay: 0.36s; }
-        @keyframes card-fade-in {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            max-width: 260px;
+            margin: 0;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .main-stats .card:hover {
-            transform: translateY(-14px) scale(1.06) rotate(-1deg);
-            box-shadow: 0 20px 48px rgba(26,35,126,0.18), 0 4px 16px #fff8 inset;
-            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
         }
         .main-stats .icon-container {
             width: 56px;
@@ -360,76 +358,108 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px rgba(26,35,126,0.10);
-            background: linear-gradient(135deg, #e0e7ff 0%, #fff 100%);
-            transition: background 0.5s, box-shadow 0.3s, transform 0.3s;
-            position: relative;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
         .main-stats .card:hover .icon-container {
-            background: rgba(255, 255, 255, 0.25);
-        }
-        @keyframes icon-bounce {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.18) rotate(-8deg); }
-            60% { transform: scale(0.92) rotate(6deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
-        .main-stats .icon-container i {
-            font-size: 2.1rem;
-            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
-        }
-        .main-stats .card:hover .icon-container i {
-            color: #fff700;
-            text-shadow: 0 2px 8px #43aa8b88, 0 1px 0 #fff;
-            animation: icon-pulse 0.7s;
-        }
-        @keyframes icon-pulse {
-            0% { filter: brightness(1); }
-            50% { filter: brightness(1.5) drop-shadow(0 0 8px #fff700); }
-            100% { filter: brightness(1); }
+            transform: scale(1.08) rotate(-4deg);
         }
         .main-stats .stat-title {
-            font-size: 0.97rem;
-            margin-bottom: 0.15rem;
-            color: #232946;
-            font-weight: 900;
+            font-size: 1.18rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
             letter-spacing: 0.7px;
-            text-shadow: 0 1px 3px rgba(26,35,126,0.08);
-            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+            color: #1a237e;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
         }
         .main-stats .stat-value {
-            font-size: 1.13rem;
-            margin-bottom: 0.08rem;
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 0.1rem;
             color: #1a237e;
-            font-weight: 900;
-            text-shadow: 0 2px 8px #b8c1ec55, 0 1px 0 #fff;
-            letter-spacing: 0.5px;
-            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         .main-stats .stat-subtitle {
-            font-size: 0.78rem;
-            margin-top: 0.07rem;
-            color: #5f6caf;
-            font-weight: 800;
-            text-shadow: 0 1px 2px #fff8, 0 1px 0 #b8c1ec44;
-            opacity: 0.92;
-            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+            font-size: 1.13rem;
+            font-weight: 600;
+            color: #1a237e;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
         }
-        .main-stats .card:hover .stat-title {
-            color: #4361ee;
-            text-shadow: 0 2px 8px #b8c1ec55, 0 1px 0 #fff;
-            transform: scale(1.06);
+        .card.clientes .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(25, 118, 210, 0.15) 100%);
+            color: #1976d2;
         }
-        .main-stats .card:hover .stat-value {
-            color: #ff006e;
-            text-shadow: 0 4px 16px #8338ec44, 0 1px 0 #fff;
-            transform: scale(1.09);
+        .card.inventario .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(67, 170, 139, 0.15) 100%);
+            color: #43aa8b;
         }
-        .main-stats .card:hover .stat-subtitle {
-            color: #8338ec;
-            text-shadow: 0 2px 8px #fff8, 0 1px 0 #b8c1ec44;
-            transform: scale(1.04);
+        .card.facturas .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(108, 92, 231, 0.15) 100%);
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 193, 7, 0.15) 100%);
+            color: #FFC107;
+        }
+        .card.clientes .stat-title {
+            color: #1976d2;
+        }
+        .card.inventario .stat-title {
+            color: #43aa8b;
+        }
+        .card.facturas .stat-title {
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .stat-title {
+            color: #FFC107;
+        }
+        .card.clientes .stat-value {
+            color: #1565c0;
+        }
+        .card.inventario .stat-value {
+            color: #388e3c;
+        }
+        .card.facturas .stat-value {
+            color: #512da8;
+        }
+        .card.tasa-bcv .stat-value {
+            color: #f57f17;
+        }
+        .card.clientes .stat-subtitle {
+            color: #1976d2;
+        }
+        .card.inventario .stat-subtitle {
+            color: #43aa8b;
+        }
+        .card.facturas .stat-subtitle {
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .stat-subtitle {
+            color: #FFC107;
+        }
+        .badge {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            color: #1a237e !important;
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+        .badge.bg-warning {
+            color: #FFC107 !important;
+        }
+        .badge.bg-primary {
+            color: #1976d2 !important;
+        }
+        #ultima-actualizacion-dashboard {
+            color: #1a237e;
+            font-weight: 600;
+        }
+        .main-stats-carousel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
         }
         @media (max-width: 991px) {
             .header-logo img {
@@ -463,20 +493,6 @@
                 margin-top: 0.7rem;
             }
         }
-        .main-stats-carousel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            justify-content: space-between;
-            align-items: stretch;
-            width: 100%;
-        }
-        .main-stats .card {
-            flex: 1 1 0;
-            min-width: 180px;
-            max-width: 260px;
-            margin: 0;
-        }
         @media (max-width: 991px) {
             .main-stats-carousel {
                 gap: 1rem;
@@ -497,7 +513,7 @@
             }
         }
         .header-stat-card {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 18px;
             box-shadow: 0 8px 32px rgba(26,35,126,0.18), 0 2px 8px #fff8 inset;
             padding: 1.1rem 1.5rem 1rem 1.5rem;
@@ -514,29 +530,28 @@
         }
 
         .header-stat-card.cobranza {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(244, 67, 54, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(244, 67, 54, 0.15) 100%);
             border-left: 7px solid #F44336;
         }
 
         .header-stat-card.pagos {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(67, 170, 139, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(67, 170, 139, 0.15) 100%);
             border-left: 7px solid #43aa8b;
         }
 
         .header-stat-card.facturado {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(108, 92, 231, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(108, 92, 231, 0.15) 100%);
             border-left: 7px solid #6C5CE7;
         }
 
         .header-stat-card.promedio {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 217, 61, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 217, 61, 0.15) 100%);
             border-left: 7px solid #FFD93D;
         }
 
         .header-stat-card:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 16px 48px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
-            background: rgba(255, 255, 255, 0.25);
         }
 
         .header-stat-card .icon {
@@ -571,121 +586,111 @@
 
         .header-stat-card.cobranza .icon {
             color: #F44336;
-            animation: pulse-red 2s infinite;
         }
 
         .header-stat-card.pagos .icon {
             color: #43aa8b;
-            animation: pulse-green 2s infinite;
         }
 
         .header-stat-card.facturado .icon {
             color: #6C5CE7;
-            animation: pulse-purple 2s infinite;
         }
 
         .header-stat-card.promedio .icon {
             color: #FFD93D;
-            animation: pulse-yellow 2s infinite;
-        }
-
-        @keyframes pulse-red {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(244,67,54,0.4)); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes pulse-green {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(67,170,139,0.4)); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes pulse-purple {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(108,92,231,0.4)); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes pulse-yellow {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,217,61,0.4)); }
-            100% { transform: scale(1); }
         }
 
         .header-stat-label {
             font-size: 1.18rem;
-            font-weight: 900;
+            font-weight: 700;
             margin-bottom: 0.3rem;
             letter-spacing: 0.7px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .header-stat-card.cobranza .header-stat-label {
-            color: #d32f2f;
-        }
-
-        .header-stat-card.pagos .header-stat-label {
-            color: #2e7d32;
-        }
-
-        .header-stat-card.facturado .header-stat-label {
-            color: #5e35b1;
-        }
-
-        .header-stat-card.promedio .header-stat-label {
-            color: #f57f17;
+            color: #1a237e;
         }
 
         .header-stat-value {
             font-size: 1.55rem;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 0.1rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .header-stat-card.cobranza .header-stat-value {
-            color: #b71c1c;
-        }
-
-        .header-stat-card.pagos .header-stat-value {
-            color: #1b5e20;
-        }
-
-        .header-stat-card.facturado .header-stat-value {
-            color: #4527a0;
-        }
-
-        .header-stat-card.promedio .header-stat-value {
-            color: #ff6f00;
+            color: #1a237e;
         }
 
         .header-stat-bs {
             font-size: 1.13rem;
-            font-weight: 800;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .header-stat-card.cobranza .header-stat-label {
+            color: #d32f2f;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            font-weight: 900;
+        }
+
+        .header-stat-card.pagos .header-stat-label {
+            color: #2e7d32;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            font-weight: 900;
+        }
+
+        .header-stat-card.facturado .header-stat-label {
+            color: #5e35b1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            font-weight: 900;
+        }
+
+        .header-stat-card.promedio .header-stat-label {
+            color: #f57f17;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+            font-weight: 900;
+        }
+
+        .header-stat-card.cobranza .header-stat-value {
+            color: #b71c1c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 900;
+        }
+
+        .header-stat-card.pagos .header-stat-value {
+            color: #1b5e20;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 900;
+        }
+
+        .header-stat-card.facturado .header-stat-value {
+            color: #4527a0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 900;
+        }
+
+        .header-stat-card.promedio .header-stat-value {
+            color: #ff6f00;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 900;
         }
 
         .header-stat-card.cobranza .header-stat-bs {
             color: #c62828;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            font-weight: 800;
         }
 
         .header-stat-card.pagos .header-stat-bs {
             color: #2e7d32;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            font-weight: 800;
         }
 
         .header-stat-card.facturado .header-stat-bs {
             color: #5e35b1;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            font-weight: 800;
         }
 
         .header-stat-card.promedio .header-stat-bs {
             color: #f57f17;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            font-weight: 800;
         }
 
         .header-stat-card:hover .header-stat-label,
@@ -718,16 +723,6 @@
             transform: scale(1.15) rotate(20deg);
         }
 
-        .main-stats .stat-value.text-secondary {
-            color: rgba(0, 0, 0, 0.9) !important;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-        }
-
-        .main-stats .stat-subtitle {
-            color: rgba(0, 0, 0, 0.8);
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-        }
-
         .carousel-control-prev,
         .carousel-control-next {
             color: rgba(0, 0, 0, 0.9);
@@ -742,22 +737,22 @@
         }
 
         .badge {
-            color: rgba(0, 0, 0, 0.9);
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            color: #1a237e !important;
+            border: 1px solid rgba(26, 35, 126, 0.1);
         }
 
         .badge.bg-warning {
-            background-color: rgba(255, 193, 7, 0.9) !important;
+            color: #FFC107 !important;
         }
 
         .badge.bg-primary {
-            background-color: rgba(13, 110, 253, 0.9) !important;
+            color: #1976d2 !important;
         }
 
         #ultima-actualizacion-dashboard {
-            color: #111;
-            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
-            font-weight: 900;
+            color: #1a237e;
+            font-weight: 600;
         }
 
         #ultima-actualizacion-dashboard i,
@@ -858,55 +853,41 @@
                         </div>
                     </div>
                     <div class="col-12 mt-3">
-                        <div id="headerStatsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                          <div class="carousel-inner">
-                            <div class="carousel-item active">
-                              <div class="row g-3 justify-content-center">
-                                <div class="col-md-6 col-lg-3">
-                                  <div class="header-stat-card cobranza d-flex flex-column align-items-start justify-content-center">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card cobranza d-flex flex-column align-items-start justify-content-center">
                                     <span class="icon mb-2" style="font-size:2.2rem;color:#F44336;"><i class="fas fa-hand-holding-usd"></i></span>
                                     <i class="fas fa-sync-alt header-stat-refresh" id="refresh-cobranza" title="Actualizando datos..."></i>
-                            <div class="header-stat-label">Cuentas por Cobrar</div>
-                            <div class="header-stat-value">${{ total_cobrar_usd|float|es_number }}</div>
-                            <div class="header-stat-bs">{{ total_cobrar_bs|float|es_number }} Bs</div>
-                        </div>
+                                    <div class="header-stat-label">Cuentas por Cobrar</div>
+                                    <div class="header-stat-value">${{ total_cobrar_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">{{ total_cobrar_bs|float|es_number }} Bs</div>
                                 </div>
-                                <div class="col-md-6 col-lg-3">
-                                  <div class="header-stat-card pagos d-flex flex-column align-items-start justify-content-center">
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card pagos d-flex flex-column align-items-start justify-content-center">
                                     <span class="icon mb-2" style="font-size:2.2rem;color:#43aa8b;"><i class="fas fa-money-check-alt"></i></span>
                                     <i class="fas fa-sync-alt header-stat-refresh" id="refresh-pagos" title="Actualizando datos..."></i>
-                            <div class="header-stat-label">Pagos Recibidos</div>
-                            <div class="header-stat-value">${{ total_pagos_recibidos_usd|float|es_number }}</div>
-                            <div class="header-stat-bs">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
-                        </div>
-                    </div>
-                                <div class="col-md-6 col-lg-3">
-                                  <div class="header-stat-card facturado d-flex flex-column align-items-start justify-content-center">
+                                    <div class="header-stat-label">Pagos Recibidos</div>
+                                    <div class="header-stat-value">${{ total_pagos_recibidos_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card facturado d-flex flex-column align-items-start justify-content-center">
                                     <span class="icon mb-2" style="font-size:2.2rem;color:#6C5CE7;"><i class="fas fa-file-invoice-dollar"></i></span>
                                     <div class="header-stat-label">Facturado</div>
                                     <div class="header-stat-value">${{ total_facturado_usd|float|es_number }}</div>
                                     <div class="header-stat-bs">Total USD</div>
-                                  </div>
                                 </div>
-                                <div class="col-md-6 col-lg-3">
-                                  <div class="header-stat-card promedio d-flex flex-column align-items-start justify-content-center">
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card promedio d-flex flex-column align-items-start justify-content-center">
                                     <span class="icon mb-2" style="font-size:2.2rem;color:#FFD93D;"><i class="fas fa-receipt"></i></span>
                                     <div class="header-stat-label">Promedio por Factura</div>
                                     <div class="header-stat-value">${{ promedio_factura_usd|float|es_number }}</div>
                                     <div class="header-stat-bs">Promedio USD</div>
-                                  </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
-                          <button class="carousel-control-prev" type="button" data-bs-target="#headerStatsCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Anterior</span>
-                          </button>
-                          <button class="carousel-control-next" type="button" data-bs-target="#headerStatsCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Siguiente</span>
-                          </button>
                         </div>
                     </div>
                 </div>

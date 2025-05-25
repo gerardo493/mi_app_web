@@ -17,14 +17,23 @@
         margin-bottom: 2rem;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         color: white;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
 
     .page-header h2 {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin: 0;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        font-weight: 700;
         color: white;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-header h2 i {
+        font-size: 1.8rem;
     }
 
     .page-header .badge {
@@ -39,24 +48,23 @@
         font-weight: 800;
     }
 
-    .btn-group .btn {
-        padding: 0.45rem 1.2rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.2px;
-        border-radius: 999px;
-        transition: all 0.18s ease;
-        font-size: 1.05rem;
-        box-shadow: none;
-        margin-right: 0.18rem;
-        border: none;
-        outline: none;
+    .btn-group {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 2.2rem;
-        min-height: 2.2rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
+
+    .btn-group .btn {
+        flex: 1 1 auto;
+        min-width: 120px;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
     .btn-group .btn:last-child {
         margin-right: 0;
     }
@@ -66,23 +74,23 @@
     }
     /* 5 colores llamativos con gradiente */
     .btn-blue {
-        background: linear-gradient(135deg, #36d1c4 0%, #5b86e5 100%);
+        background: #36d1c4;
         color: #fff;
     }
     .btn-purple {
-        background: linear-gradient(135deg, #a770ef 0%, #f6d365 100%);
+        background: #a770ef;
         color: #fff;
     }
     .btn-green {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: #43e97b;
         color: #fff;
     }
     .btn-red {
-        background: linear-gradient(135deg, #ff5858 0%, #f09819 100%);
+        background: #ff5858;
         color: #fff;
     }
     .btn-orange {
-        background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+        background: #f7971e;
         color: #fff;
     }
     .btn-group .btn:hover, .btn-group .btn:focus {
@@ -93,10 +101,10 @@
     }
     /* Botones de acciones de la tabla (rectangulares, solo ícono, color) */
     .btn-group .btn-sm {
-        padding: 0.5rem;
-        border-radius: 8px;
-        font-size: 1.25rem;
-        margin-right: 0.15rem;
+        padding: 0.25rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        margin-right: 0.1rem;
         background: #f4f6fa;
         color: #1a237e;
         border: 1px solid #e0e0e0;
@@ -106,22 +114,23 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        min-width: 28px;
     }
     .btn-group .btn-sm:last-child {
         margin-right: 0;
     }
     .btn-group .btn-sm.btn-info {
-        background: linear-gradient(135deg, #36d1c4 0%, #5b86e5 100%);
+        background: #1a237e;
         color: #fff;
         border: none;
     }
     .btn-group .btn-sm.btn-primary {
-        background: linear-gradient(135deg, #a770ef 0%, #f6d365 100%);
+        background: #f57f17;
         color: #fff;
         border: none;
     }
     .btn-group .btn-sm.btn-danger {
-        background: linear-gradient(135deg, #ff5858 0%, #f09819 100%);
+        background: #b71c1c;
         color: #fff;
         border: none;
     }
@@ -133,39 +142,93 @@
     }
     .btn-group .btn-sm i {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 0.8rem;
     }
 
     .search-card {
-        background: white;
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         margin-bottom: 2rem;
         border: none;
+        backdrop-filter: blur(10px);
     }
 
     .search-card .card-body {
         padding: 1.5rem;
     }
 
-    .form-control, .form-select {
-        border-radius: 10px;
+    .search-card .input-group-text {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border: none;
         padding: 0.75rem 1rem;
-        border: 1px solid #dee2e6;
-        transition: all 0.3s ease;
-        font-size: 1.1rem;
-        font-weight: 500;
+    }
+
+    .search-card .input-group-text i {
+        font-size: 1rem;
+        color: white;
+    }
+
+    .search-card .form-control {
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
         color: #1a237e;
     }
 
+    .search-card .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+        border-color: #1a237e;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1a237e;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
     .form-control:focus, .form-select:focus {
-        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
-        border-color: #0d47a1;
+        box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.15);
+        border-color: #1a237e;
+        background: #ffffff;
     }
 
     .form-control::placeholder {
         color: #7986cb;
         font-weight: 400;
+    }
+
+    .input-group:focus-within .input-group-text i {
+        color: #0d47a1;
+        transform: scale(1.1);
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: none;
+    }
+
+    .btn-primary {
+        background: #1a237e;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: #0d47a1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
     }
 
     .table thead th {
@@ -261,26 +324,17 @@
 
     @media (max-width: 768px) {
         .page-header {
-            padding: 1.5rem;
+            align-items: stretch;
         }
-
-        .page-header h2 {
-            font-size: 1.5rem;
+        
+        .btn-group {
+            flex-direction: column;
         }
-
+        
         .btn-group .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        .table thead th {
-            font-size: 0.8rem;
-            padding: 0.75rem;
-        }
-
-        .table tbody td {
-            padding: 0.75rem;
-            font-size: 0.9rem;
+            width: 100%;
+            max-width: none;
+            margin: 0;
         }
     }
 
@@ -331,31 +385,67 @@
     .autocomplete-active strong {
         color: #0a1a4a;
     }
+
+    .input-group-text .fa-search {
+        color: #fff !important;
+    }
+
+    /** AUTOCOMPLETADO MODERNO PARA BUSQUEDA DE PRODUCTOS **/
+    .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        max-height: 220px;
+        overflow-y: auto;
+        margin-top: -2px;
+    }
+    .autocomplete-list .autocomplete-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #1a237e;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+    .autocomplete-list .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+    .autocomplete-list .autocomplete-item:hover, .autocomplete-list .autocomplete-item.active {
+        background: #e3eafc;
+        color: #0d47a1;
+    }
 </style>
 
 <div class="inventario-container">
     <div class="container-fluid">
-        <div class="page-header d-flex justify-content-between align-items-center">
+        <div class="page-header">
             <h2>
                 <i class="fas fa-boxes me-2"></i>Inventario
             </h2>
-            <div class="btn-group">
-                <a href="{{ url_for('gestionar_categorias') }}" class="btn btn-blue" data-bs-toggle="tooltip" title="Gestionar Categorías">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('gestionar_categorias') }}" class="btn btn-blue flex-grow-1" data-bs-toggle="tooltip" title="Gestionar Categorías">
                     <i class="fas fa-tags"></i> Gestionar Categorías
                 </a>
-                <a href="{{ url_for('reporte_inventario') }}" class="btn btn-purple" data-bs-toggle="tooltip" title="Ver Reporte">
+                <a href="{{ url_for('reporte_inventario') }}" class="btn btn-purple flex-grow-1" data-bs-toggle="tooltip" title="Ver Reporte">
                     <i class="fas fa-chart-bar"></i> Ver Reporte
                 </a>
-                <a href="{{ url_for('ajustes_masivos') }}" class="btn btn-green" data-bs-toggle="tooltip" title="Historial de Ajustes Masivos de Stock">
+                <a href="{{ url_for('ajustes_masivos') }}" class="btn btn-green flex-grow-1" data-bs-toggle="tooltip" title="Historial de Ajustes Masivos de Stock">
                     <i class="fas fa-sliders-h"></i> Historial de Ajustes
                 </a>
-                <a href="{{ url_for('nuevo_producto') }}" class="btn btn-orange" data-bs-toggle="tooltip" title="Nuevo Producto">
+                <a href="{{ url_for('nuevo_producto') }}" class="btn btn-orange flex-grow-1" data-bs-toggle="tooltip" title="Nuevo Producto">
                     <i class="fas fa-plus"></i> Nuevo Producto
                 </a>
-                <a href="{{ url_for('ajustar_stock') }}" class="btn btn-red" data-bs-toggle="tooltip" title="Ajustar Stock">
+                <a href="{{ url_for('ajustar_stock') }}" class="btn btn-red flex-grow-1" data-bs-toggle="tooltip" title="Ajustar Stock">
                     <i class="fas fa-boxes"></i> Ajustar Stock
                 </a>
-                <button type="button" class="btn btn-red" id="btnEliminarSeleccionados" style="display: none;" data-bs-toggle="tooltip" title="Eliminar Seleccionados">
+                <button type="button" class="btn btn-red flex-grow-1" id="btnEliminarSeleccionados" style="display: none;" data-bs-toggle="tooltip" title="Eliminar Seleccionados">
                     <i class="fas fa-trash"></i> Eliminar Seleccionados
                 </button>
             </div>
@@ -555,56 +645,37 @@ document.addEventListener('DOMContentLoaded', function() {
         new bootstrap.Modal(document.getElementById('confirmarEliminacionMultiple')).show();
     });
 
-    // Autocompletado
+    // --- AUTOCOMPLETADO DE PRODUCTOS ---
     const searchInput = document.getElementById('searchInput');
     const productos = {{ inventario|tojson|safe }};
-    
+    let autocompleteList;
+
     searchInput.addEventListener('input', function() {
-        const val = this.value.toLowerCase();
-        const autocompleteList = document.getElementById('autocompleteList');
-        
-        // Limpiar lista anterior
-        if (autocompleteList) {
-            autocompleteList.remove();
-        }
-        
+        const val = this.value.trim().toLowerCase();
+        if (autocompleteList) autocompleteList.remove();
         if (val.length < 2) return;
-        
-        // Crear lista de sugerencias
-        const matches = Object.entries(productos).filter(([id, prod]) => 
+        const matches = Object.entries(productos).filter(([id, prod]) =>
             prod.nombre.toLowerCase().includes(val)
-        ).slice(0, 5); // Limitar a 5 resultados
-        
+        ).slice(0, 8);
         if (matches.length === 0) return;
-        
-        // Crear elemento de lista
-        const list = document.createElement('div');
-        list.id = 'autocompleteList';
-        list.className = 'autocomplete-items';
-        
+        autocompleteList = document.createElement('div');
+        autocompleteList.className = 'autocomplete-list';
         matches.forEach(([id, prod]) => {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <strong>${prod.nombre}</strong>
-                <small class="text-muted ms-2">ID: ${id}</small>
-                <small class="text-muted ms-2">Stock: ${prod.cantidad}</small>
-            `;
-            div.addEventListener('click', function() {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `<strong>${prod.nombre}</strong> <small class='text-muted ms-2'>ID: ${id}</small> <small class='text-muted ms-2'>Stock: ${prod.cantidad}</small>`;
+            item.onclick = function() {
                 searchInput.value = prod.nombre;
-                list.remove();
-            });
-            list.appendChild(div);
+                autocompleteList.remove();
+            };
+            autocompleteList.appendChild(item);
         });
-        
-        // Insertar lista después del input
-        searchInput.parentNode.appendChild(list);
+        searchInput.parentNode.appendChild(autocompleteList);
     });
-    
-    // Cerrar la lista al hacer clic fuera
+    // Cerrar lista al hacer clic fuera
     document.addEventListener('click', function(e) {
-        const list = document.getElementById('autocompleteList');
-        if (list && !searchInput.contains(e.target) && !list.contains(e.target)) {
-            list.remove();
+        if (autocompleteList && !searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+            autocompleteList.remove();
         }
     });
 

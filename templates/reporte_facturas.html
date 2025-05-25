@@ -308,7 +308,7 @@
                     <div class="col-md-3">
                         <label for="year" class="form-label">Año</label>
                         <select class="form-select" id="year" name="year">
-                            {% for y in range(2020, 2025) %}
+                            {% for y in anios_disponibles %}
                             <option value="{{ y }}" {% if y|string == request.args.get('year', '') %}selected{% endif %}>{{ y }}</option>
                             {% endfor %}
                         </select>

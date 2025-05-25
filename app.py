@@ -2074,14 +2074,17 @@ def reporte_facturas():
     filtro_anio = request.args.get('anio', '')
     filtro_mes = request.args.get('mes', '')
     filtro_cliente = request.args.get('cliente', '')
-    
+
+    # Obtener años disponibles de las facturas
+    anios_disponibles = sorted({f['fecha'].split('-')[0] for f in facturas.values() if f.get('fecha')})
+
     # Filtrar facturas
     facturas_filtradas = []
     for factura in facturas.values():
         fecha = factura['fecha'].split('-')
         anio_factura = fecha[0]
         mes_factura = fecha[1]
-        
+
         # Aplicar filtros
         if filtro_anio and anio_factura != filtro_anio:
             continue
@@ -2108,13 +2111,13 @@ def reporte_facturas():
         factura['total_abonado'] = total_abonado
         factura['saldo_pendiente'] = max(total_factura - total_abonado, 0)
         facturas_filtradas.append(factura)
-    
+
     # Calcular totales
     total_facturas = len(facturas_filtradas)
     total_usd = sum(float(f.get('total_usd', 0)) for f in facturas_filtradas)
     total_bs = sum(float(f.get('total_bs', 0)) for f in facturas_filtradas)
     promedio_usd = total_usd / total_facturas if total_facturas > 0 else 0
-    
+
     # Calcular top clientes
     clientes_totales = {}
     for factura in facturas_filtradas:
@@ -2128,21 +2131,21 @@ def reporte_facturas():
         clientes_totales[cliente_id]['total_usd'] += float(factura.get('total_usd', 0))
         clientes_totales[cliente_id]['total_bs'] += float(factura.get('total_bs', 0))
         clientes_totales[cliente_id]['total_facturas'] += 1
-    
+
     # Preparar lista de top clientes con todos los campos necesarios
     top_clientes = []
     for cid, stats in sorted(clientes_totales.items(), key=lambda x: x[1]['total_usd'], reverse=True)[:10]:
         cliente = clientes.get(cid, {})
-        total_facturas = stats['total_facturas']
-        promedio_usd = stats['total_usd'] / total_facturas if total_facturas > 0 else 0
+        total_facturas_cliente = stats['total_facturas']
+        promedio_usd_cliente = stats['total_usd'] / total_facturas_cliente if total_facturas_cliente > 0 else 0
         top_clientes.append({
             'nombre': cliente.get('nombre', 'Cliente no encontrado'),
-            'total_facturas': total_facturas,
+            'total_facturas': total_facturas_cliente,
             'total_usd': stats['total_usd'],
             'total_bs': stats['total_bs'],
-            'promedio_usd': promedio_usd
+            'promedio_usd': promedio_usd_cliente
         })
-    
+
     return render_template('reporte_facturas.html',
                          facturas=facturas_filtradas,
                          clientes=clientes,
@@ -2153,7 +2156,8 @@ def reporte_facturas():
                          top_clientes=top_clientes,
                          filtro_anio=filtro_anio,
                          filtro_mes=filtro_mes,
-                         filtro_cliente=filtro_cliente)
+                         filtro_cliente=filtro_cliente,
+                         anios_disponibles=anios_disponibles)
 
 @app.route('/inventario/')
 def inventario_slash_redirect():
@@ -2751,14 +2755,16 @@ def ajustes_masivos():
         nombre_producto = producto.get('nombre', '')
         if 'historial_ajustes' in producto:
             for ajuste in producto['historial_ajustes']:
+                tipo = ajuste.get('tipo', '')
                 ajustes.append({
                     'fecha': ajuste.get('fecha', ''),
                     'motivo': ajuste.get('motivo', ''),
                     'producto': nombre_producto,
-                    'ingreso': ajuste['cantidad'] if ajuste.get('tipo') == 'entrada' else 0,
-                    'salida': ajuste['cantidad'] if ajuste.get('tipo') == 'salida' else 0,
-                    'usuario': '',
-                    'observaciones': ajuste.get('motivo', '')
+                    'tipo': tipo,
+                    'ingreso': ajuste['cantidad'] if tipo == 'entrada' else 0,
+                    'salida': ajuste['cantidad'] if tipo == 'salida' else 0,
+                    'usuario': ajuste.get('usuario', ''),
+                    'observaciones': ajuste.get('observaciones', ajuste.get('motivo', ''))
                 })
     # Obtener filtros
     filtro_fecha = request.args.get('fecha', '')
@@ -2773,7 +2779,7 @@ def ajustes_masivos():
     if filtro_usuario:
         ajustes = [a for a in ajustes if filtro_usuario in a['usuario'].lower()]
     if filtro_tipo:
-        ajustes = [a for a in ajustes if a['tipo'] == filtro_tipo]
+        ajustes = [a for a in ajustes if a.get('tipo') == filtro_tipo]
     # Ordenar por fecha descendente
     ajustes.sort(key=lambda x: x['fecha'], reverse=True)
     # Obtener listas para filtros

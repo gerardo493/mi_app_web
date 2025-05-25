@@ -1,0 +1,130 @@
+{
+    "numero_factura": "0604",
+    "fecha": "2025-05-02T19:35:52.518832",
+    "tasa_cambio": 88.64,
+    "cliente": {
+        "rif": "V-13.058.545",
+        "nombre": "ALICIA LUNA",
+        "direccion": "URB LAS BEATRICES MANZANA 11 # 09 C/ BOLIVAR - EDO- BOLIVAR",
+        "telefono": "0412-112-3420"
+    },
+    "items": [
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "29",
+            "nombre": "ÑAME SALVAJE X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Menopausia",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "38",
+            "nombre": "ZARZAPARRILLA X 60CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Depurativo Desintoxicante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "22",
+            "nombre": "GINKGOBILOBA X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Oxigenate Cerebral",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "34",
+            "nombre": "SAW PALMETO X 60 CAP",
+            "cantidad": 12,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "hiperplasia prostatica",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "3",
+            "nombre": "ANTITUMORAL X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "15",
+            "nombre": "COLA DE CABALLO X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Calculo Renal",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "31",
+            "nombre": "PIRA X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Oxigenante Cerebral",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "49",
+            "nombre": "FIVERPLANT",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "50",
+            "nombre": "MULTIVIC",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "28",
+            "nombre": "MAPURITE X 60 CAP",
+            "cantidad": 6,
+            "precio_unitario_usd": 2.6,
+            "precio_unitario_bs": 230.464,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "46",
+            "nombre": "DOC QUENOPODIO X 12 UND",
+            "cantidad": 4,
+            "precio_unitario_usd": 7.0,
+            "precio_unitario_bs": 620.48,
+            "categoria": "Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 19075.328,
+    "iva_bs": 0.0,
+    "total_bs": 19075.328,
+    "subtotal_usd": 215.20000000000002,
+    "iva_usd": 0.0,
+    "total_usd": 215.20000000000002,
+    "condicion_pago": "Credito",
+    "dias_credito": 15,
+    "tasa_iva_aplicada": 0.0
+}
