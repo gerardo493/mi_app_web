@@ -1,0 +1,49 @@
+{
+    "numero_factura": "0035",
+    "fecha": "2024-04-07T09:31:00",
+    "tasa_cambio": 88.65,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "11",
+            "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
+            "cantidad": 5,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.95000000000005,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "45",
+            "nombre": "PIÑA + GRAPPEFRUIT X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.95000000000005,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "54",
+            "nombre": "CHAMPU DE CAYENA",
+            "cantidad": 2,
+            "precio_unitario_usd": 1.5,
+            "precio_unitario_bs": 132.97500000000002,
+            "categoria": "COSMETICO",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 2127.6000000000004,
+    "iva_bs": 340.41600000000005,
+    "total_bs": 2468.0160000000005,
+    "subtotal_usd": 24.0,
+    "iva_usd": 3.8400000000000003,
+    "total_usd": 27.840000000000003,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.16
+}
