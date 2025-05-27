@@ -1,0 +1,31 @@
+{
+    "numero_factura": "0038",
+    "fecha": "2025-05-08T20:14:07.078835",
+    "tasa_cambio": 88.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "22",
+            "nombre": "GINKGOBILOBA X 60 CAP",
+            "cantidad": 5,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 264.0,
+            "categoria": "Oxigenate Cerebral",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 1320.0,
+    "iva_bs": 211.20000000000002,
+    "total_bs": 1531.2,
+    "subtotal_usd": 15.0,
+    "iva_usd": 2.4000000000000004,
+    "total_usd": 17.400000000000002,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.16
+}
