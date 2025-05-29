@@ -1,0 +1,31 @@
+{
+    "numero_factura": "0044",
+    "fecha": "2025-05-08T20:27:00.945761",
+    "tasa_cambio": 90.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "6",
+            "nombre": "BOLDO X 60 CAP",
+            "cantidad": 20,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 270.0,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 5400.0,
+    "iva_bs": 0.0,
+    "total_bs": 5400.0,
+    "subtotal_usd": 60.0,
+    "iva_usd": 0.0,
+    "total_usd": 60.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}

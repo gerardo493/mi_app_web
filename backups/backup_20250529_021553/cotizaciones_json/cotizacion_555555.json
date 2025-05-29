@@ -1,0 +1,32 @@
+{
+    "numero_cotizacion": "555555",
+    "fecha": "2025-05-21",
+    "hora": "03:36",
+    "cliente": {
+        "id": "J-503178576",
+        "nombre": "T/N FERNATURAL",
+        "email": "t/n.fernatural@dominioinventado.com",
+        "telefono": "+5804243771007",
+        "direccion": "CALLE MARIÑO ENTRE AV. BOLIVAR Y SANTOS MICHELENA MARACAY"
+    },
+    "productos": [
+        "3"
+    ],
+    "cantidades": [
+        "200"
+    ],
+    "precios": [
+        "3.0"
+    ],
+    "subtotal_usd": 600.0,
+    "subtotal_bs": 56916.0,
+    "descuento": 0.0,
+    "tipo_descuento": "bs",
+    "descuento_total": 0.0,
+    "iva": 16.0,
+    "iva_total": 96.0,
+    "total_usd": 696.0,
+    "total_bs": 66022.56,
+    "tasa_bcv": 94.86,
+    "validez_dias": 3
+}

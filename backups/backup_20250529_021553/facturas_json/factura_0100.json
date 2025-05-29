@@ -1,0 +1,61 @@
+{
+    "numero_factura": "0100",
+    "fecha": "2025-05-10T01:17:11.498099",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 30,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "9",
+            "nombre": "CARDO MARIANO X 60 CAP",
+            "cantidad": 50,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Protector Hepatico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "40",
+            "nombre": "SANGRE DE DRAGO X 60 CAP",
+            "cantidad": 300,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Ulcera Gastrica",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "39",
+            "nombre": "QUIEBRA GRASA FACIL X 60 CAP",
+            "cantidad": 400,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 222300.0,
+    "iva_bs": 35568.0,
+    "total_bs": 252710.64,
+    "subtotal_usd": 2340.0,
+    "iva_usd": 374.40000000000003,
+    "total_usd": 2660.112,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.16,
+    "descuento_porcentaje": 2.0,
+    "descuento_bs": 5157.36,
+    "descuento_usd": 54.288000000000004
+}

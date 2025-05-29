@@ -1,0 +1,43 @@
+{
+    "numero_factura": "0077",
+    "fecha": "2025-05-10T01:55:44.395692",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "28",
+            "nombre": "MAPURITE X 60 CAP",
+            "cantidad": 90,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "3",
+            "nombre": "ANTITUMORAL X 60 CAP",
+            "cantidad": 50,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Antitumorales - anticancerigeno",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 39900.0,
+    "iva_bs": 0.0,
+    "total_bs": 39900.0,
+    "subtotal_usd": 420.0,
+    "iva_usd": 0.0,
+    "total_usd": 420.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}
