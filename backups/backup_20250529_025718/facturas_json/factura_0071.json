@@ -1,0 +1,34 @@
+{
+    "numero_factura": "0071",
+    "fecha": "2025-05-10T01:32:33.913886",
+    "tasa_cambio": 96.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 400,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 288.0,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 115200.0,
+    "iva_bs": 2304.0,
+    "total_bs": 111628.8,
+    "subtotal_usd": 1200.0,
+    "iva_usd": 24.0,
+    "total_usd": 1162.8,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.02,
+    "descuento_porcentaje": 5.0,
+    "descuento_bs": 5875.200000000001,
+    "descuento_usd": 61.2
+}

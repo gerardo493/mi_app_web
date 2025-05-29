@@ -1,0 +1,166 @@
+{
+    "numero_factura": "6041",
+    "fecha": "2025-05-02T20:05:11.247419",
+    "tasa_cambio": 88.64,
+    "cliente": {
+        "rif": "J-503478373",
+        "nombre": "FARMACIA JK, C.A",
+        "direccion": "CALLE PARAMACONI CRUCE CON ARISMENDI EDF OCUMITO PB, LOCAL 28 PALO NEGRO",
+        "telefono": "0412-347-3236"
+    },
+    "items": [
+        {
+            "id": "2",
+            "nombre": "ADELGALAX  X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "4",
+            "nombre": "ARANDANO NEGRO X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Protector Ocular",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "5",
+            "nombre": "ARANDANO ROJO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "10",
+            "nombre": "CASTAÑA DE INDIA X 60  CAP",
+            "cantidad": 3,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "11",
+            "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "12",
+            "nombre": "CENTELLA ASIATICA X 60 CAP",
+            "cantidad": 4,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "22",
+            "nombre": "GINKGOBILOBA X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Oxigenate Cerebral",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "20",
+            "nombre": "GINKGO C/ GINSENG X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Oxigenante/ Energizante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "27",
+            "nombre": "MACA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Repontesiador Sexsual",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "50",
+            "nombre": "MULTIVIC",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Vitaminas y Minerales",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "44",
+            "nombre": "ORTIGA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Bactericida",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "41",
+            "nombre": "SABILA X 60 CAP",
+            "cantidad": 1,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "34",
+            "nombre": "SAW PALMETO X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "hiperplasia prostatica",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "17",
+            "nombre": "CURCUMA C/ PIIMIENTA NEGRA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Anti-inflamatorio",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 2,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 265.92,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "30",
+            "nombre": "OMEGA 3 X 30 UND",
+            "cantidad": 6,
+            "precio_unitario_usd": 4.2,
+            "precio_unitario_bs": 372.288,
+            "categoria": "Cardiovascular",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 10211.328000000001,
+    "iva_bs": 0.0,
+    "total_bs": 10211.328000000001,
+    "subtotal_usd": 115.2,
+    "iva_usd": 0.0,
+    "total_usd": 115.20000000000002,
+    "condicion_pago": "Credito",
+    "dias_credito": 15,
+    "tasa_iva_aplicada": 0.0
+}
