@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (busqueda) params.push('busqueda=' + encodeURIComponent(busqueda));
             var query = params.length ? ('?' + params.join('&')) : '';
             var tipo = '{{ tipo }}';
-            var url = '{{ url_for('lista_precios_pdf', tipo='TIPO_PLACEHOLDER') }}'.replace('TIPO_PLACEHOLDER', tipo) + query;
+            var url = "{{ url_for('lista_precios_pdf', tipo='TIPO_PLACEHOLDER') }}".replace('TIPO_PLACEHOLDER', tipo) + query;
             window.open(url, '_blank');
         });
     }
