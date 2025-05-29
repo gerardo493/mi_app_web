@@ -750,6 +750,13 @@ def descargar_factura_pdf(id):
         flash('Factura no encontrada', 'danger')
         return redirect(url_for('mostrar_facturas'))
     empresa = cargar_empresa()
+    
+    # Convertir rutas relativas a absolutas para las imágenes
+    if empresa.get('logo'):
+        empresa['logo'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['logo'])
+    if empresa.get('membrete'):
+        empresa['membrete'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['membrete'])
+    
     rendered = render_template('factura_imprimir.html', 
                              factura=factura, 
                              clientes=clientes, 
@@ -2361,6 +2368,13 @@ def descargar_cotizacion_pdf(id):
         flash('Cotización no encontrada', 'danger')
         return redirect(url_for('mostrar_cotizaciones'))
     empresa = cargar_empresa()
+    
+    # Convertir rutas relativas a absolutas para las imágenes
+    if empresa.get('logo'):
+        empresa['logo'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['logo'])
+    if empresa.get('membrete'):
+        empresa['membrete'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['membrete'])
+    
     rendered = render_template('cotizacion_imprimir.html', 
                              cotizacion=cotizacion, 
                              clientes=clientes, 
@@ -3067,6 +3081,13 @@ def lista_precios_pdf(tipo):
     # Cargar datos
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
     empresa = cargar_datos('empresa.json')
+    
+    # Convertir rutas relativas a absolutas para las imágenes
+    if empresa.get('logo'):
+        empresa['logo'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['logo'])
+    if empresa.get('membrete'):
+        empresa['membrete'] = request.url_root.rstrip('/') + url_for('static', filename=empresa['membrete'])
+    
     fecha_actual = datetime.now()
     # Obtener categorías únicas
     categorias = sorted(set(producto.get('categoria', '') for producto in inventario.values() if producto.get('categoria')))
@@ -3131,7 +3152,6 @@ def lista_precios_pdf(tipo):
             'image-quality': 100,
             'enable-local-file-access': None
         }
-        
         pdf = pdfkit.from_string(rendered, False, options=options, configuration=config)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
