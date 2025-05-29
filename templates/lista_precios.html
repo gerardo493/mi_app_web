@@ -398,7 +398,7 @@ body, .lista-precios-container {
             <table class="header-table">
                 <tr>
                     <td style="width:110px;">
-                        <img src="file:///{{ app.static_folder }}/{{ empresa.logo }}" alt="Logo {{ empresa.nombre }}" class="empresa-logo">
+                        <img src="{{ empresa.logo }}" alt="Logo {{ empresa.nombre }}" class="empresa-logo">
                     </td>
                     <td class="empresa-info">
                         <div class="empresa-nombre">{{ empresa.nombre }}</div>
