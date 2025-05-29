@@ -1,0 +1,49 @@
+{
+    "numero_factura": "0606",
+    "fecha": "2025-05-05T19:26:12.724341",
+    "tasa_cambio": 88.64,
+    "cliente": {
+        "rif": "V-7240529",
+        "nombre": "LUIS ARIAS",
+        "direccion": "AV. 106, NRO 48 BARRIO LA COROMOTO, LOS TACARIGUA, MARACAY ESTADO ARAGUA.",
+        "telefono": "04243389609"
+    },
+    "items": [
+        {
+            "id": "14",
+            "nombre": "CLORURO DE MAGNESIO X 33 GR",
+            "cantidad": 22,
+            "precio_unitario_usd": 1.0,
+            "precio_unitario_bs": 88.64,
+            "categoria": "Regenerador osio",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "33",
+            "nombre": "SABILAX-6 X 12 SOBRES X 12 UNDS",
+            "cantidad": 2,
+            "precio_unitario_usd": 8.5,
+            "precio_unitario_bs": 753.44,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "46",
+            "nombre": "DOC QUENOPODIO X 12 UND",
+            "cantidad": 2,
+            "precio_unitario_usd": 7.0,
+            "precio_unitario_bs": 620.48,
+            "categoria": "Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 4697.92,
+    "iva_bs": 0.0,
+    "total_bs": 4697.92,
+    "subtotal_usd": 53.0,
+    "iva_usd": 0.0,
+    "total_usd": 53.0,
+    "condicion_pago": "Credito",
+    "dias_credito": 15,
+    "tasa_iva_aplicada": 0.0
+}

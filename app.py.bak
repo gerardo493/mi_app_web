@@ -1444,9 +1444,10 @@ def ajustar_stock():
     if filtro_orden == 'nombre':
         inventario = dict(sorted(inventario.items(), key=lambda item: item[1].get('nombre', '').lower()))
     elif filtro_orden == 'stock':
-        inventario = dict(sorted(inventario.items(), key=lambda item: x[1]['cantidad']))
-    
-    return render_template('ajustar_stock.html', inventario=inventario, q=q, filtro_categoria=filtro_categoria, filtro_orden=filtro_orden)
+        inventario = dict(sorted(inventario.items(), key=lambda item: int(item[1].get('cantidad', 0)), reverse=True))
+    # Lista de categorías únicas para el select
+    categorias = sorted(set(v.get('categoria', '') for v in cargar_datos(ARCHIVO_INVENTARIO).values() if v.get('categoria', '')))
+    return render_template('ajustar_stock.html', inventario=inventario, q=q, filtro_categoria=filtro_categoria, filtro_orden=filtro_orden, categorias=categorias)
 
 @app.route('/inventario/reporte')
 def reporte_inventario():
@@ -2441,41 +2442,7 @@ def ver_bitacora():
             lineas = f.readlines()
     except Exception:
         lineas = []
-    # Obtener filtros
-    filtro_accion = request.args.get('accion', '')
-    filtro_fecha = request.args.get('fecha', '')
-    # Extraer acciones únicas
-    acciones_unicas = set()
-    for linea in lineas:
-        partes = linea.strip().split('] ', 1)
-        if len(partes) == 2:
-            resto = partes[1].split(' | ')
-            if len(resto) > 1:
-                accion = resto[1].replace('Acción: ', '').strip()
-                if accion:
-                    acciones_unicas.add(accion)
-    acciones_unicas = sorted(acciones_unicas)
-    # Filtrar líneas
-    lineas_filtradas = []
-    for linea in lineas:
-        partes = linea.strip().split('] ', 1)
-        if len(partes) == 2:
-            fecha_ok = True
-            accion_ok = True
-            # Filtrar por fecha
-            if filtro_fecha:
-                fecha_ok = partes[0][1:11] == filtro_fecha
-            # Filtrar por acción
-            resto = partes[1].split(' | ')
-            if filtro_accion and len(resto) > 1:
-                accion_ok = (resto[1].replace('Acción: ', '').strip() == filtro_accion)
-            if fecha_ok and accion_ok:
-                lineas_filtradas.append(linea)
-        else:
-            # Si la línea no tiene el formato esperado, igual la mostramos
-            if not filtro_fecha and not filtro_accion:
-                lineas_filtradas.append(linea)
-    return render_template('bitacora.html', lineas=lineas_filtradas, acciones_unicas=acciones_unicas, filtro_accion=filtro_accion, filtro_fecha=filtro_fecha)
+    return render_template('bitacora.html', lineas=lineas)
 
 @app.route('/bitacora/limpiar', methods=['POST'])
 @login_required
@@ -2968,128 +2935,6 @@ def api_tasas_actualizadas():
             'fecha_actualizacion': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
 
-@app.route('/inventario/lista-precios/<tipo>')
-@login_required
-def lista_precios(tipo):
-    if tipo not in ['detal', 'distribuidor']:
-        abort(404)
-    
-    # Obtener filtros
-    filtro_categoria = request.args.get('categoria', '')
-    filtro_precio_min = request.args.get('precio_min', '')
-    filtro_precio_max = request.args.get('precio_max', '')
-    filtro_busqueda = request.args.get('busqueda', '')
-    
-    # Cargar datos
-    inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    empresa = cargar_datos('empresa.json')
-    fecha_actual = datetime.now()
-    
-    # Obtener categorías únicas
-    categorias = sorted(set(producto.get('categoria', '') for producto in inventario.values() if producto.get('categoria')))
-    
-    # Filtrar productos
-    productos_filtrados = {}
-    for id_producto, producto in inventario.items():
-        # Aplicar filtros
-        if filtro_categoria and producto.get('categoria') != filtro_categoria:
-            continue
-            
-        precio = float(producto.get('precio', 0))
-        if filtro_precio_min and precio < float(filtro_precio_min):
-            continue
-        if filtro_precio_max and precio > float(filtro_precio_max):
-            continue
-            
-        if filtro_busqueda:
-            busqueda = filtro_busqueda.lower()
-            if busqueda not in producto.get('nombre', '').lower():
-                continue
-                
-        productos_filtrados[id_producto] = producto
-    
-    return render_template('lista_precios.html', 
-                         inventario=productos_filtrados, 
-                         tipo=tipo, 
-                         empresa=empresa,
-                         now=fecha_actual,
-                         categorias=categorias,
-                         filtro_categoria=filtro_categoria,
-                         filtro_precio_min=filtro_precio_min,
-                         filtro_precio_max=filtro_precio_max,
-                         filtro_busqueda=filtro_busqueda)
-
-@app.route('/inventario/lista-precios/<tipo>/pdf')
-@login_required
-def lista_precios_pdf(tipo):
-    if tipo not in ['detal', 'distribuidor']:
-        abort(404)
-    # Obtener filtros
-    filtro_categoria = request.args.get('categoria', '')
-    filtro_precio_min = request.args.get('precio_min', '')
-    filtro_precio_max = request.args.get('precio_max', '')
-    filtro_busqueda = request.args.get('busqueda', '')
-    # Cargar datos
-    inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    empresa = cargar_datos('empresa.json')
-    fecha_actual = datetime.now()
-    # Obtener categorías únicas
-    categorias = sorted(set(producto.get('categoria', '') for producto in inventario.values() if producto.get('categoria')))
-    # Filtrar productos
-    productos_filtrados = {}
-    for id_producto, producto in inventario.items():
-        if filtro_categoria and producto.get('categoria') != filtro_categoria:
-            continue
-        precio = float(producto.get('precio', 0))
-        if filtro_precio_min and precio < float(filtro_precio_min):
-            continue
-        if filtro_precio_max and precio > float(filtro_precio_max):
-            continue
-        if filtro_busqueda:
-            busqueda = filtro_busqueda.lower()
-            if busqueda not in producto.get('nombre', '').lower():
-                continue
-        productos_filtrados[id_producto] = producto
-    rendered = render_template('lista_precios.html', 
-                             inventario=productos_filtrados, 
-                             tipo=tipo, 
-                             empresa=empresa, 
-                             pdf=True,
-                             now=fecha_actual,
-                             app=app,
-                             categorias=categorias,
-                             filtro_categoria=filtro_categoria,
-                             filtro_precio_min=filtro_precio_min,
-                             filtro_precio_max=filtro_precio_max,
-                             filtro_busqueda=filtro_busqueda)
-    try:
-        # Configurar opciones de pdfkit con opciones compatibles
-        options = {
-            'page-size': 'A4',
-            'margin-top': '20mm',
-            'margin-right': '20mm',
-            'margin-bottom': '20mm',
-            'margin-left': '20mm',
-            'encoding': 'UTF-8',
-            'no-outline': None,
-            'quiet': '',
-            'print-media-type': None,
-            'orientation': 'Portrait',
-            'dpi': 300,
-            'image-quality': 100,
-            'enable-local-file-access': None
-        }
-        config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
-        pdf = pdfkit.from_string(rendered, False, options=options, configuration=config)
-        response = make_response(pdf)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=lista_precios_{tipo}.pdf'
-        return response
-    except Exception as e:
-        print(f"Error al generar PDF: {str(e)}")  # Para debugging
-        flash(f'Error al generar PDF: {str(e)}', 'danger')
-        return redirect(url_for('lista_precios', tipo=tipo))
-
 # --- Bloque para Ejecutar la Aplicación ---
 if __name__ == '__main__':
     app.run(debug=True)
@@ -3183,76 +3028,39 @@ def webauthn_authenticate_verify():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@app.route('/inventario/<id>/editar')
+@app.route('/inventario/lista-precios/<tipo>')
 @login_required
-def editar_producto(id):
-    # Cargar el inventario
+def lista_precios(tipo):
+    if tipo not in ['detal', 'distribuidor']:
+        abort(404)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
-    
-    if id not in inventario:
+    empresa = cargar_datos('empresa.json')
+    return render_template('lista_precios.html', inventario=inventario, tipo=tipo, empresa=empresa)
+
+@app.route('/inventario/lista-precios/<tipo>/pdf')
+@login_required
+def lista_precios_pdf(tipo):
+    if tipo not in ['detal', 'distribuidor']:
+        abort(404)
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    empresa = cargar_datos('empresa.json')
+    rendered = render_template('lista_precios.html', inventario=inventario, tipo=tipo, empresa=empresa, pdf=True)
+    try:
+        pdf = pdfkit.from_string(rendered, False)
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=lista_precios_{tipo}.pdf'
+        return response
+    except Exception as e:
+        flash(f'Error al generar PDF: {str(e)}', 'danger')
+        return redirect(url_for('lista_precios', tipo=tipo))
+
+@app.route('/inventario/<id>')
+def ver_producto(id):
+    """Muestra los detalles de un producto del inventario."""
+    inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    producto = inventario.get(id)
+    if not producto:
         flash('Producto no encontrado', 'danger')
         return redirect(url_for('mostrar_inventario'))
-    
-    if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        categoria = request.form.get('categoria')
-        precio_detal = float(request.form.get('precio_detal', 0))
-        precio_distribuidor = float(request.form.get('precio_distribuidor', 0))
-        cantidad = int(request.form.get('cantidad', 0))
-        
-        if not nombre or not categoria:
-            flash('El nombre y la categoría son requeridos', 'danger')
-            return redirect(url_for('editar_producto', id=id))
-        
-        # Procesar imagen si se subió una nueva
-        ruta_imagen = inventario[id].get('ruta_imagen')
-        if 'imagen' in request.files and request.files['imagen'].filename:
-            nueva_ruta = guardar_imagen_producto(request.files['imagen'], id)
-            if nueva_ruta:
-                # Eliminar imagen anterior si existe
-                if ruta_imagen:
-                    try:
-                        ruta_anterior = os.path.join(BASE_DIR, 'static', ruta_imagen)
-                        if os.path.exists(ruta_anterior):
-                            os.remove(ruta_anterior)
-                    except Exception as e:
-                        print(f"Error eliminando imagen anterior: {e}")
-                ruta_imagen = nueva_ruta
-        
-        # Actualizar producto
-        inventario[id].update({
-            'nombre': nombre,
-            'categoria': categoria,
-            'precio': precio_detal,  # Para compatibilidad
-            'precio_detal': precio_detal,
-            'precio_distribuidor': precio_distribuidor,
-            'cantidad': cantidad,
-            'ruta_imagen': ruta_imagen
-        })
-        
-        if guardar_datos(ARCHIVO_INVENTARIO, inventario):
-            flash('Producto actualizado exitosamente', 'success')
-        else:
-            flash('Error al actualizar el producto', 'danger')
-        
-        return redirect(url_for('mostrar_inventario'))
-    
-    # Obtener categorías para el formulario
-    categorias = []
-    for producto in inventario.values():
-        if producto.get('categoria') and producto['categoria'] not in [c['nombre'] for c in categorias]:
-            categorias.append({
-                'id': len(categorias) + 1,
-                'nombre': producto['categoria']
-            })
-    
-    # Agregar el ID al producto para el template
-    producto = inventario[id].copy()
-    producto['id'] = id
-    # Compatibilidad: si no existen los campos nuevos, usar el precio base
-    if 'precio_detal' not in producto:
-        producto['precio_detal'] = producto.get('precio', 0)
-    if 'precio_distribuidor' not in producto:
-        producto['precio_distribuidor'] = producto.get('precio', 0)
-    
-    return render_template('producto_form.html', producto=producto, categorias=categorias)
+    return render_template('producto_detalle.html', producto=producto, id=id)

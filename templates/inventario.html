@@ -445,6 +445,17 @@
                 <a href="{{ url_for('ajustar_stock') }}" class="btn btn-red flex-grow-1" data-bs-toggle="tooltip" title="Ajustar Stock">
                     <i class="fas fa-boxes"></i> Ajustar Stock
                 </a>
+                <!-- Menú desplegable de Listas de Precio -->
+                <div class="dropdown flex-grow-1">
+                  <button class="btn btn-blue dropdown-toggle w-100" type="button" id="dropdownListasPrecio" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-list"></i> Listas de Precio
+                  </button>
+                  <ul class="dropdown-menu w-100" aria-labelledby="dropdownListasPrecio">
+                    <li><a class="dropdown-item" href="{{ url_for('lista_precios', tipo='detal') }}"><i class="fas fa-store"></i> Lista de Precios a Tiendas</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('lista_precios', tipo='distribuidor') }}"><i class="fas fa-truck"></i> Lista de Precios Distribuidor</a></li>
+                  </ul>
+                </div>
+                <!-- Fin menú desplegable -->
                 <button type="button" class="btn btn-red flex-grow-1" id="btnEliminarSeleccionados" style="display: none;" data-bs-toggle="tooltip" title="Eliminar Seleccionados">
                     <i class="fas fa-trash"></i> Eliminar Seleccionados
                 </button>
@@ -500,7 +511,8 @@
                                 <th>ID</th>
                                 <th>Nombre</th>
                                 <th>Categoría</th>
-                                <th>Precio</th>
+                                <th>Precio Detal</th>
+                                <th>Precio Distribuidor</th>
                                 <th>Stock</th>
                                 <th>Acciones</th>
                             </tr>
@@ -516,7 +528,8 @@
                                 <td>{{ id }}</td>
                                 <td>{{ producto.nombre }}</td>
                                 <td>{{ producto.categoria }}</td>
-                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio_detal if producto.precio_detal is defined else producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio_distribuidor if producto.precio_distribuidor is defined else producto.precio) }}</td>
                                 <td>
                                     <span class="badge {% if producto.cantidad > 0 %}bg-success{% else %}bg-danger{% endif %}">
                                         {{ producto.cantidad }}
