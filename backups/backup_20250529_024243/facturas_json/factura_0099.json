@@ -1,0 +1,43 @@
+{
+    "numero_factura": "0099",
+    "fecha": "2025-05-10T22:04:18.839123",
+    "tasa_cambio": 93.0495,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "32",
+            "nombre": "SABILA + LINAZA X 60 CAP",
+            "cantidad": 5,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.1485,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "45",
+            "nombre": "PIÑA + GRAPPEFRUIT X 60 CAP",
+            "cantidad": 400,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 279.1485,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 113055.1425,
+    "iva_bs": 0.0,
+    "total_bs": 113055.1425,
+    "subtotal_usd": 1215.0,
+    "iva_usd": 0.0,
+    "total_usd": 1215.0,
+    "condicion_pago": "Credito",
+    "dias_credito": 30,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}

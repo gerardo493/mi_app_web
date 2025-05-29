@@ -1,0 +1,283 @@
+{
+    "0602": {
+        "rif": "J-312239761",
+        "total_usd": 223.90000000000003,
+        "abonado_usd": 223.9,
+        "estado": "Cobrada",
+        "tipo_pago": "Efectivo (USD)",
+        "fecha_ultimo_abono": "2025-05-08 22:39",
+        "fecha_emision": "2025-04-29 22:29"
+    },
+    "0604": {
+        "rif": "V-13.058.545",
+        "total_usd": 215.20000000000002,
+        "abonado_usd": 215.2,
+        "estado": "Cobrada",
+        "fecha_emision": "2025-05-02 19:35",
+        "tipo_pago": "Efectivo (USD)",
+        "fecha_ultimo_abono": "2025-05-09 22:38"
+    },
+    "6041": {
+        "rif": "J-503478373",
+        "total_usd": 115.20000000000002,
+        "abonado_usd": 115.2,
+        "estado": "Cobrada",
+        "fecha_emision": "2025-05-02 20:05",
+        "tipo_pago": "Efectivo (USD)",
+        "fecha_ultimo_abono": "2025-05-09 22:43",
+        "referencia_pago": "0585"
+    },
+    "0605": {
+        "rif": "N/A",
+        "total_usd": 362.4,
+        "abonado_usd": 362.4,
+        "estado": "Cobrada",
+        "fecha_emision": "2025-05-05 19:06",
+        "tipo_pago": "Efectivo (USD)",
+        "fecha_ultimo_abono": "2025-05-09 22:42"
+    },
+    "0606": {
+        "rif": "V-7240529",
+        "total_usd": 53.0,
+        "abonado_usd": 53.0,
+        "estado": "Cobrada",
+        "fecha_emision": "2025-05-05 19:26",
+        "tipo_pago": "Efectivo (USD)",
+        "fecha_ultimo_abono": "2025-05-09 22:43"
+    },
+    "0070": {
+        "rif": "26369968",
+        "total_usd": 27.0,
+        "abonado_usd": 27.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-08 21:08",
+        "tipo_pago": "Contado",
+        "fecha_emision": "2025-05-08 21:08"
+    },
+    "0609": {
+        "rif": "J-503178575",
+        "total_usd": 48.0,
+        "abonado_usd": 48.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-08 23:05",
+        "tipo_pago": "Contado",
+        "fecha_emision": "2025-05-08 23:05"
+    },
+    "0053": {
+        "rif": "V-23298746",
+        "total_usd": 273.0,
+        "abonado_usd": 273.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-09 22:29",
+        "tipo_pago": "Contado",
+        "fecha_emision": "2025-05-09 22:29"
+    },
+    "0056": {
+        "rif": "V-7240529",
+        "total_usd": 7.5,
+        "abonado_usd": 7.5,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-09 23:59",
+        "tipo_pago": "Contado"
+    },
+    "0058": {
+        "rif": "26369968",
+        "total_usd": 177.0,
+        "abonado_usd": 177.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 00:09",
+        "tipo_pago": "Contado"
+    },
+    "0060": {
+        "rif": "J-412047842",
+        "total_usd": 117.0,
+        "abonado_usd": 117.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 00:48",
+        "tipo_pago": "Contado"
+    },
+    "0090": {
+        "rif": "26369968",
+        "total_usd": 90.0,
+        "abonado_usd": 90.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:00",
+        "tipo_pago": "Contado"
+    },
+    "0063": {
+        "rif": "26369968",
+        "total_usd": 202.86,
+        "abonado_usd": 202.86,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:04",
+        "tipo_pago": "Contado"
+    },
+    "0065": {
+        "rif": "26369968",
+        "total_usd": 150.0,
+        "abonado_usd": 150.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:11",
+        "tipo_pago": "Contado"
+    },
+    "0100": {
+        "rif": "26369968",
+        "total_usd": 2660.112,
+        "abonado_usd": 2660.112,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:17",
+        "tipo_pago": "Contado"
+    },
+    "0102": {
+        "rif": "J-501899061",
+        "total_usd": 1680.0,
+        "abonado_usd": 1680.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:20",
+        "tipo_pago": "Contado"
+    },
+    "0069": {
+        "rif": "26369968",
+        "total_usd": 3731.84,
+        "abonado_usd": 3731.84,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:26",
+        "tipo_pago": "Contado"
+    },
+    "0071": {
+        "rif": "26369968",
+        "total_usd": 1162.8,
+        "abonado_usd": 1162.8,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:32",
+        "tipo_pago": "Contado"
+    },
+    "0073": {
+        "rif": "26369968",
+        "total_usd": 103.887,
+        "abonado_usd": 103.887,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:39",
+        "tipo_pago": "Contado"
+    },
+    "0075": {
+        "rif": "26369968",
+        "total_usd": 117.0,
+        "abonado_usd": 117.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:47",
+        "tipo_pago": "Contado"
+    },
+    "0077": {
+        "rif": "26369968",
+        "total_usd": 420.0,
+        "abonado_usd": 420.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 01:55",
+        "tipo_pago": "Contado"
+    },
+    "0079": {
+        "rif": "26369968",
+        "total_usd": 1500.0,
+        "abonado_usd": 1500.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:13",
+        "tipo_pago": "Contado"
+    },
+    "0081": {
+        "rif": "26369968",
+        "total_usd": 2100.0,
+        "abonado_usd": 2100.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:17",
+        "tipo_pago": "Contado"
+    },
+    "0083": {
+        "rif": "26369968",
+        "total_usd": 3732.0,
+        "abonado_usd": 3732.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:25",
+        "tipo_pago": "Contado"
+    },
+    "0085": {
+        "rif": "26369968",
+        "total_usd": 240.0,
+        "abonado_usd": 240.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:32",
+        "tipo_pago": "Contado"
+    },
+    "0087": {
+        "rif": "J-504304604",
+        "total_usd": 270.0,
+        "abonado_usd": 270.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:38",
+        "tipo_pago": "Contado"
+    },
+    "0089": {
+        "rif": "V-19289407",
+        "total_usd": 300.0,
+        "abonado_usd": 300.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 02:50",
+        "tipo_pago": "Contado"
+    },
+    "0091": {
+        "rif": "V-12189390",
+        "total_usd": 1200.0,
+        "abonado_usd": 1200.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 20:23",
+        "tipo_pago": "Contado"
+    },
+    "0093": {
+        "rif": "26369968",
+        "total_usd": 165.0,
+        "abonado_usd": 165.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 20:38",
+        "tipo_pago": "Contado"
+    },
+    "0095": {
+        "rif": "26369968",
+        "total_usd": 300.0,
+        "abonado_usd": 300.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 20:45",
+        "tipo_pago": "Contado"
+    },
+    "0097": {
+        "rif": "26369968",
+        "total_usd": 921.0,
+        "abonado_usd": 921.0,
+        "estado": "Cobrada",
+        "fecha_ultimo_abono": "2025-05-10 20:50",
+        "tipo_pago": "Contado"
+    },
+    "0099": {
+        "rif": "26369968",
+        "total_usd": 1215.0,
+        "abonado_usd": 0,
+        "estado": "Por Cobrar"
+    },
+    "0101": {
+        "rif": "V-20504814",
+        "total_usd": 87.0,
+        "abonado_usd": 0,
+        "estado": "Por Cobrar"
+    },
+    "0110": {
+        "rif": "26369968",
+        "total_usd": 600.0,
+        "abonado_usd": 0,
+        "estado": "Por Cobrar"
+    },
+    "0104": {
+        "rif": "26369968",
+        "total_usd": 600.0,
+        "abonado_usd": 0,
+        "estado": "Por Cobrar"
+    }
+}
