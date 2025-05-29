@@ -1,0 +1,31 @@
+{
+    "numero_factura": "0056",
+    "fecha": "2025-05-09T23:59:01.967573",
+    "tasa_cambio": 88.0,
+    "cliente": {
+        "rif": "V-7240529",
+        "nombre": "LUIS ARIAS",
+        "direccion": "AV. 106, NRO 48 BARRIO LA COROMOTO, LOS TACARIGUA, MARACAY ESTADO ARAGUA.",
+        "telefono": "04243389609"
+    },
+    "items": [
+        {
+            "id": "55",
+            "nombre": "SABILAX-6 X 30 CAP",
+            "cantidad": 5,
+            "precio_unitario_usd": 1.5,
+            "precio_unitario_bs": 132.0,
+            "categoria": "LAXANTE",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 660.0,
+    "iva_bs": 0.0,
+    "total_bs": 660.0,
+    "subtotal_usd": 7.5,
+    "iva_usd": 0.0,
+    "total_usd": 7.5,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0
+}

@@ -1,0 +1,34 @@
+{
+    "numero_factura": "0085",
+    "fecha": "2025-05-10T02:32:49.421167",
+    "tasa_cambio": 96.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "34",
+            "nombre": "SAW PALMETO X 60 CAP",
+            "cantidad": 80,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 288.0,
+            "categoria": "hiperplasia prostatica",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 23040.0,
+    "iva_bs": 0.0,
+    "total_bs": 23040.0,
+    "subtotal_usd": 240.0,
+    "iva_usd": 0.0,
+    "total_usd": 240.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}
