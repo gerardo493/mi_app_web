@@ -758,7 +758,24 @@ def descargar_factura_pdf(id):
                              empresa=empresa,
                              zip=zip)
     try:
-        config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+        # Intentar diferentes ubicaciones comunes de wkhtmltopdf
+        wkhtmltopdf_paths = [
+            'C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe',
+            '/usr/bin/wkhtmltopdf',
+            '/usr/local/bin/wkhtmltopdf',
+            'wkhtmltopdf'  # Si está en el PATH
+        ]
+        
+        config = None
+        for path in wkhtmltopdf_paths:
+            if os.path.exists(path):
+                config = pdfkit.configuration(wkhtmltopdf=path)
+                break
+        
+        if config is None:
+            # Si no se encuentra wkhtmltopdf, intentar usar el comando directamente
+            config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf')
+            
         options = {
             'page-size': 'Letter',
             'margin-top': '0.75in',
@@ -783,8 +800,8 @@ def descargar_factura_pdf(id):
         response.headers['Content-Disposition'] = f'attachment; filename=factura_{factura["numero"]}.pdf'
         return response
     except Exception as e:
-        print(f"Error generando PDF: {str(e)}")
-        flash('Error al generar el PDF. Por favor, verifica que wkhtmltopdf esté instalado correctamente.', 'danger')
+        print(f"Error al generar PDF: {str(e)}")  # Para debugging
+        flash(f'Error al generar PDF: {str(e)}', 'danger')
         return redirect(url_for('ver_factura', id=id))
 
 @app.route('/facturas/<id>/imprimir')
@@ -2333,25 +2350,43 @@ def imprimir_cotizacion(id):
 
 @app.route('/cotizaciones/<id>/pdf')
 def descargar_cotizacion_pdf(id):
-    """Descargar la cotización como PDF."""
-    try:
-        import pdfkit
-    except ImportError:
+    if pdfkit is None:
         flash('PDFKit no está instalado. Instala con: pip install pdfkit', 'danger')
-        return redirect(url_for('imprimir_cotizacion', id=id))
-    cotizaciones_dir = 'cotizaciones_json'
-    filename = os.path.join(cotizaciones_dir, f"cotizacion_{id}.json")
-    if not os.path.exists(filename):
-        flash('Cotización no encontrada', 'danger')
-        return redirect(url_for('mostrar_cotizaciones'))
-    with open(filename, 'r', encoding='utf-8') as f:
-        cotizacion = json.load(f)
+        return redirect(url_for('ver_cotizacion', id=id))
+    cotizaciones = cargar_datos(ARCHIVO_COTIZACIONES)
     clientes = cargar_datos(ARCHIVO_CLIENTES)
     inventario = cargar_datos(ARCHIVO_INVENTARIO)
+    cotizacion = cotizaciones.get(id)
+    if not cotizacion:
+        flash('Cotización no encontrada', 'danger')
+        return redirect(url_for('mostrar_cotizaciones'))
     empresa = cargar_empresa()
-    rendered = render_template('cotizacion_imprimir.html', cotizacion=cotizacion, clientes=clientes, inventario=inventario, empresa=empresa, zip=zip)
+    rendered = render_template('cotizacion_imprimir.html', 
+                             cotizacion=cotizacion, 
+                             clientes=clientes, 
+                             inventario=inventario,
+                             now=datetime.now,
+                             empresa=empresa,
+                             zip=zip)
     try:
-        config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+        # Intentar diferentes ubicaciones comunes de wkhtmltopdf
+        wkhtmltopdf_paths = [
+            'C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe',
+            '/usr/bin/wkhtmltopdf',
+            '/usr/local/bin/wkhtmltopdf',
+            'wkhtmltopdf'  # Si está en el PATH
+        ]
+        
+        config = None
+        for path in wkhtmltopdf_paths:
+            if os.path.exists(path):
+                config = pdfkit.configuration(wkhtmltopdf=path)
+                break
+        
+        if config is None:
+            # Si no se encuentra wkhtmltopdf, intentar usar el comando directamente
+            config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf')
+            
         options = {
             'page-size': 'Letter',
             'margin-top': '0.75in',
@@ -2373,12 +2408,12 @@ def descargar_cotizacion_pdf(id):
         pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion["numero_cotizacion"]}.pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=cotizacion_{cotizacion["numero"]}.pdf'
         return response
     except Exception as e:
-        print(f"Error generando PDF: {str(e)}")
-        flash('Error al generar el PDF. Por favor, verifica que wkhtmltopdf esté instalado correctamente.', 'danger')
-        return redirect(url_for('imprimir_cotizacion', id=id))
+        print(f"Error al generar PDF: {str(e)}")  # Para debugging
+        flash(f'Error al generar PDF: {str(e)}', 'danger')
+        return redirect(url_for('ver_cotizacion', id=id))
 
 @app.route('/cotizacion/<numero>')
 def ver_cotizacion(numero):
@@ -3063,7 +3098,24 @@ def lista_precios_pdf(tipo):
                              filtro_precio_max=filtro_precio_max,
                              filtro_busqueda=filtro_busqueda)
     try:
-        # Configurar opciones de pdfkit con opciones compatibles
+        # Intentar diferentes ubicaciones comunes de wkhtmltopdf
+        wkhtmltopdf_paths = [
+            'C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe',
+            '/usr/bin/wkhtmltopdf',
+            '/usr/local/bin/wkhtmltopdf',
+            'wkhtmltopdf'  # Si está en el PATH
+        ]
+        
+        config = None
+        for path in wkhtmltopdf_paths:
+            if os.path.exists(path):
+                config = pdfkit.configuration(wkhtmltopdf=path)
+                break
+        
+        if config is None:
+            # Si no se encuentra wkhtmltopdf, intentar usar el comando directamente
+            config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf')
+        
         options = {
             'page-size': 'A4',
             'margin-top': '20mm',
@@ -3079,7 +3131,7 @@ def lista_precios_pdf(tipo):
             'image-quality': 100,
             'enable-local-file-access': None
         }
-        config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+        
         pdf = pdfkit.from_string(rendered, False, options=options, configuration=config)
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
