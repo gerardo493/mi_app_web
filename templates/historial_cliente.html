@@ -332,8 +332,8 @@
                         <h6 class="card-title mb-3">
                             <i class="fas fa-filter me-2"></i>Total Facturado (Filtrado)
                         </h6>
-                        <div class="h4 mb-2">${{ total_compras|es_number }}</div>
-                        <div class="h5">{{ total_bs|es_number }} Bs</div>
+                        <div class="h4 mb-2">${{ total_compras|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_bs|default(0)|es_number }} Bs</div>
                     </div>
                 </div>
             </div>
@@ -343,8 +343,8 @@
                         <h6 class="card-title mb-3">
                             <i class="fas fa-calendar-alt me-2"></i>Total Facturado (Año Actual)
                         </h6>
-                        <div class="h4 mb-2">${{ total_anual_usd|es_number }}</div>
-                        <div class="h5">{{ total_anual_bs|es_number }} Bs</div>
+                        <div class="h4 mb-2">${{ total_anual_usd|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_anual_bs|default(0)|es_number }} Bs</div>
                     </div>
                 </div>
             </div>
@@ -354,8 +354,8 @@
                         <h6 class="card-title mb-3">
                             <i class="fas fa-calendar-day me-2"></i>Total Facturado (Mes Actual)
                         </h6>
-                        <div class="h4 mb-2">${{ (total_mensual_usd or 0)|es_number }}</div>
-                        <div class="h5">{{ (total_mensual_bs or 0)|es_number }} Bs</div>
+                        <div class="h4 mb-2">${{ total_mensual_usd|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_mensual_bs|default(0)|es_number }} Bs</div>
                     </div>
                 </div>
             </div>
@@ -369,28 +369,85 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="mb-3"><strong>Nombre:</strong> {{ cliente.nombre }}</p>
-                        <p class="mb-3"><strong>Email:</strong> {{ cliente.email or 'No disponible' }}</p>
-                        <p class="mb-3"><strong>Teléfono:</strong> {{ cliente.telefono or 'No disponible' }}</p>
-                        <p class="mb-3"><strong>Dirección:</strong> <span style="white-space: normal; word-break: break-all;">{{ cliente.direccion or 'No disponible' }}</span></p>
+                        <div class="cliente-info">
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-building"></i>
+                                    Información de la Empresa
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Nombre:</strong><br>
+                                        <span class="info-value">{{ cliente.nombre }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-address-card"></i>
+                                    Información de Contacto
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Email:</strong><br>
+                                        <span class="info-value">{{ cliente.email or 'No disponible' }}</span>
+                                    </p>
+                                    <p class="mb-3">
+                                        <strong>Teléfono:</strong><br>
+                                        <span class="info-value">{{ cliente.telefono or 'No disponible' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Ubicación
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Dirección:</strong><br>
+                                        <span class="info-value">{{ cliente.direccion or 'No disponible' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <p class="mb-3"><strong>Total Compras:</strong> ${{ (total_compras or 0)|es_number }}</p>
-                        <p class="mb-3"><strong>Total Facturas:</strong> {{ facturas|length }}</p>
-                        {% if cuenta %}
-                        <p class="mb-3 text-danger"><strong>Cuenta por Cobrar:</strong> ${{ (cuenta.monto or 0)|es_number }}</p>
+                        {% if cliente.direccion %}
+                        <div class="map-container">
+                            <div id="map"></div>
+                            <div class="map-overlay">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Ubicación del cliente
+                            </div>
+                        </div>
+                        <div class="map-actions">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ cliente.direccion|urlencode }}" 
+                               target="_blank" 
+                               class="btn btn-primary btn-navigation">
+                                <i class="fas fa-directions"></i>
+                                Comenzar Ruta
+                            </a>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle"></i> Puedes cambiar entre diferentes vistas del mapa usando el control en la esquina superior derecha.
+                        </small>
                         {% endif %}
                     </div>
                 </div>
-                <div class="mt-3">
+                <div class="cliente-actions">
                     {% if cliente.email %}
-                    <a href="mailto:{{ cliente.email }}" class="btn btn-success me-2">
-                        <i class="fas fa-envelope me-2"></i>Enviar Email
+                    <a href="mailto:{{ cliente.email }}" class="btn btn-success">
+                        <i class="fas fa-envelope"></i>
+                        Enviar Email
                     </a>
                     {% endif %}
                     {% if cliente.telefono %}
                     <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" class="btn btn-success">
-                        <i class="fab fa-whatsapp me-2"></i>Enviar WhatsApp
+                        <i class="fab fa-whatsapp"></i>
+                        Enviar WhatsApp
                     </a>
                     {% endif %}
                 </div>
@@ -484,10 +541,274 @@
     </div>
 </div>
 
+{% block extra_css %}
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    #map:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: #1a237e;
+    }
+
+    .map-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .map-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        font-size: 0.9rem;
+        color: #1a237e;
+        font-weight: 500;
+    }
+
+    .map-overlay i {
+        margin-right: 5px;
+        color: #1a237e;
+    }
+
+    .cliente-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .cliente-info p {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #2c3e50;
+        line-height: 1.6;
+    }
+
+    .cliente-info strong {
+        color: #1a237e;
+        font-weight: 600;
+    }
+
+    .cliente-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .cliente-actions .btn {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .cliente-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    }
+
+    @media (max-width: 768px) {
+        #map {
+            height: 300px;
+        }
+        
+        .cliente-actions .btn {
+            min-width: 100%;
+        }
+    }
+
+    .info-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .info-section:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        color: #1a237e;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-title i {
+        color: #1a237e;
+        font-size: 1.1rem;
+    }
+
+    .info-content {
+        padding: 0.5rem 0;
+    }
+
+    .info-value {
+        display: block;
+        margin-top: 0.5rem;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .cliente-info strong {
+        color: #1a237e;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .info-section {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+        }
+    }
+
+    .map-actions {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .btn-navigation {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-navigation:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .btn-navigation i {
+        font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+        .btn-navigation {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block extra_js %}
 <script>
+function initMap() {
+    {% if cliente.direccion %}
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: { lat: 10.5, lng: -66.9 },
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.TOP_RIGHT
+        },
+        streetViewControl: true,
+        fullscreenControl: true
+    });
+
+    var geocoder = new google.maps.Geocoder();
+    var address = "{{ cliente.direccion }}";
+    
+    geocoder.geocode({ 'address': address }, function(results, status) {
+        if (status === 'OK') {
+            map.setCenter(results[0].geometry.location);
+            
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location,
+                title: "{{ cliente.nombre }}"
+            });
+
+            var infowindow = new google.maps.InfoWindow({
+                content: "<strong>{{ cliente.nombre }}</strong><br>{{ cliente.direccion }}"
+            });
+
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
+
+            infowindow.open(map, marker);
+        }
+    });
+    {% endif %}
+}
+
+function loadGoogleMapsScript() {
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDwc6TnKyHP0Q6O6tNo4_RfK24CuKvM524&callback=initMap';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('filtroAnio').focus();
+    {% if cliente.direccion %}
+    loadGoogleMapsScript();
+    {% endif %}
 });
 </script>
 {% endblock %}

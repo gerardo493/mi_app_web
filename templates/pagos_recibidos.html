@@ -303,7 +303,12 @@
           <li class="list-group-item"><strong>Método:</strong> <span id="detalle-metodo"></span></li>
           <li class="list-group-item"><strong>Referencia:</strong> <span id="detalle-referencia"></span></li>
           <li class="list-group-item"><strong>Banco:</strong> <span id="detalle-banco"></span></li>
-          <li class="list-group-item" id="detalle-captura-li" style="display:none;"><strong>Captura:</strong> <a id="detalle-captura" href="#" target="_blank">Ver Imagen</a></li>
+          <li class="list-group-item" id="detalle-captura-li">
+            <strong>Captura:</strong>
+            <div class="mt-2" id="detalle-captura-content">
+              <!-- Aquí se mostrará la imagen o el mensaje -->
+            </div>
+          </li>
         </ul>
       </div>
       <div class="modal-footer">
@@ -459,12 +464,18 @@ modalDetalle.addEventListener('show.bs.modal', function (event) {
     document.getElementById('detalle-metodo').textContent = button.getAttribute('data-metodo').replace('_',' ').toUpperCase();
     document.getElementById('detalle-referencia').textContent = button.getAttribute('data-referencia') || '-';
     document.getElementById('detalle-banco').textContent = button.getAttribute('data-banco') || '-';
+    
     var captura = button.getAttribute('data-captura');
-    if (captura && captura !== 'None') {
-        document.getElementById('detalle-captura-li').style.display = '';
-        document.getElementById('detalle-captura').href = '/static/' + captura;
+    var capturaContent = document.getElementById('detalle-captura-content');
+    if (captura && captura !== 'None' && captura !== '') {
+        capturaContent.innerHTML = `
+            <img src="/static/${captura}" alt="Captura de pago" class="img-fluid rounded" style="max-width: 100%;">
+            <a href="/static/${captura}" target="_blank" class="btn btn-sm btn-primary mt-2">
+                <i class="fas fa-external-link-alt"></i> Ver en tamaño completo
+            </a>
+        `;
     } else {
-        document.getElementById('detalle-captura-li').style.display = 'none';
+        capturaContent.innerHTML = '<span class="text-muted">No hay imagen de captura disponible para este pago.</span>';
     }
 });
 

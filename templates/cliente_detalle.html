@@ -35,6 +35,17 @@
                     <dt class="col-sm-4">Dirección:</dt>
                     <dd class="col-sm-8">{{ cliente.direccion }}</dd>
                 </dl>
+                {% if cliente.direccion %}
+                <div class="mt-3">
+                    <h6>Ubicación en el mapa:</h6>
+                    <div class="ratio ratio-16x9">
+                        <iframe 
+                            src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q={{ cliente.direccion|urlencode }}&language=es" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         

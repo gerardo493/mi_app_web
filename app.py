@@ -1819,17 +1819,30 @@ def historial_cliente(id):
     filtro_anio = int(request.args.get('anio', now.year))
     filtro_mes = request.args.get('mes', '')
 
-    # Filtrar facturas por cliente, año y mes
+    # Filtrar facturas por cliente
     facturas_cliente = [f for f in facturas.values() if f.get('cliente_id') == id]
+    
+    # Filtrar facturas por año y mes seleccionados
     facturas_filtradas = []
     for f in facturas_cliente:
         fecha = f.get('fecha', '')
         try:
             fecha_dt = datetime.strptime(fecha, '%Y-%m-%d')
+            if fecha_dt.year == filtro_anio and (not filtro_mes or fecha_dt.month == int(filtro_mes)):
+                facturas_filtradas.append(f)
         except Exception:
             continue
-        if fecha_dt.year == filtro_anio and (not filtro_mes or fecha_dt.month == int(filtro_mes)):
-            facturas_filtradas.append(f)
+
+    # Calcular totales anuales
+    facturas_anio_actual = [f for f in facturas_cliente if datetime.strptime(f.get('fecha', ''), '%Y-%m-%d').year == now.year]
+    total_anual_usd = sum(float(f.get('total_usd', 0)) for f in facturas_anio_actual)
+    total_anual_bs = sum(float(f.get('total_bs', 0)) for f in facturas_anio_actual)
+
+    # Calcular totales mensuales
+    facturas_mes_actual = [f for f in facturas_cliente if datetime.strptime(f.get('fecha', ''), '%Y-%m-%d').year == now.year and datetime.strptime(f.get('fecha', ''), '%Y-%m-%d').month == now.month]
+    total_mensual_usd = sum(float(f.get('total_usd', 0)) for f in facturas_mes_actual)
+    total_mensual_bs = sum(float(f.get('total_bs', 0)) for f in facturas_mes_actual)
+    
     cuenta = next((c for c in cuentas.values() if c.get('cliente_id') == id), None)
     
     # Totales filtrados
@@ -1843,10 +1856,16 @@ def historial_cliente(id):
         )
         for f in facturas_filtradas
     )
+
     # Productos comprados filtrados
     productos_comprados = {}
     for factura in facturas_filtradas:
-        for prod_id, cantidad in zip(factura.get('productos', []), factura.get('cantidades', [])):
+        productos = factura.get('productos', [])
+        cantidades = factura.get('cantidades', [])
+        precios = factura.get('precios', [])
+        
+        for i in range(len(productos)):
+            prod_id = productos[i]
             if prod_id in inventario:
                 if prod_id not in productos_comprados:
                     productos_comprados[prod_id] = {
@@ -1854,17 +1873,31 @@ def historial_cliente(id):
                         'cantidad': 0,
                         'valor': 0
                     }
-                productos_comprados[prod_id]['cantidad'] += int(cantidad)
-                productos_comprados[prod_id]['valor'] += int(cantidad) * float(inventario[prod_id]['precio'])
+                try:
+                    cantidad = int(cantidades[i])
+                    precio = float(precios[i])
+                    productos_comprados[prod_id]['cantidad'] += cantidad
+                    productos_comprados[prod_id]['valor'] += cantidad * precio
+                except (ValueError, TypeError, IndexError):
+                    continue
+
+    # Ordenar productos por valor total
+    productos_comprados = dict(sorted(productos_comprados.items(), key=lambda x: x[1]['valor'], reverse=True))
+
     # Para el formulario de filtro
     anios_disponibles = sorted({datetime.strptime(f.get('fecha', ''), '%Y-%m-%d').year for f in facturas_cliente if f.get('fecha', '')})
+    
     return render_template(
         'historial_cliente.html',
-                         cliente=cliente,
+        cliente=cliente,
         facturas=facturas_filtradas,
-                         cuenta=cuenta,
-                         total_compras=total_compras,
+        cuenta=cuenta,
+        total_compras=total_compras,
         total_bs=total_bs,
+        total_anual_usd=total_anual_usd,
+        total_anual_bs=total_anual_bs,
+        total_mensual_usd=total_mensual_usd,
+        total_mensual_bs=total_mensual_bs,
         productos_comprados=productos_comprados,
         filtro_anio=filtro_anio,
         filtro_mes=filtro_mes,
@@ -2104,13 +2137,31 @@ def mostrar_pagos_recibidos():
         tasa_paralelo = float(data['USD']['promedio']) if 'USD' in data and 'promedio' in data['USD'] else None
         tasa_bcv_eur = float(data['EUR']['promedio']) if 'EUR' in data and 'promedio' in data['EUR'] else None
     except Exception:
-        # Si falla, usar la tasa BCV local
         tasa_bcv = obtener_tasa_bcv() or 1.0
         tasa_paralelo = tasa_bcv
         tasa_bcv_eur = 0
+
     for f in facturas.values():
         if 'pagos' in f and f['pagos']:
             for pago in f['pagos']:
+                captura_path = pago.get('captura_path')
+                if captura_path:
+                    # Normalizar la ruta para que siempre sea /uploads/capturas/...
+                    if 'uploads/capturas/' in captura_path:
+                        # Quitar static/ si lo tiene
+                        captura_path = captura_path.split('static/')[-1]
+                        # Asegurar que empiece con uploads/capturas/
+                        if not captura_path.startswith('uploads/capturas/'):
+                            captura_path = 'uploads/capturas/' + os.path.basename(captura_path)
+                    else:
+                        captura_path = 'uploads/capturas/' + os.path.basename(captura_path)
+                    # Validar existencia del archivo
+                    ruta_absoluta = os.path.join('static', captura_path.replace('/', os.sep))
+                    if not os.path.exists(ruta_absoluta):
+                        captura_path = None
+                else:
+                    captura_path = None
+
                 pagos.append({
                     'factura_id': f.get('id'),
                     'fecha': f.get('fecha'),
@@ -2120,11 +2171,19 @@ def mostrar_pagos_recibidos():
                     'tasa_bcv': float(f.get('tasa_bcv', tasa_bcv)),
                     'referencia': pago.get('referencia', ''),
                     'banco': pago.get('banco', ''),
-                    'captura_path': pago.get('captura_path', None)
+                    'captura_path': captura_path
                 })
                 total_usd += float(pago.get('monto', 0))
                 total_bs += float(pago.get('monto', 0)) * float(f.get('tasa_bcv', tasa_bcv))
-    return render_template('pagos_recibidos.html', pagos=pagos, clientes=clientes, total_usd=total_usd, total_bs=total_bs, tasa_bcv=tasa_bcv, tasa_paralelo=tasa_paralelo, tasa_bcv_eur=tasa_bcv_eur)
+
+    return render_template('pagos_recibidos.html', 
+                         pagos=pagos, 
+                         clientes=clientes, 
+                         total_usd=total_usd, 
+                         total_bs=total_bs, 
+                         tasa_bcv=tasa_bcv, 
+                         tasa_paralelo=tasa_paralelo, 
+                         tasa_bcv_eur=tasa_bcv_eur)
 
 @app.template_filter('split')
 def split_filter(value, delimiter=' '):
@@ -2585,10 +2644,13 @@ def registrar_pago(id):
             captura = request.files['captura']
             if captura.filename:
                 filename = secure_filename(captura.filename)
-                captura_path = os.path.join('uploads', 'capturas', filename)
-                os.makedirs(os.path.dirname(captura_path), exist_ok=True)
-                captura.save(captura_path)
-                nuevo_pago['captura_path'] = captura_path
+                # Guardar siempre en static/uploads/capturas/
+                carpeta_destino = os.path.join('static', 'uploads', 'capturas')
+                os.makedirs(carpeta_destino, exist_ok=True)
+                ruta_absoluta = os.path.join(carpeta_destino, filename)
+                captura.save(ruta_absoluta)
+                # Guardar la ruta relativa para el JSON
+                nuevo_pago['captura_path'] = f"uploads/capturas/{filename}"
         
         factura['pagos'].append(nuevo_pago)
         
