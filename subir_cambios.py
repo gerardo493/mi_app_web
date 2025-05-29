@@ -71,5 +71,22 @@ def subir_cambios():
     except Exception as e:
         print(f"Error inesperado: {e}")
 
+# Cargar inventario
+with open('inventario.json', 'r', encoding='utf-8') as f:
+    inventario = json.load(f)
+
+cambios = 0
+for prod_id, prod in inventario.items():
+    if 'ruta_imagen' in prod and isinstance(prod['ruta_imagen'], str) and '\\' in prod['ruta_imagen']:
+        prod['ruta_imagen'] = prod['ruta_imagen'].replace('\\', '/')
+        cambios += 1
+
+if cambios > 0:
+    with open('inventario.json', 'w', encoding='utf-8') as f:
+        json.dump(inventario, f, ensure_ascii=False, indent=4)
+    print(f"Rutas corregidas en {cambios} productos.")
+else:
+    print("No se encontraron rutas para corregir.")
+
 if __name__ == "__main__":
     subir_cambios() 

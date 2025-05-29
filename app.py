@@ -30,25 +30,42 @@ csrf = CSRFProtect(app)
 # --- Constantes ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+IMAGENES_PRODUCTOS_FOLDER = os.path.join(BASE_DIR, 'static', 'imagenes_productos')
 ARCHIVO_CLIENTES = 'clientes.json'
 ARCHIVO_INVENTARIO = 'inventario.json'
 ARCHIVO_FACTURAS = 'facturas_json/facturas.json'
 ARCHIVO_COTIZACIONES = 'cotizaciones_json/cotizaciones.json'
 ARCHIVO_CUENTAS = 'cuentas_por_cobrar.json'
 ULTIMA_TASA_BCV_FILE = 'ultima_tasa_bcv.json'
-ALLOWED_EXTENSIONS = {'csv'}
+ALLOWED_EXTENSIONS = {'csv', 'jpg', 'jpeg', 'png', 'gif'}
 BITACORA_FILE = 'bitacora.log'
 
-# Asegurar que la carpeta de subidas existe
+# Asegurar que las carpetas de subidas existen
 try:
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(IMAGENES_PRODUCTOS_FOLDER, exist_ok=True)
 except Exception as e:
-    print(f"Error creando carpeta de subidas: {e}")
+    print(f"Error creando carpetas de subidas: {e}")
 
 # --- Funciones de Utilidad ---
 def allowed_file(filename):
     """Verifica si la extensión del archivo está permitida."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def guardar_imagen_producto(imagen, producto_id):
+    """Guarda la imagen de un producto y retorna la ruta relativa con '/' como separador."""
+    if imagen and allowed_file(imagen.filename):
+        # Generar nombre único para la imagen
+        extension = imagen.filename.rsplit('.', 1)[1].lower()
+        nombre_archivo = f"producto_{producto_id}.{extension}"
+        ruta_archivo = os.path.join(IMAGENES_PRODUCTOS_FOLDER, nombre_archivo)
+        
+        # Guardar la imagen
+        imagen.save(ruta_archivo)
+        
+        # Retornar la ruta relativa para guardar en la base de datos (siempre con /)
+        return f"imagenes_productos/{nombre_archivo}"
+    return None
 
 def cargar_clientes_desde_csv(archivo_csv):
     """Carga clientes desde un archivo CSV."""
@@ -528,13 +545,19 @@ def nuevo_producto():
         # Generar nuevo ID
         nuevo_id = str(max([int(k) for k in inventario.keys()]) + 1) if inventario else '1'
         
+        # Procesar imagen si se subió una
+        ruta_imagen = None
+        if 'imagen' in request.files:
+            ruta_imagen = guardar_imagen_producto(request.files['imagen'], nuevo_id)
+        
         # Crear nuevo producto
         inventario[nuevo_id] = {
             'nombre': nombre,
             'categoria': categoria,
             'precio': precio,
             'cantidad': cantidad,
-            'ultima_entrada': datetime.now().isoformat()
+            'ultima_entrada': datetime.now().isoformat(),
+            'ruta_imagen': ruta_imagen
         }
         
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):
@@ -575,12 +598,28 @@ def editar_producto(id):
             flash('El nombre y la categoría son requeridos', 'danger')
             return redirect(url_for('editar_producto', id=id))
         
+        # Procesar imagen si se subió una nueva
+        ruta_imagen = inventario[id].get('ruta_imagen')
+        if 'imagen' in request.files and request.files['imagen'].filename:
+            nueva_ruta = guardar_imagen_producto(request.files['imagen'], id)
+            if nueva_ruta:
+                # Eliminar imagen anterior si existe
+                if ruta_imagen:
+                    try:
+                        ruta_anterior = os.path.join(BASE_DIR, 'static', ruta_imagen)
+                        if os.path.exists(ruta_anterior):
+                            os.remove(ruta_anterior)
+                    except Exception as e:
+                        print(f"Error eliminando imagen anterior: {e}")
+                ruta_imagen = nueva_ruta
+        
         # Actualizar producto
         inventario[id].update({
             'nombre': nombre,
             'categoria': categoria,
             'precio': precio,
-            'cantidad': cantidad
+            'cantidad': cantidad,
+            'ruta_imagen': ruta_imagen
         })
         
         if guardar_datos(ARCHIVO_INVENTARIO, inventario):

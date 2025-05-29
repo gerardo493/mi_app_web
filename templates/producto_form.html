@@ -11,7 +11,7 @@
                     <h4 class="mb-0">{{ 'Editar Producto' if producto else 'Nuevo Producto' }}</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{% if producto %}{{ url_for('editar_producto', id=producto.id) }}{% else %}{{ url_for('nuevo_producto') }}{% endif %}">
+                    <form method="POST" action="{% if producto %}{{ url_for('editar_producto', id=producto.id) }}{% else %}{{ url_for('nuevo_producto') }}{% endif %}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-3">
@@ -47,6 +47,17 @@
                         <div class="mb-3">
                             <label for="cantidad" class="form-label">Stock Inicial</label>
                             <input type="number" class="form-control" id="cantidad" name="cantidad" min="0" value="{{ producto.cantidad if producto else '' }}" required {% if producto %}readonly{% endif %}>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imagen" class="form-label">Imagen del Producto</label>
+                            {% if producto and producto.ruta_imagen %}
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename=producto.ruta_imagen) }}" class="img-thumbnail" style="max-height: 200px;" alt="Imagen actual">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                            <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</div>
                         </div>
                         
                         <div class="d-grid gap-2">
