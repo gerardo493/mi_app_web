@@ -1,0 +1,70 @@
+{
+    "numero_factura": "0083",
+    "fecha": "2025-05-10T02:25:21.051838",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "14",
+            "nombre": "CLORURO DE MAGNESIO X 33 GR",
+            "cantidad": 400,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Regenerador osio",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "12",
+            "nombre": "CENTELLA ASIATICA X 60 CAP",
+            "cantidad": 39,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Diuretico",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "10",
+            "nombre": "CASTAÑA DE INDIA X 60  CAP",
+            "cantidad": 500,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Circulación Insuficiencia Venosa",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "55",
+            "nombre": "SABILAX-6 X 30 CAP",
+            "cantidad": 10,
+            "precio_unitario_usd": 1.5,
+            "precio_unitario_bs": 142.5,
+            "categoria": "LAXANTE",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "42",
+            "nombre": "RUI BARDO X 60 CAP",
+            "cantidad": 300,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Adelgazante-Laxante",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 354540.0,
+    "iva_bs": 0.0,
+    "total_bs": 354540.0,
+    "subtotal_usd": 3732.0,
+    "iva_usd": 0.0,
+    "total_usd": 3732.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}
