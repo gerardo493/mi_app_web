@@ -2,7 +2,7 @@
     "1": {
         "nombre": "ADELGALAX  X 60 CAP",
         "precio": 3.0,
-        "cantidad": 982,
+        "cantidad": 965,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "imagenes_productos/producto_1.jpg",
         "ultima_entrada": "2025-05-24 22:06:30",
@@ -115,6 +115,22 @@
                 "motivo": "Venta por factura N°000611",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000611"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:09:12",
+                "tipo": "salida",
+                "cantidad": 5,
+                "motivo": "Venta por factura N°000624",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000624"
             }
         ],
         "precio_detal": 3.0,
@@ -247,7 +263,7 @@
     "4": {
         "nombre": "ARANDANO ROJO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 851,
+        "cantidad": 816,
         "categoria": "Bactericida",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -326,13 +342,45 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 8,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:37:20",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000627",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000627"
+            },
+            {
+                "fecha": "2025-05-29 18:40:53",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000629",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000629"
+            },
+            {
+                "fecha": "2025-05-29 19:13:09",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000637",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000637"
             }
         ]
     },
     "5": {
         "nombre": "BOLDO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 993,
+        "cantidad": 990,
         "categoria": "Protector Hepatico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -369,13 +417,21 @@
                 "motivo": "Venta por factura N°000613",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000613"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
             }
         ]
     },
     "7": {
         "nombre": "CALCIO MAG-ZINC X 50 CAP",
         "precio": 3.0,
-        "cantidad": 693,
+        "cantidad": 683,
         "categoria": "Vitaminas y Minerales",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -412,13 +468,21 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
             }
         ]
     },
     "8": {
         "nombre": "CARDO LECHOZO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 964,
+        "cantidad": 958,
         "categoria": "Protector Hepatico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -471,13 +535,21 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
             }
         ]
     },
     "9": {
         "nombre": "CARDO MARIANO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 942,
+        "cantidad": 931,
         "categoria": "Protector Hepatico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -548,13 +620,29 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 8,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "10": {
         "nombre": "CASTAÑA DE INDIA X 60  CAP",
         "precio": 3.0,
-        "cantidad": 933,
+        "cantidad": 886,
         "categoria": "Circulación Insuficiencia Venosa",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -625,13 +713,69 @@
                 "motivo": "Venta por factura N°000616",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000616"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 8,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:37:20",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000627",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000627"
+            },
+            {
+                "fecha": "2025-05-29 18:40:53",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000629",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000629"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
+            },
+            {
+                "fecha": "2025-05-29 18:54:01",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000633",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000633"
+            },
+            {
+                "fecha": "2025-05-29 18:57:45",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000635",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000635"
+            },
+            {
+                "fecha": "2025-05-29 19:13:09",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000637",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000637"
             }
         ]
     },
     "11": {
         "nombre": "CENTELLA A.  C/ ALCACHOFA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 983,
+        "cantidad": 966,
         "categoria": "Adelgazante-Diuretico",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -686,17 +830,41 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:40:53",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000629",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000629"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 2,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
+            },
+            {
+                "fecha": "2025-05-29 18:54:01",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000633",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000633"
             }
         ]
     },
     "12": {
         "nombre": "CENTELLA ASIATICA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 949,
+        "cantidad": 144,
         "categoria": "Adelgazante-Diuretico",
         "ruta_imagen": "",
-        "ultima_entrada": "2025-05-22 19:57:11",
-        "ultima_salida": "2025-05-14 22:24:12",
+        "ultima_entrada": "2025-05-29 16:40:24",
+        "ultima_salida": "2025-05-29 16:29:56",
         "historial_ajustes": [
             {
                 "fecha": "2025-05-14 22:24:12",
@@ -755,13 +923,59 @@
                 "motivo": "Venta por factura N°000617",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000617"
+            },
+            {
+                "fecha": "2025-05-29 16:29:56",
+                "tipo": "salida",
+                "cantidad": 949,
+                "motivo": "AJUSTE",
+                "usuario": "admin"
+            },
+            {
+                "fecha": "2025-05-29 16:40:24",
+                "tipo": "entrada",
+                "cantidad": 187,
+                "motivo": "ajuste",
+                "usuario": "admin"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 15,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
+            },
+            {
+                "fecha": "2025-05-29 18:54:01",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000633",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000633"
             }
         ]
     },
     "13": {
         "nombre": "CHANCA PIEDRA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 580,
+        "cantidad": 515,
         "categoria": "Calculo Renal",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -820,6 +1034,54 @@
                 "motivo": "Venta por factura N°000611",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000611"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 24,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:37:20",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000627",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000627"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 5,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
+            },
+            {
+                "fecha": "2025-05-29 18:55:46",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000634",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000634"
             }
         ]
     },
@@ -901,7 +1163,7 @@
     "15": {
         "nombre": "COLA DE CABALLO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 894,
+        "cantidad": 886,
         "categoria": "Calculo Renal",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -938,13 +1200,29 @@
                 "motivo": "Ajuste por edición de factura N°000603",
                 "usuario": "angel",
                 "observaciones": "Cantidad anterior: 0, Nueva cantidad: 6"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 2,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "16": {
         "nombre": "COLON CLEANSER X 60 CAP",
         "precio": 3.0,
-        "cantidad": 585,
+        "cantidad": 576,
         "categoria": "Limpieza De colon",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1003,13 +1281,29 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
             }
         ]
     },
     "17": {
         "nombre": "CURCUMA C/ PIIMIENTA NEGRA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 936,
+        "cantidad": 915,
         "categoria": "Anti-inflamatorio",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1114,6 +1408,30 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
@@ -1169,7 +1487,7 @@
     "19": {
         "nombre": "ESCOBA DE CARNICERO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 965,
+        "cantidad": 951,
         "categoria": "Circulación Insuficiencia Venosa",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1230,6 +1548,22 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 2,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
@@ -1342,7 +1676,7 @@
     "22": {
         "nombre": "GINKGOBILOBA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 938,
+        "cantidad": 935,
         "categoria": "Oxigenate Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1433,6 +1767,14 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
@@ -1440,7 +1782,7 @@
         "id": "23",
         "nombre": "JARABE BERRO MIEL PLUS X 240 ML",
         "precio": 1.8,
-        "cantidad": 994,
+        "cantidad": 982,
         "categoria": "Bronco-Dilatadores",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1465,6 +1807,14 @@
                 "motivo": "Venta por factura N°000628",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000628"
+            },
+            {
+                "fecha": "2025-05-29 18:05:00",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000622",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000622"
             }
         ]
     },
@@ -1472,7 +1822,7 @@
         "id": "24",
         "nombre": "JARABE MIEL  EUCALIPTAL X 240 ML",
         "precio": 1.8,
-        "cantidad": 1000,
+        "cantidad": 988,
         "categoria": "Bronco-Dilatadores",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1489,6 +1839,14 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "s"
+            },
+            {
+                "fecha": "2025-05-29 18:05:00",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000622",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000622"
             }
         ]
     },
@@ -1524,7 +1882,7 @@
     "26": {
         "nombre": "LOCHITA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 997,
+        "cantidad": 994,
         "categoria": "Oxigenate Cerebral",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1553,6 +1911,14 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "s"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
@@ -1669,7 +2035,7 @@
     "29": {
         "nombre": "ÑAME SALVAJE X 60 CAP",
         "precio": 3.0,
-        "cantidad": 951,
+        "cantidad": 933,
         "categoria": "Menopausia",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1730,13 +2096,29 @@
                 "motivo": "Venta por factura N°000617",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000617"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
             }
         ]
     },
     "30": {
         "nombre": "OMEGA 3 X 30 UND",
         "precio": 4.2,
-        "cantidad": 964,
+        "cantidad": 917,
         "categoria": "Cardiovascular",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1805,6 +2187,46 @@
                 "motivo": "Venta por factura N°000615",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000615"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 9,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 13,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
+            },
+            {
+                "fecha": "2025-05-29 18:43:27",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000631",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000631"
+            },
+            {
+                "fecha": "2025-05-29 18:55:46",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000634",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000634"
+            },
+            {
+                "fecha": "2025-05-29 18:59:59",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000636",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000636"
             }
         ]
     },
@@ -1878,7 +2300,7 @@
     "32": {
         "nombre": "SABILA + LINAZA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 974,
+        "cantidad": 954,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1923,13 +2345,37 @@
                 "motivo": "Ajuste por edición de factura N°000604",
                 "usuario": "angel",
                 "observaciones": "Cantidad anterior: 0, Nueva cantidad: 2"
+            },
+            {
+                "fecha": "2025-05-29 18:09:12",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000624",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000624"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 5,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "33": {
         "nombre": "SABILAX-6 X 12 SOBRES X 12 UNDS",
         "precio": 8.5,
-        "cantidad": 991,
+        "cantidad": 981,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -1974,13 +2420,45 @@
                 "motivo": "Venta por factura N°000612",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000612"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:09:12",
+                "tipo": "salida",
+                "cantidad": 1,
+                "motivo": "Venta por factura N°000624",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000624"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 2,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 1,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "34": {
         "nombre": "SAW PALMETO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 907,
+        "cantidad": 873,
         "categoria": "hiperplasia prostatica",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2061,13 +2539,45 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
+            },
+            {
+                "fecha": "2025-05-29 18:37:20",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000627",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000627"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 4,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "35": {
         "nombre": "UÑA DE GATO C/MAPURITE X 60 CAP",
         "precio": 3.0,
-        "cantidad": 988,
+        "cantidad": 970,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2110,6 +2620,22 @@
                 "motivo": "Venta por factura N°000612",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000612"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 15,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:55:46",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000634",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000634"
             }
         ]
     },
@@ -2161,7 +2687,7 @@
     "37": {
         "nombre": "VITAMINA E C/SELENIUM X 50 CAP",
         "precio": 4.2,
-        "cantidad": 994,
+        "cantidad": 982,
         "categoria": "Vitaminas y Minerales",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2192,13 +2718,21 @@
                 "motivo": "Venta por factura N°000605",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000605"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
             }
         ]
     },
     "38": {
         "nombre": "ZARZAPARRILLA X 60CAP",
         "precio": 3.0,
-        "cantidad": 988,
+        "cantidad": 976,
         "categoria": "Depurativo Desintoxicante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2229,6 +2763,14 @@
                 "motivo": "Venta por factura N°000603",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000603"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
             }
         ]
     },
@@ -2264,7 +2806,7 @@
     "40": {
         "nombre": "SANGRE DE DRAGO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 984,
+        "cantidad": 970,
         "categoria": "Ulcera Gastrica",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2295,13 +2837,29 @@
                 "motivo": "Venta por factura N°000618",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000618"
+            },
+            {
+                "fecha": "2025-05-29 18:30:57",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000625",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000625"
+            },
+            {
+                "fecha": "2025-05-29 18:42:26",
+                "tipo": "salida",
+                "cantidad": 4,
+                "motivo": "Venta por factura N°000630",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000630"
             }
         ]
     },
     "41": {
         "nombre": "SABILA X 60 CAP",
         "precio": 3.0,
-        "cantidad": 993,
+        "cantidad": 991,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2348,13 +2906,21 @@
                 "motivo": "Venta por factura N°000611",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000611"
+            },
+            {
+                "fecha": "2025-05-29 18:51:55",
+                "tipo": "salida",
+                "cantidad": 2,
+                "motivo": "Venta por factura N°000632",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000632"
             }
         ]
     },
     "42": {
         "nombre": "RUI BARDO X 60 CAP",
         "precio": 3.0,
-        "cantidad": 997,
+        "cantidad": 994,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2391,6 +2957,14 @@
                 "motivo": "Venta por factura N°000613",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000613"
+            },
+            {
+                "fecha": "2025-05-29 17:59:36",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000620",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000620"
             }
         ]
     },
@@ -2524,7 +3098,7 @@
     "46": {
         "nombre": "DOC QUENOPODIO X 12 UND",
         "precio": 8.0,
-        "cantidad": 982,
+        "cantidad": 977,
         "categoria": "Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2579,6 +3153,14 @@
                 "motivo": "Venta por factura N°000617",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000617"
+            },
+            {
+                "fecha": "2025-05-29 18:02:05",
+                "tipo": "salida",
+                "cantidad": 5,
+                "motivo": "Venta por factura N°000621",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000621"
             }
         ]
     },
@@ -2614,7 +3196,7 @@
     "48": {
         "nombre": "CITRATO DE MAGNESIO",
         "precio": 4.2,
-        "cantidad": 990,
+        "cantidad": 951,
         "categoria": "Vitaminas y Minerales",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2645,13 +3227,45 @@
                 "motivo": "Venta por factura N°000605",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000605"
+            },
+            {
+                "fecha": "2025-05-29 18:40:53",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000629",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000629"
+            },
+            {
+                "fecha": "2025-05-29 18:42:26",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000630",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000630"
+            },
+            {
+                "fecha": "2025-05-29 18:43:27",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000631",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000631"
+            },
+            {
+                "fecha": "2025-05-29 18:55:46",
+                "tipo": "salida",
+                "cantidad": 3,
+                "motivo": "Venta por factura N°000634",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000634"
             }
         ]
     },
     "49": {
         "nombre": "FIVERPLANT",
         "precio": 3.0,
-        "cantidad": 952,
+        "cantidad": 940,
         "categoria": "Antitumorales - anticancerigeno",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2706,6 +3320,14 @@
                 "motivo": "Venta por factura N°000611",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000611"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
             }
         ]
     },
@@ -2765,7 +3387,7 @@
     "51": {
         "nombre": "REDUCTIL FAST X 60CAPS",
         "precio": 3.2,
-        "cantidad": 988,
+        "cantidad": 976,
         "categoria": "Adelgazante-Laxante",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2796,13 +3418,21 @@
                 "motivo": "Venta por factura N°000607",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000607"
+            },
+            {
+                "fecha": "2025-05-29 18:54:01",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000633",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000633"
             }
         ]
     },
     "52": {
         "nombre": "CHAMPU DE ROMERO",
         "precio": 1.5,
-        "cantidad": 1000,
+        "cantidad": 990,
         "categoria": "COSMETICO",
         "ruta_imagen": "0",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2831,13 +3461,21 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "s"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
             }
         ]
     },
     "53": {
         "nombre": "CHAMPU 4 EN 1",
         "precio": 1.5,
-        "cantidad": 1000,
+        "cantidad": 990,
         "categoria": "COSMETICO",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2866,6 +3504,14 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "s"
+            },
+            {
+                "fecha": "2025-05-29 18:34:57",
+                "tipo": "salida",
+                "cantidad": 10,
+                "motivo": "Venta por factura N°000626",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000626"
             }
         ]
     },
@@ -2901,7 +3547,7 @@
     "55": {
         "nombre": "TOTUMO Y JEMGIBRE X 240 ML",
         "precio": 1.8,
-        "cantidad": 988,
+        "cantidad": 976,
         "categoria": "Via Respiratoria",
         "ruta_imagen": "",
         "ultima_entrada": "2025-05-22 19:57:11",
@@ -2912,6 +3558,14 @@
                 "tipo": "entrada",
                 "cantidad": 500,
                 "motivo": "s"
+            },
+            {
+                "fecha": "2025-05-29 18:05:00",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000622",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000622"
             }
         ]
     },
@@ -2919,7 +3573,7 @@
         "nombre": "SABILAX-6 X  30 UNDS",
         "categoria": "Protector Hepatico",
         "precio": 1.5,
-        "cantidad": 976,
+        "cantidad": 958,
         "ultima_entrada": "2025-05-24T21:45:07.607403",
         "historial_ajustes": [
             {
@@ -2929,6 +3583,22 @@
                 "motivo": "Venta por factura N°000609",
                 "usuario": "angel",
                 "observaciones": "Venta por factura N°000609"
+            },
+            {
+                "fecha": "2025-05-29 17:44:03",
+                "tipo": "salida",
+                "cantidad": 12,
+                "motivo": "Venta por factura N°000619",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000619"
+            },
+            {
+                "fecha": "2025-05-29 18:09:12",
+                "tipo": "salida",
+                "cantidad": 6,
+                "motivo": "Venta por factura N°000624",
+                "usuario": "admin",
+                "observaciones": "Venta por factura N°000624"
             }
         ]
     },
