@@ -1,0 +1,43 @@
+{
+    "numero_factura": "0081",
+    "fecha": "2025-05-10T02:17:35.526715",
+    "tasa_cambio": 95.0,
+    "cliente": {
+        "rif": "26369968",
+        "nombre": "gerardo",
+        "direccion": "marcay",
+        "telefono": "04121447869"
+    },
+    "items": [
+        {
+            "id": "16",
+            "nombre": "COLON CLEANSER X 60 CAP",
+            "cantidad": 400,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Limpieza De colon",
+            "ruta_imagen": ""
+        },
+        {
+            "id": "15",
+            "nombre": "COLA DE CABALLO X 60 CAP",
+            "cantidad": 300,
+            "precio_unitario_usd": 3.0,
+            "precio_unitario_bs": 285.0,
+            "categoria": "Calculo Renal",
+            "ruta_imagen": ""
+        }
+    ],
+    "subtotal_bs": 199500.0,
+    "iva_bs": 0.0,
+    "total_bs": 199500.0,
+    "subtotal_usd": 2100.0,
+    "iva_usd": 0.0,
+    "total_usd": 2100.0,
+    "condicion_pago": "Contado",
+    "dias_credito": 0,
+    "tasa_iva_aplicada": 0.0,
+    "descuento_porcentaje": 0.0,
+    "descuento_bs": 0.0,
+    "descuento_usd": 0.0
+}
