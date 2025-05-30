@@ -6,7 +6,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file, session, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file, session, abort, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -2610,7 +2610,6 @@ def registrar_pago(id):
     if id not in facturas:
         flash('Factura no encontrada', 'error')
         return redirect(url_for('mostrar_facturas'))
-    
     try:
         factura = facturas[id]
         monto = float(request.form.get('monto_pago', 0))
@@ -2621,13 +2620,9 @@ def registrar_pago(id):
         metodo = request.form.get('metodo_pago', '')
         referencia = request.form.get('referencia_pago', '')
         banco = request.form.get('banco', '')
-        
-        # Convertir monto a USD si está en Bs
         if moneda == 'Bs':
             tasa_bcv = float(factura.get('tasa_bcv', 1))
             monto = monto / tasa_bcv
-        
-        # Crear nuevo pago
         nuevo_pago = {
             'id': str(uuid.uuid4()),
             'monto': monto,
@@ -2638,34 +2633,22 @@ def registrar_pago(id):
             'captura_path': None,
             'fecha': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
-        
-        # Procesar captura si existe
         if 'captura' in request.files:
             captura = request.files['captura']
             if captura.filename:
                 filename = secure_filename(captura.filename)
-                # Guardar siempre en static/uploads/capturas/
-                carpeta_destino = os.path.join('static', 'uploads', 'capturas')
-                os.makedirs(carpeta_destino, exist_ok=True)
-                ruta_absoluta = os.path.join(carpeta_destino, filename)
+                ruta_absoluta = os.path.join(CAPTURAS_FOLDER, filename)
                 captura.save(ruta_absoluta)
-                # Guardar la ruta relativa para el JSON
-                nuevo_pago['captura_path'] = f"uploads/capturas/{filename}"
-        
+                nuevo_pago['captura_path'] = f"{CAPTURAS_URL}/{filename}"
         factura['pagos'].append(nuevo_pago)
-        
-        # Recalcular total abonado y saldo pendiente
         total_abonado = sum(float(p['monto']) for p in factura['pagos'])
         factura['total_abonado'] = total_abonado
         saldo_pendiente = factura.get('total_usd', 0) - total_abonado
-        
-        # Si el saldo pendiente es muy pequeño (menos de 0.01) o el total abonado es igual o mayor al total
         if abs(saldo_pendiente) < 0.01 or total_abonado >= factura.get('total_usd', 0):
             saldo_pendiente = 0
             factura['estado'] = 'pagada'
         else:
             factura['estado'] = 'pendiente'
-        
         factura['saldo_pendiente'] = saldo_pendiente
         facturas[id] = factura
         guardar_datos(ARCHIVO_FACTURAS, facturas)
@@ -3316,3 +3299,17 @@ def webauthn_authenticate_verify():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+# --- Configuración de rutas de capturas según entorno ---
+IS_RENDER = os.environ.get('RENDER', False) or os.environ.get('RENDER_EXTERNAL_HOSTNAME', False)
+if IS_RENDER:
+    CAPTURAS_FOLDER = '/data/uploads/capturas'
+    CAPTURAS_URL = '/uploads/capturas'
+else:
+    CAPTURAS_FOLDER = os.path.join('static', 'uploads', 'capturas')
+    CAPTURAS_URL = '/static/uploads/capturas'
+os.makedirs(CAPTURAS_FOLDER, exist_ok=True)
+
+@app.route('/uploads/capturas/<filename>')
+def serve_captura(filename):
+    return send_from_directory(CAPTURAS_FOLDER, filename)
