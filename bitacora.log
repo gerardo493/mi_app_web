@@ -486,3 +486,7 @@ T e s t   d e   v e l o c i d a d  
 [2025-05-29 21:13:25] Usuario: admin | Acción: Intento fallido | Detalles: Intento fallido de inicio de sesión | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
 [2025-05-29 21:13:45] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
 [2025-05-29 21:13:47] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 96.8577 | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
+[2025-05-29 21:15:02] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 96.8577 | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
+[2025-05-29 21:15:52] Usuario: admin | Acción: Cierre de sesión | Detalles: Sesión finalizada | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
+[2025-05-29 21:15:57] Usuario: admin | Acción: Inicio de sesión | Detalles: Inicio de sesión exitoso | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
+[2025-05-29 21:16:01] Usuario: admin | Acción: Actualizar tasa BCV | Detalles: Tasa: 96.8577 | IP: 190.202.123.123 | Ubicación: Maracay, Aragua, Venezuela | Coordenadas: 10.2268928,-67.5807232
