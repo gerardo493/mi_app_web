@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Facturación{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='LOGO-KISVIC.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #3498db;
+            --sidebar-width: 240px;
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -220px;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: #fff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 2rem;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+            transition: left 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.2s;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar.visible {
+            left: 0;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.18);
+        }
+        .sidebar-tab {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 90px;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: #fff;
+            border-radius: 0 20px 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            cursor: pointer;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.10);
+        }
+        .sidebar-tab i {
+            font-size: 1.5rem;
+        }
+        .sidebar .logo {
+            width: 80px;
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+        .sidebar .nav {
+            width: 100%;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            border-radius: 30px 0 0 30px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            position: relative;
+        }
+        .sidebar .nav-link .fa {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            transition: transform 0.3s, color 0.3s;
+        }
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            background: linear-gradient(90deg, #0d47a1 60%, #42a5f5 100%);
+            color: #fff;
+            transform: translateX(8px) scale(1.04);
+            box-shadow: 2px 4px 16px rgba(66,165,245,0.08);
+        }
+        .sidebar .nav-link.active .fa, .sidebar .nav-link:hover .fa {
+            color: #ffd600;
+            transform: scale(1.2) rotate(-10deg);
+            filter: drop-shadow(0 0 6px #ffd60088);
+        }
+        .sidebar .logout {
+            margin-top: auto;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        .sidebar .logout .nav-link {
+            color: #ff5252;
+            background: none;
+        }
+        .sidebar .logout .nav-link:hover {
+            background: linear-gradient(90deg, #b71c1c 60%, #ff5252 100%);
+            color: #fff;
+        }
+        .main-content {
+            margin-left: 0;
+            padding: 2rem 1rem 1rem 1rem;
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+        .sidebar.visible ~ .main-content {
+            margin-left: var(--sidebar-width);
+        }
+        @media (max-width: 991px) {
+            .sidebar {
+                left: -260px;
+                transition: left 0.3s;
+            }
+            .sidebar.visible {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            .sidebar-tab {
+                top: 10px;
+                left: 10px;
+                transform: none;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                font-size: 2rem;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-toggle .fa-bars {
+            font-size: 1.7rem;
+            color: var(--primary-color);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="sidebar-tab" id="sidebarTab" title="Mostrar menú"><i class="fas fa-angle-right"></i></div>
+    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo user-logo" style="
+            width: 80px; height: 80px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; box-shadow: 0 4px 16px rgba(26,35,126,0.10); border: 2px solid #b8c1ec;">
+            <span style="font-size:2.5rem; font-weight:800; color:#1A237E; text-transform:uppercase; letter-spacing:1px;">
+                {{ session.get('nombre', 'U')[0] }}{{ session.get('apellido', 'S')[0] }}
+            </span>
+        </div>
+        <div style="color:#fff; font-weight:600; font-size:1.1rem; margin-bottom:2rem; text-align:center; word-break:break-word;">
+            {{ session['usuario'] }}
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"><i class="fas fa-home"></i> Inicio</a>
+            <a class="nav-link {% if '/clientes' in request.path %}active{% endif %}" href="/clientes"><i class="fas fa-users"></i> Clientes</a>
+            <a class="nav-link {% if '/inventario' in request.path %}active{% endif %}" href="/inventario"><i class="fas fa-box"></i> Inventario</a>
+            <a class="nav-link {% if '/facturas' in request.path %}active{% endif %}" href="/facturas"><i class="fas fa-file-invoice"></i> Facturas</a>
+            <a class="nav-link {% if '/cotizaciones' in request.path %}active{% endif %}" href="/cotizaciones"><i class="fas fa-file-alt"></i> Cotizaciones</a>
+            <a class="nav-link {% if '/cuentas-por-cobrar' in request.path %}active{% endif %}" href="/cuentas-por-cobrar"><i class="fas fa-money-bill-wave"></i> Cuentas por Cobrar</a>
+            <a class="nav-link {% if '/pagos-recibidos' in request.path %}active{% endif %}" href="/pagos-recibidos"><i class="fas fa-cash-register"></i> Pagos Recibidos</a>
+            <a class="nav-link {% if '/bitacora' in request.path %}active{% endif %}" href="/bitacora"><i class="fas fa-book"></i> Bitácora</a>
+        </nav>
+        <div class="logout">
+            {% if session['usuario'] %}
+            <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar sesión ({{ session['usuario'] }})</a>
+            {% endif %}
+        </div>
+    </aside>
+    <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Kisvic 1045 C.A . Todos los derechos reservados.</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Sidebar toggle para móviles y escritorio
+        document.addEventListener('DOMContentLoaded', function() {
+            var sidebar = document.getElementById('sidebar');
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebarTab = document.getElementById('sidebarTab');
+            var hideTimeout = null;
+            var isMobile = window.matchMedia('(max-width: 991px)').matches;
+
+            // Mostrar sidebar al pasar el mouse por el borde izquierdo o la pestaña
+            function showSidebar() {
+                sidebar.classList.add('visible');
+                sidebarTab.style.display = 'none';
+            }
+            // Ocultar sidebar al salir
+            function hideSidebar() {
+                sidebar.classList.remove('visible');
+                sidebarTab.style.display = 'flex';
+            }
+            // Mostrar sidebar si el mouse/touch está en el borde izquierdo
+            function handleEdge(e) {
+                var x = e.touches ? e.touches[0].clientX : e.clientX;
+                var threshold = isMobile ? 40 : 20;
+                if (x <= threshold && !sidebar.classList.contains('visible')) {
+                    showSidebar();
+                }
+            }
+            document.body.addEventListener('mousemove', handleEdge);
+            document.body.addEventListener('touchstart', handleEdge);
+            // Mostrar sidebar al hacer click/touch en la pestaña
+            sidebarTab.addEventListener('mouseenter', showSidebar);
+            sidebarTab.addEventListener('click', showSidebar);
+            sidebarTab.addEventListener('touchstart', function(e) { e.preventDefault(); showSidebar(); });
+            // Ocultar sidebar al salir
+            sidebar.addEventListener('mouseleave', function(e) {
+                // Solo ocultar si el mouse sale completamente de la sidebar
+                var x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+                if (x > sidebar.offsetWidth) {
+                    hideSidebar();
+                }
+            });
+            // Ocultar sidebar si se hace click/touch fuera de ella
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target) && !sidebarTab.contains(e.target) && sidebar.classList.contains('visible')) {
+                    hideSidebar();
+                }
+            });
+            document.addEventListener('touchstart', function(e) {
+                if (!sidebar.contains(e.target) && !sidebarTab.contains(e.target) && sidebar.classList.contains('visible')) {
+                    hideSidebar();
+                }
+            });
+            // Inicialmente oculta
+            hideSidebar();
+            // Sidebar toggle para móviles
+            toggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

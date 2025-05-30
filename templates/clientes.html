@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Clientes{% endblock %}
+
+{% block content %}
+<style>
+    .clientes-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 1.5rem;
+    }
+
+    .search-card .input-group {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .search-card .input-group-text {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+    }
+
+    .search-card .form-control {
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        color: #1a237e;
+    }
+
+    .search-card .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+        border-color: #1a237e;
+    }
+
+    .search-card .form-select {
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        color: #1a237e;
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .search-card .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+        border-color: #1a237e;
+    }
+
+    .search-card .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .search-card .btn-primary:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .table th {
+        background-color: #1a237e;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+    }
+
+    .table td {
+        font-size: 1.1rem;
+        color: #1a237e;
+        padding: 1rem;
+        vertical-align: middle;
+        font-weight: 500;
+    }
+
+    .cliente-info {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1a237e;
+    }
+
+    .cliente-info:hover {
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        margin: 0 0.1rem;
+    }
+
+    .contact-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-whatsapp {
+        background-color: #25D366;
+        color: white;
+    }
+
+    .btn-whatsapp:hover {
+        background-color: #128C7E;
+        color: white;
+    }
+
+    .btn-gmail {
+        background-color: #EA4335;
+        color: white;
+    }
+
+    .btn-gmail:hover {
+        background-color: #D33426;
+        color: white;
+    }
+
+    .fa-gmail:before {
+        content: "G";
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+    }
+
+    .badge {
+        font-size: 1rem;
+        padding: 0.6em 1em;
+        font-weight: 600;
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .text-muted {
+        font-size: 1rem;
+        color: #1a237e !important;
+        font-weight: 500;
+    }
+
+    .text-muted i {
+        margin-right: 5px;
+        color: #1a237e;
+    }
+
+    .btn-sm {
+        font-size: 1rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+        .table-responsive {
+            font-size: 1rem;
+        }
+        .btn-action {
+            padding: 0.2rem 0.4rem;
+        }
+        .cliente-info {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="clientes-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-users me-2"></i>Gestión de Clientes</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('reporte_clientes') }}" class="btn btn-info">
+                    <i class="fas fa-chart-bar me-2"></i>Ver Reporte
+                </a>
+                <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                </a>
+            </div>
+        </div>
+
+        <div class="search-card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" name="q" 
+                                   placeholder="Buscar por nombre o RIF del cliente..." value="{{ q or '' }}"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="orden" class="form-select">
+                            <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>
+                                <i class="fas fa-sort-alpha-down"></i> Ordenar por Nombre
+                            </option>
+                            <option value="rif" {% if filtro_orden == 'rif' %}selected{% endif %}>
+                                <i class="fas fa-sort-numeric-down"></i> Ordenar por RIF
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>RIF</th>
+                                <th>Nombre</th>
+                                <th>Contacto</th>
+                                <th>Dirección</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, cliente in clientes.items() %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">{{ id }}</span>
+                                </td>
+                                <td>
+                                    <div class="cliente-info" title="{{ cliente.nombre }}">
+                                        {{ cliente.nombre }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="contact-buttons">
+                                        {% if cliente.telefono %}
+                                        <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" 
+                                           class="btn btn-whatsapp btn-sm" title="Enviar WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if cliente.email %}
+                                        <a href="mailto:{{ cliente.email }}" class="btn btn-gmail btn-sm" title="Enviar Email">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        {% if cliente.telefono %}
+                                        <i class="fab fa-whatsapp"></i> {{ cliente.telefono }}<br>
+                                        {% endif %}
+                                        {% if cliente.email %}
+                                        <i class="fas fa-envelope"></i> {{ cliente.email }}
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="cliente-info" title="{{ cliente.direccion }}">
+                                        {{ cliente.direccion }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('historial_cliente', id=id) }}" 
+                                           class="btn btn-info btn-action" title="Ver historial">
+                                            <i class="fas fa-history"></i>
+                                        </a>
+                                        <a href="{{ url_for('editar_cliente', id=id) }}" 
+                                           class="btn btn-warning btn-action" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger btn-action" title="Eliminar"
+                                                onclick="confirmarEliminacion('{{ id }}', '{{ cliente.nombre }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar al cliente <strong id="nombreCliente"></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar Cliente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto py-3 bg-light text-center">
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmarEliminacion(id, nombre) {
+    document.getElementById('nombreCliente').textContent = nombre;
+    document.getElementById('formEliminar').action = `/clientes/${id}/eliminar`;
+    new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+}
+</script>
+{% endblock %}

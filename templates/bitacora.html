@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% block title %}Bitácora del Sistema{% endblock %}
+{% block content %}
+<style>
+    .bitacora-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem 2rem 1rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .bitacora-header h4 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    .bitacora-header i {
+        font-size: 2.2rem;
+        margin-right: 1rem;
+    }
+    .bitacora-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .bitacora-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(13,71,161,0.10);
+    }
+    .bitacora-card .card-body {
+        padding: 1.5rem;
+    }
+    .bitacora-filtros {
+        background: #e3eafc;
+        border-radius: 10px;
+        padding: 1rem 1.5rem 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(13,71,161,0.04);
+    }
+    .bitacora-filtros .form-control, .bitacora-filtros .form-select {
+        border-radius: 8px;
+        border: 1px solid #b0bec5;
+        font-size: 1rem;
+    }
+    .bitacora-filtros .btn-primary {
+        background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+    }
+    .table thead th {
+        background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+        color: white;
+        font-weight: 700;
+        border-top: none;
+        font-size: 1.05rem;
+        letter-spacing: 0.5px;
+    }
+    .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: #f4f8fd;
+    }
+    .table-striped > tbody > tr:nth-of-type(even) {
+        background-color: #e3eafc;
+    }
+    .table tbody tr:hover {
+        background: #bbdefb !important;
+        transform: scale(1.01);
+        box-shadow: 0 2px 8px rgba(13,71,161,0.10);
+    }
+    .table td, .table th {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+    }
+    .table td {
+        font-size: 0.98rem;
+    }
+    .table a.text-primary {
+        color: #1976d2 !important;
+        text-decoration: underline;
+        font-weight: 500;
+    }
+    .alert-info {
+        background: #e3eafc;
+        color: #0d47a1;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .btn-limpiar {
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%) !important;
+        color: #fff !important;
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(211,47,47,0.10);
+        padding: 0.5rem 1.2rem;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-limpiar:hover, .btn-limpiar:focus {
+        background: linear-gradient(90deg, #b71c1c 0%, #d32f2f 100%) !important;
+        box-shadow: 0 4px 16px rgba(211,47,47,0.18);
+        color: #fff !important;
+    }
+</style>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch('/guardar_ubicacion_precisa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                })
+            });
+        });
+    }
+});
+</script>
+<div class="container mt-4">
+    <div class="bitacora-header mb-4">
+        <h4 class="mb-0"><i class="fas fa-book"></i> Bitácora del Sistema</h4>
+        {% if lineas %}
+        <form method="POST" action="{{ url_for('limpiar_bitacora') }}" onsubmit="return confirm('¿Seguro que deseas borrar toda la bitácora?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-limpiar"><i class="fas fa-trash"></i> Limpiar Bitácora</button>
+        </form>
+        {% endif %}
+    </div>
+    <div class="bitacora-card">
+        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+            <form method="get" class="row g-2 mb-3 bitacora-filtros align-items-end">
+                <div class="col-md-4">
+                    <label for="fecha" class="form-label mb-1">Fecha</label>
+                    <input type="date" class="form-control" id="fecha" name="fecha" value="{{ filtro_fecha }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="accion" class="form-label mb-1">Acción</label>
+                    <select name="accion" id="accion" class="form-select">
+                        <option value="">Todas las acciones</option>
+                        {% for accion in acciones_unicas %}
+                        <option value="{{ accion }}" {% if filtro_accion == accion %}selected{% endif %}>{{ accion }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Filtrar</button>
+                </div>
+            </form>
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Detalles</th>
+                        <th>IP</th>
+                        <th>Ubicación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for linea in lineas|reverse %}
+                        {% set partes = linea.strip().split('] ', 1) %}
+                        {% if partes|length == 2 %}
+                            <tr>
+                                <td>{{ partes[0][1:] }}</td>
+                                {% set resto = partes[1].split(' | ') %}
+                                <td>{{ resto[0].replace('Usuario: ', '') }}</td>
+                                <td>{{ resto[1].replace('Acción: ', '') }}</td>
+                                <td>{{ resto[2].replace('Detalles: ', '') }}</td>
+                                <td>
+                                    {% if resto|length > 3 %}
+                                        {% set ip = resto[3].replace('IP: ', '').strip() %}
+                                        {% if ip and ip != '-' %}
+                                            <a href="https://ipinfo.io/{{ ip }}" target="_blank" class="text-primary">
+                                                <i class="fas fa-globe"></i> {{ ip }}
+                                            </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if resto|length > 5 %}
+                                        {% set coords = resto[5].replace('Coordenadas: ', '').strip() %}
+                                        {% set ubic = resto[4].replace('Ubicación: ', '').strip() %}
+                                        {% if coords and coords != ',' and ubic %}
+                                            <a href="https://www.google.com/maps?q={{ coords }}" target="_blank" class="text-primary">
+                                                <i class="fas fa-map-marker-alt"></i> {{ ubic }}
+                                            </a>
+                                        {% else %}
+                                            {{ ubic }}
+                                        {% endif %}
+                                    {% else %}
+                                        {% if resto|length > 4 %}{{ resto[4].replace('Ubicación: ', '') }}{% else %}-{% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not lineas %}
+                <div class="alert alert-info text-center">No hay registros en la bitácora.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

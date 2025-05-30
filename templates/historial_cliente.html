@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ cliente.nombre }}{% endblock %}
+
+{% block content %}
+<style>
+    .historial-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stats-card.primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+    }
+
+    .stats-card.success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        color: white;
+    }
+
+    .stats-card.info {
+        background: linear-gradient(135deg, #0277bd 0%, #01579b 100%);
+        color: white;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .card-header h4 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-card .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .h4 {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card .h5 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        opacity: 0.9;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        z-index: 0;
+    }
+
+    .stats-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+    }
+
+    .table th {
+        background-color: #1a237e;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        letter-spacing: 0.8px;
+        padding: 1rem;
+    }
+
+    .table td {
+        font-size: 1.15rem;
+        color: #1a237e;
+        padding: 1rem;
+        vertical-align: middle;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .badge {
+        font-size: 1.1rem;
+        padding: 0.6em 1em;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    }
+
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #f57f17 0%, #ff6f00 100%);
+    }
+
+    .btn {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0.5rem 1rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #37474f 100%);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #37474f 0%, #455a64 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .form-select {
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        color: #1a237e;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 8px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+        border-color: #1a237e;
+    }
+
+    .cliente-info p {
+        font-size: 1.15rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        margin-bottom: 1rem;
+    }
+
+    .cliente-info strong {
+        font-weight: 700;
+        color: #1a237e;
+    }
+
+    .text-danger {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-sm {
+        font-size: 1.1rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .credito-info {
+        font-size: 1.05rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        line-height: 1.4;
+    }
+
+    @media print {
+        .btn-group, .navbar {
+            display: none !important;
+        }
+        .card {
+            break-inside: avoid;
+        }
+        .page-header {
+            background: none !important;
+            color: #1a237e !important;
+            box-shadow: none !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 1.8rem;
+        }
+        .stats-card .card-title {
+            font-size: 1.1rem;
+        }
+        .stats-card .h4 {
+            font-size: 1.8rem;
+        }
+        .stats-card .h5 {
+            font-size: 1.3rem;
+        }
+        .table td, .table th {
+            font-size: 1rem;
+        }
+        .btn {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="historial-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-history me-2"></i>Historial de {{ cliente.nombre }}</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+                </a>
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="fas fa-print me-2"></i>Imprimir Historial
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtro por año y mes -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <select name="anio" class="form-select" id="filtroAnio">
+                            {% for anio in anios_disponibles %}
+                            <option value="{{ anio }}" {% if anio == filtro_anio %}selected{% endif %}>{{ anio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="mes" class="form-select" id="filtroMes">
+                            <option value="">Todos los meses</option>
+                            {% for m in range(1, 13) %}
+                            <option value="{{ m }}" {% if m == filtro_mes|int %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen de Facturación del Cliente -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card primary">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-filter me-2"></i>Total Facturado (Filtrado)
+                        </h6>
+                        <div class="h4 mb-2">${{ total_compras|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_bs|default(0)|es_number }} Bs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card success">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-calendar-alt me-2"></i>Total Facturado (Año Actual)
+                        </h6>
+                        <div class="h4 mb-2">${{ total_anual_usd|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_anual_bs|default(0)|es_number }} Bs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card info">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-calendar-day me-2"></i>Total Facturado (Mes Actual)
+                        </h6>
+                        <div class="h4 mb-2">${{ total_mensual_usd|default(0)|es_number }}</div>
+                        <div class="h5">{{ total_mensual_bs|default(0)|es_number }} Bs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-user me-2"></i>Información del Cliente</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="cliente-info">
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-building"></i>
+                                    Información de la Empresa
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Nombre:</strong><br>
+                                        <span class="info-value">{{ cliente.nombre }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-address-card"></i>
+                                    Información de Contacto
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Email:</strong><br>
+                                        <span class="info-value">{{ cliente.email or 'No disponible' }}</span>
+                                    </p>
+                                    <p class="mb-3">
+                                        <strong>Teléfono:</strong><br>
+                                        <span class="info-value">{{ cliente.telefono or 'No disponible' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Ubicación
+                                </h5>
+                                <div class="info-content">
+                                    <p class="mb-3">
+                                        <strong>Dirección:</strong><br>
+                                        <span class="info-value">{{ cliente.direccion or 'No disponible' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {% if cliente.direccion %}
+                        <div class="map-container">
+                            <div id="map"></div>
+                            <div class="map-overlay">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Ubicación del cliente
+                            </div>
+                        </div>
+                        <div class="map-actions">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ cliente.direccion|urlencode }}" 
+                               target="_blank" 
+                               class="btn btn-primary btn-navigation">
+                                <i class="fas fa-directions"></i>
+                                Comenzar Ruta
+                            </a>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle"></i> Puedes cambiar entre diferentes vistas del mapa usando el control en la esquina superior derecha.
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="cliente-actions">
+                    {% if cliente.email %}
+                    <a href="mailto:{{ cliente.email }}" class="btn btn-success">
+                        <i class="fas fa-envelope"></i>
+                        Enviar Email
+                    </a>
+                    {% endif %}
+                    {% if cliente.telefono %}
+                    <a href="https://wa.me/{{ cliente.telefono }}" target="_blank" class="btn btn-success">
+                        <i class="fab fa-whatsapp"></i>
+                        Enviar WhatsApp
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos Comprados -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Productos Comprados</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad Total</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, stats in productos_comprados.items() %}
+                            <tr>
+                                <td>{{ stats.nombre }}</td>
+                                <td>{{ stats.cantidad }}</td>
+                                <td>${{ stats.valor|es_number }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Facturas -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Historial de Facturas</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Total (USD $)</th>
+                                <th>Total (Bs)</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for factura in facturas|sort(attribute='fecha', reverse=true) %}
+                            <tr>
+                                <td>{{ factura.id }}</td>
+                                <td>{{ factura.fecha }}</td>
+                                <td>${{ (factura.total_usd or 0)|es_number }}</td>
+                                <td>{{ (factura.total_bs or 0)|es_number }} Bs</td>
+                                <td>
+                                    {% if factura.estado == 'pagada' %}
+                                    <span class="badge bg-success">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    {% endif %}
+                                    {% if factura.condicion_pago == 'credito' %}
+                                        <div class="credito-info">
+                                            Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
+                                            Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('ver_factura', id=factura.id) }}" class="btn btn-info btn-sm" title="Ver factura">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('editar_factura', id=factura.id) }}" class="btn btn-warning btn-sm" title="Editar factura">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    #map:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: #1a237e;
+    }
+
+    .map-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .map-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        font-size: 0.9rem;
+        color: #1a237e;
+        font-weight: 500;
+    }
+
+    .map-overlay i {
+        margin-right: 5px;
+        color: #1a237e;
+    }
+
+    .cliente-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .cliente-info p {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #2c3e50;
+        line-height: 1.6;
+    }
+
+    .cliente-info strong {
+        color: #1a237e;
+        font-weight: 600;
+    }
+
+    .cliente-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .cliente-actions .btn {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .cliente-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    }
+
+    @media (max-width: 768px) {
+        #map {
+            height: 300px;
+        }
+        
+        .cliente-actions .btn {
+            min-width: 100%;
+        }
+    }
+
+    .info-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .info-section:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        color: #1a237e;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-title i {
+        color: #1a237e;
+        font-size: 1.1rem;
+    }
+
+    .info-content {
+        padding: 0.5rem 0;
+    }
+
+    .info-value {
+        display: block;
+        margin-top: 0.5rem;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .cliente-info strong {
+        color: #1a237e;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .info-section {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+        }
+    }
+
+    .map-actions {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .btn-navigation {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-navigation:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .btn-navigation i {
+        font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+        .btn-navigation {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function initMap() {
+    {% if cliente.direccion %}
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: { lat: 10.5, lng: -66.9 },
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.TOP_RIGHT
+        },
+        streetViewControl: true,
+        fullscreenControl: true
+    });
+
+    var geocoder = new google.maps.Geocoder();
+    var address = "{{ cliente.direccion }}";
+    
+    geocoder.geocode({ 'address': address }, function(results, status) {
+        if (status === 'OK') {
+            map.setCenter(results[0].geometry.location);
+            
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location,
+                title: "{{ cliente.nombre }}"
+            });
+
+            var infowindow = new google.maps.InfoWindow({
+                content: "<strong>{{ cliente.nombre }}</strong><br>{{ cliente.direccion }}"
+            });
+
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
+
+            infowindow.open(map, marker);
+        }
+    });
+    {% endif %}
+}
+
+function loadGoogleMapsScript() {
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDwc6TnKyHP0Q6O6tNo4_RfK24CuKvM524&callback=initMap';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('filtroAnio').focus();
+    {% if cliente.direccion %}
+    loadGoogleMapsScript();
+    {% endif %}
+});
+</script>
+{% endblock %}
+{% endblock %} 

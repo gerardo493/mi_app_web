@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+{% block title %}Lista de Precios{% endblock %}
+{% block content %}
+<style>
+/* COLORES SÓLIDOS Y PRINT COLOR ADJUST PARA PDF */
+.page-header, .categoria-header {
+    background: #1a237e !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.categoria-header h4 {
+    color: #fff !important;
+}
+.empresa-logo {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+body, .lista-precios-container {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.table thead th {
+    background: #1a237e !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+.lista-precios-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+.page-header {
+    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+}
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+.empresa-logo {
+    width: 100px;
+    height: auto;
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: white;
+    padding: 5px;
+}
+.empresa-info {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 0 2rem;
+}
+.empresa-nombre {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.8rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+}
+.empresa-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+.empresa-details p {
+    margin: 0;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+.empresa-details i {
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+    color: rgba(255,255,255,0.9);
+}
+.titulo-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+.titulo-lista {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+.fecha-emision {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.9);
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+.btn-download {
+    background: white;
+    color: #1a237e;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.btn-download:hover {
+    background: #f0f0f0;
+    color: #1a237e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.categoria-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.categoria-header {
+    background: #1a237e;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+}
+.categoria-header h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+.table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table thead th {
+    background: #f8f9fa;
+    color: #1a237e;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 1rem;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+.table tbody td {
+    padding: 0.8rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+    color: #333;
+    font-size: 0.95rem;
+}
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+.text-center {
+    text-align: center !important;
+}
+.text-end {
+    text-align: right !important;
+}
+
+/* Estilos para los filtros */
+.filtros-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.filtros-section .form-control,
+.filtros-section .form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    color: #1a237e;
+}
+.filtros-section .form-control:focus,
+.filtros-section .form-select:focus {
+    border-color: #1a237e;
+    box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.15);
+}
+.filtros-section .btn-primary {
+    background: #1a237e;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+}
+.filtros-section .btn-primary:hover {
+    background: #0d47a1;
+    transform: translateY(-1px);
+}
+.filtros-section .btn-outline-secondary {
+    border-color: #dee2e6;
+    color: #1a237e;
+}
+.filtros-section .btn-outline-secondary:hover {
+    background: #f8f9fa;
+    color: #1a237e;
+}
+</style>
+
+{% if pdf %}
+<style>
+    body, .page-header, .categoria-section, .table {
+        font-family: 'Segoe UI', Arial, Helvetica, sans-serif !important;
+    }
+    .page-header {
+        background: #1a237e !important;
+        color: #fff !important;
+        padding: 2rem 2rem 1.5rem 2rem;
+        margin-bottom: 2rem;
+        border: none;
+        text-align: center;
+    }
+    .header-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 1.2rem;
+    }
+    .header-table td {
+        vertical-align: middle;
+        border: none;
+        padding: 0;
+    }
+    .empresa-logo {
+        width: 90px;
+        height: auto;
+        border-radius: 8px;
+        background: #fff;
+        padding: 5px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: block;
+        margin-right: 1.5rem;
+    }
+    .empresa-info {
+        text-align: left;
+        padding-left: 1.5rem;
+    }
+    .empresa-nombre {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+    .empresa-details {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #fff;
+    }
+    .empresa-details p {
+        margin: 0.2rem 0;
+        font-size: 0.95rem;
+        color: #fff;
+        font-weight: 500;
+        background: none;
+        padding: 0;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+    }
+    .empresa-details i {
+        width: 18px;
+        text-align: center;
+        margin-right: 6px;
+        color: #fff;
+    }
+    .header-separator {
+        border: none;
+        border-top: 2px solid #fff;
+        margin: 1.2rem 0 1.2rem 0;
+    }
+    .titulo-section {
+        text-align: center;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 2px solid #fff;
+    }
+    .titulo-lista {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 0.4rem 0;
+    }
+    .fecha-emision {
+        font-size: 0.95rem;
+        color: #fff;
+        margin: 0.4rem 0;
+        font-weight: 500;
+    }
+    /* --- EVITAR SALTOS DE PÁGINA FEOS EN PDF --- */
+    .categoria-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+    }
+    .categoria-header {
+        page-break-after: avoid;
+        break-after: avoid;
+        background: #1a237e;
+        color: #fff;
+        padding: 0.7rem 1.2rem;
+        border-radius: 8px 8px 0 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    .categoria-header h4 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        font-size: 0.97rem;
+    }
+    .table thead th {
+        background: #1a237e;
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.95rem;
+        padding: 0.7rem 0.5rem;
+        border: 1px solid #1a237e;
+        white-space: nowrap;
+        text-align: center;
+    }
+    .table tbody td {
+        padding: 0.6rem 0.5rem;
+        vertical-align: middle;
+        border: 1px solid #1a237e;
+        color: #222;
+        font-size: 0.97rem;
+        text-align: center;
+    }
+    .table tbody tr:nth-child(even) td {
+        background: #f3f6fa;
+    }
+    .table tbody tr:nth-child(odd) td {
+        background: #fff;
+    }
+    .fw-medium {
+        font-weight: 600;
+    }
+</style>
+{% endif %}
+
+<div class="lista-precios-container">
+    <div class="container">
+        <div class="page-header">
+            {% if pdf %}
+            <table class="header-table">
+                <tr>
+                    <td style="width:110px;">
+                        <img src="{{ empresa.logo }}" alt="Logo {{ empresa.nombre }}" class="empresa-logo">
+                    </td>
+                    <td class="empresa-info">
+                        <div class="empresa-nombre">{{ empresa.nombre }}</div>
+                        <div class="empresa-details">
+                            <p><i class="fas fa-map-marker-alt"></i> {{ empresa.direccion }}</p>
+                            <p><i class="fas fa-phone"></i> {{ empresa.telefono }}</p>
+                            <p><i class="fas fa-envelope"></i> {{ empresa.email }}</p>
+                            {% if empresa.rif %}
+                            <p><i class="fas fa-id-card"></i> RIF: {{ empresa.rif }}</p>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <hr class="header-separator">
+            <div class="titulo-section">
+                <h2 class="titulo-lista">
+                    <i class="fas fa-list me-2"></i>
+                    {% if tipo == 'detal' %}Lista de Precio a Tiendas{% else %}Lista de Precios a Distribuidores{% endif %}
+                </h2>
+                <p class="fecha-emision">Fecha de emisión: {{ now.strftime('%d/%m/%Y %H:%M') }}</p>
+            </div>
+            {% else %}
+            <div class="header-content">
+                {% if empresa.logo %}
+                <img src="{{ url_for('static', filename=empresa.logo) }}" alt="Logo {{ empresa.nombre }}" class="empresa-logo">
+                {% endif %}
+                <div class="empresa-info">
+                    <h3 class="empresa-nombre">{{ empresa.nombre }}</h3>
+                    <div class="empresa-details">
+                        <p><i class="fas fa-map-marker-alt"></i> {{ empresa.direccion }}</p>
+                        <p><i class="fas fa-phone"></i> {{ empresa.telefono }}</p>
+                        <p><i class="fas fa-envelope"></i> {{ empresa.email }}</p>
+                        {% if empresa.rif %}
+                        <p><i class="fas fa-id-card"></i> RIF: {{ empresa.rif }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="titulo-section">
+                    <h2 class="titulo-lista">
+                        <i class="fas fa-list me-2"></i>
+                        {% if tipo == 'detal' %}Lista de Precio a Tiendas{% else %}Lista de Precios a Distribuidores{% endif %}
+                    </h2>
+                    <p class="fecha-emision">Fecha de emisión: {{ now.strftime('%d/%m/%Y %H:%M') }}</p>
+                    {% if not pdf %}
+                    <a id="btnDescargarPDF" href="#" class="btn-download">
+                        <i class="fas fa-download"></i>
+                        Descargar PDF
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if not pdf %}
+        <div class="filtros-section">
+            <form method="get" class="row g-3">
+                <input type="hidden" name="tipo" value="{{ tipo }}">
+                <div class="col-md-3">
+                    <label for="categoria" class="form-label">Categoría</label>
+                    <select name="categoria" id="categoria" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% for cat in categorias %}
+                        <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="precio_min" class="form-label">Precio Mínimo</label>
+                    <input type="number" class="form-control" id="precio_min" name="precio_min" 
+                           value="{{ filtro_precio_min or '' }}" step="0.01" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label for="precio_max" class="form-label">Precio Máximo</label>
+                    <input type="number" class="form-control" id="precio_max" name="precio_max" 
+                           value="{{ filtro_precio_max or '' }}" step="0.01" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label for="busqueda" class="form-label">Búsqueda</label>
+                    <input type="text" class="form-control" id="busqueda" name="busqueda" 
+                           value="{{ filtro_busqueda or '' }}" placeholder="Buscar producto...">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i>Filtrar
+                    </button>
+                    <a href="{{ url_for('lista_precios', tipo=tipo) }}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-times me-2"></i>Limpiar Filtros
+                    </a>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        {% set categorias = {} %}
+        {% for id, producto in inventario.items() %}
+            {% if producto.categoria not in categorias %}
+                {% set _ = categorias.update({producto.categoria: {}}) %}
+            {% endif %}
+            {% set _ = categorias[producto.categoria].update({id: producto}) %}
+        {% endfor %}
+
+        {% for categoria, productos in categorias.items() %}
+        <div class="categoria-section">
+            <div class="categoria-header">
+                <h4><i class="fas fa-tags me-2"></i>{{ categoria }}</h4>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Nombre</th>
+                            <th style="width: 120px;">Precio</th>
+                            {% if not pdf %}
+                            <th style="width: 100px;">Stock</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for id, producto in productos.items() %}
+                        <tr>
+                            <td class="text-center fw-medium">{{ id }}</td>
+                            <td class="fw-medium">{{ producto.nombre }}</td>
+                            <td class="text-end fw-medium">${{ "%.2f"|format(producto.get('precio_detal' if tipo == 'detal' else 'precio_distribuidor', producto.get('precio', 0))) }}</td>
+                            {% if not pdf %}
+                            <td class="text-center fw-medium">{{ producto.cantidad }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if not pdf %}
+<script>
+// --- Botón de descarga PDF con filtros activos ---
+document.addEventListener('DOMContentLoaded', function() {
+    var btnPDF = document.getElementById('btnDescargarPDF');
+    if (btnPDF) {
+        btnPDF.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Obtener los valores de los filtros
+            var params = [];
+            var categoria = document.getElementById('categoria').value;
+            var precioMin = document.getElementById('precio_min').value;
+            var precioMax = document.getElementById('precio_max').value;
+            var busqueda = document.getElementById('busqueda').value;
+            if (categoria) params.push('categoria=' + encodeURIComponent(categoria));
+            if (precioMin) params.push('precio_min=' + encodeURIComponent(precioMin));
+            if (precioMax) params.push('precio_max=' + encodeURIComponent(precioMax));
+            if (busqueda) params.push('busqueda=' + encodeURIComponent(busqueda));
+            var query = params.length ? ('?' + params.join('&')) : '';
+            var tipo = '{{ tipo }}';
+            var url = "{{ url_for('lista_precios_pdf', tipo='TIPO_PLACEHOLDER') }}".replace('TIPO_PLACEHOLDER', tipo) + query;
+            window.open(url, '_blank');
+        });
+    }
+});
+</script>
+{% endif %}
+{% endblock %} 

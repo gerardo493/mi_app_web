@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Producto' if producto else 'Nuevo Producto' }}{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(120deg, #e9f2fb 0%, #f8fbff 100%);
+    }
+    .producto-form-card {
+        border: 2px solid #1976d2;
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 24px 0 rgba(25, 118, 210, 0.08), 0 1.5px 4px 0 rgba(25, 118, 210, 0.10);
+        background: #fff;
+        overflow: hidden;
+    }
+    .form-label {
+        color: #1976d2;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-label .icon {
+        width: 1.2em;
+        text-align: center;
+    }
+    .img-preview-box {
+        background: linear-gradient(135deg, #e3f0fc 60%, #b3d1f7 100%);
+        border: 2px solid #1976d2;
+        border-radius: 1rem;
+        padding: 10px;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    .img-preview-box img {
+        max-height: 180px;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 0.7rem;
+        border: 2px solid #1976d2;
+        background: #fff;
+        padding: 5px;
+        box-shadow: 0 2px 12px 0 rgba(25, 118, 210, 0.10);
+    }
+    .btn-primary, .btn-outline-primary {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .card-header {
+        background: #e9f2fb;
+        border-bottom: 2px solid #1976d2;
+    }
+    @media (max-width: 767px) {
+        .producto-form-card {
+            border-radius: 0.7rem;
+        }
+        .img-preview-box {
+            padding: 5px;
+        }
+    }
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card producto-form-card">
+                <div class="card-header">
+                    <h4 class="mb-0 text-primary fw-bold"><i class="fas fa-cube me-2"></i>{{ 'Editar Producto' if producto else 'Nuevo Producto' }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% if producto %}{{ url_for('editar_producto', id=producto.id) }}{% else %}{{ url_for('nuevo_producto') }}{% endif %}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label"><span class="icon"><i class="fas fa-cube"></i></span>Nombre del producto</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ producto.nombre if producto else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label"><span class="icon"><i class="fas fa-tags"></i></span>Categoría</label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="">Seleccione una categoría</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.nombre }}" {% if producto and producto.categoria == categoria.nombre %}selected{% endif %}>
+                                    {{ categoria.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <a href="{{ url_for('gestionar_categorias') }}" class="text-decoration-none">
+                                    <i class="fas fa-plus-circle me-1"></i>Gestionar categorías
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio_detal" class="form-label"><span class="icon"><i class="fas fa-dollar-sign"></i></span>Precio al detal</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_detal" name="precio_detal" step="0.01" min="0" value="{{ producto.precio_detal if producto else producto.precio if producto else '' }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio_distribuidor" class="form-label"><span class="icon"><i class="fas fa-handshake"></i></span>Precio a distribuidor</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_distribuidor" name="precio_distribuidor" step="0.01" min="0" value="{{ producto.precio_distribuidor if producto else producto.precio if producto else '' }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label"><span class="icon"><i class="fas fa-warehouse"></i></span>Stock Inicial</label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" min="0" value="{{ producto.cantidad if producto else '' }}" required {% if producto %}readonly{% endif %}>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imagen" class="form-label"><span class="icon"><i class="fas fa-image"></i></span>Imagen del Producto</label>
+                            {% if producto and producto.ruta_imagen %}
+                            <div class="img-preview-box">
+                                <img src="{{ url_for('static', filename=producto.ruta_imagen) }}" alt="Imagen actual">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                            <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-2">
+                                <i class="fas fa-save me-2"></i>{{ 'Actualizar Producto' if producto else 'Guardar Producto' }}
+                            </button>
+                            <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-outline-primary py-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

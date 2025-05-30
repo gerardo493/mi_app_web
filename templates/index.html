@@ -1,0 +1,1375 @@
+    {% extends "base.html" %}
+
+    {% block title %}Inicio - Sistema de Facturación{% endblock %}
+
+    {% block content %}
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .main-bg-blur {
+            display: none;
+        }
+        .container-fluid.px-4 {
+            position: relative;
+            z-index: 1;
+        }
+        .stats-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .stats-icon {
+            transition: transform 0.3s ease;
+            color: #2c3e50;
+        }
+
+        .stats-card:hover .stats-icon {
+            transform: scale(1.1);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .display-4 {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .quick-actions .btn {
+            border: none;
+            border-radius: 6px;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        .quick-actions .btn-primary {
+            background: #2c3e50;
+        }
+        .quick-actions .btn-success {
+            background: #27ae60;
+        }
+        .quick-actions .btn-warning {
+            background: #f39c12;
+        }
+        .quick-actions .btn-info {
+            background: #3498db;
+        }
+        .quick-actions .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            filter: brightness(1.1);
+        }
+        .quick-actions .btn i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            transition: transform 0.3s;
+        }
+        .quick-actions .btn:hover i {
+            transform: scale(1.1);
+        }
+        .list-group-item {
+            transition: all 0.3s ease;
+            border-radius: 6px !important;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+            background: #ffffff;
+        }
+
+        .list-group-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #f8f9fa;
+        }
+
+        .list-group-item h6 {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .list-group-item p {
+            color: #6c757d;
+        }
+
+        .list-group-item small {
+            color: #6c757d !important;
+        }
+
+        .list-group-item .text-muted {
+            color: #6c757d !important;
+        }
+
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 1rem;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        #fecha-hora-actual {
+            background: linear-gradient(145deg, #4b6cb7, #182848);
+            padding: 1.2rem 2rem;
+            border-radius: 16px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 1px solid rgba(75, 108, 183, 0.8);
+            box-shadow: 
+                8px 8px 20px rgba(24, 40, 72, 0.3),
+                -8px -8px 20px rgba(75, 108, 183, 0.2),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.2),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(75, 108, 183, 0.2);
+            text-align: center;
+            margin-left: 0;
+            white-space: normal;
+            word-break: break-word;
+            backdrop-filter: blur(10px);
+            transform: translateY(0) translateZ(0);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        #fecha-hora-actual::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                rgba(75, 108, 183, 0) 0%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                rgba(75, 108, 183, 0) 100%);
+            box-shadow: 0 1px 2px rgba(75, 108, 183, 0.3);
+        }
+
+        #fecha-hora-actual::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                rgba(24, 40, 72, 0) 0%, 
+                rgba(24, 40, 72, 0.4) 50%, 
+                rgba(24, 40, 72, 0) 100%);
+            box-shadow: 0 -1px 2px rgba(24, 40, 72, 0.2);
+        }
+
+        #fecha-hora-actual:hover {
+            transform: translateY(-4px) translateZ(20px);
+            box-shadow: 
+                12px 12px 30px rgba(24, 40, 72, 0.4),
+                -12px -12px 30px rgba(75, 108, 183, 0.3),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.2),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(75, 108, 183, 0.3);
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #fecha-hora-actual:active {
+            transform: translateY(-2px) translateZ(10px);
+            box-shadow: 
+                6px 6px 15px rgba(24, 40, 72, 0.3),
+                -6px -6px 15px rgba(75, 108, 183, 0.2),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.2),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2),
+                0 0 15px rgba(75, 108, 183, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            #fecha-hora-actual {
+                font-size: 0.95rem;
+                padding: 1rem 1.5rem;
+                margin: 1rem 0;
+                border-radius: 14px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #fecha-hora-actual {
+                font-size: 0.85rem;
+                padding: 0.8rem 1.2rem;
+                border-radius: 12px;
+            }
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .display-4 {
+                font-size: 2rem;
+            }
+
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .quick-actions .btn {
+                margin-bottom: 0.5rem;
+            }
+
+            .list-group-item {
+                padding: 0.75rem;
+            }
+
+            .card-header {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .display-4 {
+                font-size: 1.5rem;
+            }
+
+            .stats-card .card-body {
+                padding: 1rem;
+            }
+
+            .welcome-text {
+                font-size: 1.2rem;
+            }
+
+            .welcome-subtext {
+                font-size: 0.9rem;
+            }
+        }
+
+        .header-container {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            padding: 2.5rem 0 2rem 0;
+            margin: -1.5rem -1.5rem 0 -1.5rem;
+            border-radius: 0 0 40px 40px;
+            box-shadow: 0 12px 32px rgba(75, 108, 183, 0.15);
+            position: relative;
+            overflow: visible;
+        }
+
+        .header-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-logo {
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+            background: none;
+            border: none;
+            width: 160px;
+            height: 160px;
+        }
+
+        .header-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .header-logo:hover img {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 991px) {
+            .header-logo {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-logo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        .welcome-text {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .welcome-subtext {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 0;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .main-stats {
+            margin-top: 2.5rem;
+        }
+        .main-stats .card {
+            flex: 1 1 0;
+            min-width: 180px;
+            max-width: 260px;
+            margin: 0;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .main-stats .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(26,35,126,0.22), 0 4px 16px #fff8 inset;
+        }
+        .main-stats .icon-container {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            font-size: 2.1rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(26,35,126,0.10);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .main-stats .card:hover .icon-container {
+            transform: scale(1.08) rotate(-4deg);
+        }
+        .main-stats .stat-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.7px;
+            color: #1a237e;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        }
+        .main-stats .stat-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 0.1rem;
+            color: #1a237e;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .main-stats .stat-subtitle {
+            font-size: 1.13rem;
+            font-weight: 600;
+            color: #1a237e;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+        }
+        .card.clientes .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(25, 118, 210, 0.15) 100%);
+            color: #1976d2;
+        }
+        .card.inventario .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(67, 170, 139, 0.15) 100%);
+            color: #43aa8b;
+        }
+        .card.facturas .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(108, 92, 231, 0.15) 100%);
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .icon-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 193, 7, 0.15) 100%);
+            color: #FFC107;
+        }
+        .card.clientes .stat-title {
+            color: #1976d2;
+        }
+        .card.inventario .stat-title {
+            color: #43aa8b;
+        }
+        .card.facturas .stat-title {
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .stat-title {
+            color: #FFC107;
+        }
+        .card.clientes .stat-value {
+            color: #1565c0;
+        }
+        .card.inventario .stat-value {
+            color: #388e3c;
+        }
+        .card.facturas .stat-value {
+            color: #512da8;
+        }
+        .card.tasa-bcv .stat-value {
+            color: #f57f17;
+        }
+        .card.clientes .stat-subtitle {
+            color: #1976d2;
+        }
+        .card.inventario .stat-subtitle {
+            color: #43aa8b;
+        }
+        .card.facturas .stat-subtitle {
+            color: #6C5CE7;
+        }
+        .card.tasa-bcv .stat-subtitle {
+            color: #FFC107;
+        }
+        .badge {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            color: #1a237e !important;
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+        .badge.bg-warning {
+            color: #FFC107 !important;
+        }
+        .badge.bg-primary {
+            color: #1976d2 !important;
+        }
+        #ultima-actualizacion-dashboard {
+            color: #1a237e;
+            font-weight: 600;
+        }
+        .main-stats-carousel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+        }
+        @media (max-width: 991px) {
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            .header-container {
+                padding: 1.2rem 0 1.2rem 0;
+                border-radius: 0 0 24px 24px;
+            }
+            .main-stats {
+                margin-top: 1.2rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .welcome-text {
+                font-size: 1.1rem;
+            }
+            .header-container {
+                padding: 0.7rem 0 0.7rem 0;
+                border-radius: 0 0 14px 14px;
+            }
+            .main-stats {
+                margin-top: 0.7rem;
+            }
+        }
+        @media (max-width: 991px) {
+            .main-stats-carousel {
+                gap: 1rem;
+            }
+            .main-stats .card {
+                min-width: 160px;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 768px) {
+            .main-stats-carousel {
+                flex-direction: column;
+                gap: 0.7rem;
+            }
+            .main-stats .card {
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+        .header-stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .header-stat-card.cobranza {
+            background: linear-gradient(135deg, #ffffff 0%, #ffe5e5 100%);
+            border-left: 8px solid #dc3545;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+        }
+
+        .header-stat-card.cobranza::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(220, 53, 69, 0.1) 100%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .header-stat-card.cobranza .icon {
+            color: #dc3545;
+            font-size: 2.6rem;
+            margin-bottom: 1.2rem;
+            background: rgba(220, 53, 69, 0.15);
+            padding: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+        }
+
+        .header-stat-card.cobranza:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.2);
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        .header-stat-card.cobranza .header-stat-label {
+            color: #dc3545;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 1px 2px rgba(220, 53, 69, 0.1);
+        }
+
+        .header-stat-card.cobranza .header-stat-value {
+            color: #dc3545;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(220, 53, 69, 0.1);
+        }
+
+        .header-stat-card.cobranza .header-stat-bs {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #dc3545;
+            margin-top: 0.3rem;
+            opacity: 0.9;
+        }
+
+        .header-stat-card.cobranza:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.2);
+            background: linear-gradient(135deg, #ffffff 0%, #ffcccc 100%);
+        }
+
+        .header-stat-card.pagos {
+            background: linear-gradient(135deg, #ffffff 0%, #e5ffe5 100%);
+            border-left: 8px solid #28a745;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+        }
+
+        .header-stat-card.pagos::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(40, 167, 69, 0.1) 100%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .header-stat-card.pagos .icon {
+            color: #28a745;
+            font-size: 2.6rem;
+            margin-bottom: 1.2rem;
+            background: rgba(40, 167, 69, 0.15);
+            padding: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.1);
+        }
+
+        .header-stat-card.pagos:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.2);
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .header-stat-card.pagos .header-stat-label {
+            color: #28a745;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 1px 2px rgba(40, 167, 69, 0.1);
+        }
+
+        .header-stat-card.pagos .header-stat-value {
+            color: #28a745;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(40, 167, 69, 0.1);
+        }
+
+        .header-stat-card.pagos .header-stat-bs {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #28a745;
+            margin-top: 0.3rem;
+            opacity: 0.9;
+        }
+
+        .header-stat-card.pagos:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(40, 167, 69, 0.2);
+            background: linear-gradient(135deg, #ffffff 0%, #ccffcc 100%);
+        }
+
+        .header-stat-card.facturado {
+            background: linear-gradient(135deg, #ffffff 0%, #e5e8ff 100%);
+            border-left: 8px solid #6C5CE7;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+        }
+
+        .header-stat-card.facturado::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(108, 92, 231, 0.1) 100%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .header-stat-card.facturado .icon {
+            color: #6C5CE7;
+            font-size: 2.6rem;
+            margin-bottom: 1.2rem;
+            background: rgba(108, 92, 231, 0.15);
+            padding: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.1);
+        }
+
+        .header-stat-card.facturado:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.2);
+            background: rgba(108, 92, 231, 0.2);
+        }
+
+        .header-stat-card.facturado .header-stat-label {
+            color: #6C5CE7;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 1px 2px rgba(108, 92, 231, 0.1);
+        }
+
+        .header-stat-card.facturado .header-stat-value {
+            color: #6C5CE7;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(108, 92, 231, 0.1);
+        }
+
+        .header-stat-card.facturado .header-stat-bs {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #6C5CE7;
+            margin-top: 0.3rem;
+            opacity: 0.9;
+        }
+
+        .header-stat-card.facturado:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(108, 92, 231, 0.2);
+            background: linear-gradient(135deg, #ffffff 0%, #ccd4ff 100%);
+        }
+
+        .header-stat-card.promedio {
+            background: linear-gradient(135deg, #ffffff 0%, #fff3cd 100%);
+            border-left: 8px solid #ffc107;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
+        }
+
+        .header-stat-card.promedio::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .header-stat-card.promedio .icon {
+            color: #ffc107;
+            font-size: 2.6rem;
+            margin-bottom: 1.2rem;
+            background: rgba(255, 193, 7, 0.15);
+            padding: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.1);
+        }
+
+        .header-stat-card.promedio:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 6px 16px rgba(255, 193, 7, 0.2);
+            background: rgba(255, 193, 7, 0.2);
+        }
+
+        .header-stat-card.promedio .header-stat-label {
+            color: #ff9800;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 1px 2px rgba(255, 193, 7, 0.1);
+        }
+
+        .header-stat-card.promedio .header-stat-value {
+            color: #ff9800;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(255, 193, 7, 0.1);
+        }
+
+        .header-stat-card.promedio .header-stat-bs {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff9800;
+            margin-top: 0.3rem;
+            opacity: 0.9;
+        }
+
+        .header-stat-card.promedio:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+            background: linear-gradient(135deg, #ffffff 0%, #ffe69c 100%);
+        }
+
+        .header-stat-card.promedio .header-stat-refresh {
+            color: #ff9800;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .header-stat-card.promedio:hover .header-stat-refresh {
+            opacity: 1;
+            transform: rotate(180deg);
+            color: #ff9800;
+        }
+
+        .header-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .header-stat-card .icon {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .header-stat-card.cobranza .icon {
+            color: #dc3545;
+        }
+
+        .header-stat-card.pagos .icon {
+            color: #28a745;
+        }
+
+        .header-stat-card.facturado .icon {
+            color: #6C5CE7;
+            font-size: 2.4rem;
+            margin-bottom: 1.2rem;
+            background: rgba(108, 92, 231, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .header-stat-card.facturado::before,
+        .header-stat-card.promedio::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.1) 0%, rgba(44, 62, 80, 0.05) 100%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .header-stat-card.facturado .header-stat-label {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .header-stat-card.facturado .header-stat-value {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-stat-card.facturado .header-stat-bs,
+        .header-stat-card.promedio .header-stat-bs {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #6c757d;
+            margin-top: 0.3rem;
+        }
+
+        .header-stat-card.facturado:hover,
+        .header-stat-card.promedio:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .header-stat-refresh {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.1rem;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .header-stat-card.cobranza .header-stat-refresh {
+            color: #dc3545;
+        }
+
+        .header-stat-card.pagos .header-stat-refresh {
+            color: #28a745;
+        }
+
+        .header-stat-card:hover .header-stat-refresh {
+            opacity: 1;
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .header-stat-card {
+                padding: 1.2rem;
+            }
+            
+            .header-stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .header-stat-label {
+                font-size: 1rem;
+            }
+            
+            .header-stat-card .icon {
+                font-size: 1.8rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            color: rgba(0, 0, 0, 0.9);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            padding: 1.5rem;
+        }
+
+        .badge {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            color: #1a237e !important;
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+
+        .badge.bg-warning {
+            color: #FFC107 !important;
+        }
+
+        .badge.bg-primary {
+            color: #1976d2 !important;
+        }
+
+        #ultima-actualizacion-dashboard {
+            color: #1a237e;
+            font-weight: 600;
+        }
+
+        #ultima-actualizacion-dashboard i,
+        #ultima-actualizacion-dashboard .text-success,
+        #ultima-actualizacion-dashboard .text-danger,
+        #ultima-actualizacion-dashboard .text-muted,
+        #ultima-actualizacion-dashboard .fa-sync-alt,
+        #ultima-actualizacion-dashboard .fa-check-circle,
+        #ultima-actualizacion-dashboard .fa-exclamation-circle,
+        #ultima-actualizacion-dashboard .fa-clock {
+            color: #111 !important;
+            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
+            font-weight: 900;
+        }
+
+        .card.clientes .icon-container {
+            background: linear-gradient(135deg, #e0e7ff 0%, #4f8cff 100%);
+            color: #1976d2;
+            animation: pulse-blue 2s infinite;
+        }
+        .card.inventario .icon-container {
+            background: linear-gradient(135deg, #e0ffe7 0%, #43aa8b 100%);
+            color: #43aa8b;
+            animation: pulse-green 2s infinite;
+        }
+        .card.facturas .icon-container {
+            background: linear-gradient(135deg, #ede7ff 0%, #6C5CE7 100%);
+            color: #6C5CE7;
+            animation: pulse-purple 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #1976d2aa); }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #43aa8baa); }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulse-purple {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 8px #6C5CE7aa); }
+            100% { transform: scale(1); }
+        }
+        .card.clientes .stat-title,
+        .card.inventario .stat-title,
+        .card.facturas .stat-title,
+        .card.clientes .stat-value,
+        .card.inventario .stat-value,
+        .card.facturas .stat-value {
+            color: #111 !important;
+            text-shadow: 0 2px 8px #fff, 0 1px 0 #fff, 0 0 2px #fff8;
+            font-weight: 900;
+        }
+        .card.clientes .icon-container i,
+        .card.inventario .icon-container i,
+        .card.facturas .icon-container i {
+            font-size: 2.1rem;
+            transition: color 0.3s, text-shadow 0.3s, transform 0.3s;
+        }
+        .card.clientes:hover .icon-container,
+        .card.inventario:hover .icon-container,
+        .card.facturas:hover .icon-container {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.08) rotate(-4deg);
+        }
+        .card.clientes:hover .icon-container i {
+            color: #1565c0;
+            text-shadow: 0 2px 8px #1976d2aa, 0 1px 0 #fff;
+        }
+        .card.inventario:hover .icon-container i {
+            color: #388e3c;
+            text-shadow: 0 2px 8px #43aa8baa, 0 1px 0 #fff;
+        }
+        .card.facturas:hover .icon-container i {
+            color: #512da8;
+            text-shadow: 0 2px 8px #6C5CE7aa, 0 1px 0 #fff;
+        }
+    </style>
+    <div class="main-bg-blur"></div>
+    <div class="container-fluid px-4">
+        <div class="header-container">
+            <div class="container">
+                <div class="header-content">
+                    <div class="row align-items-center g-3">
+                        <div class="col-auto d-flex align-items-center justify-content-center" style="min-width:120px;">
+                            <div class="header-logo">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Empresa">
+                            </div>
+                        </div>
+                        <div class="col ps-0 ps-md-3">
+                            <h1 class="welcome-text mb-1">Bienvenido al Sistema de Facturación</h1>
+                            <p class="welcome-subtext mb-0">Panel de Control y Gestión Empresarial</p>
+                        </div>
+                        <div class="col-12 col-md-auto text-md-start mt-3 mt-md-0">
+                            <div id="fecha-hora-actual"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card cobranza d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#F44336;"><i class="fas fa-hand-holding-usd"></i></span>
+                                    <i class="fas fa-sync-alt header-stat-refresh" id="refresh-cobranza" title="Actualizando datos..."></i>
+                                    <div class="header-stat-label">Cuentas por Cobrar</div>
+                                    <div class="header-stat-value">${{ total_cobrar_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">{{ total_cobrar_bs|float|es_number }} Bs</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card pagos d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#43aa8b;"><i class="fas fa-money-check-alt"></i></span>
+                                    <i class="fas fa-sync-alt header-stat-refresh" id="refresh-pagos" title="Actualizando datos..."></i>
+                                    <div class="header-stat-label">Pagos Recibidos</div>
+                                    <div class="header-stat-value">${{ total_pagos_recibidos_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">{{ total_pagos_recibidos_bs|float|es_number }} Bs</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card facturado d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#6C5CE7;"><i class="fas fa-file-invoice-dollar"></i></span>
+                                    <div class="header-stat-label">Facturado</div>
+                                    <div class="header-stat-value">${{ total_facturado_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">Total USD</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="header-stat-card promedio d-flex flex-column align-items-start justify-content-center">
+                                    <span class="icon mb-2" style="font-size:2.2rem;color:#FFD93D;"><i class="fas fa-receipt"></i></span>
+                                    <div class="header-stat-label">Promedio por Factura</div>
+                                    <div class="header-stat-value">${{ promedio_factura_usd|float|es_number }}</div>
+                                    <div class="header-stat-bs">Promedio USD</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4 main-stats">
+            <div class="main-stats-carousel w-100">
+                <div class="card clientes">
+                    <div class="card-body text-center">
+                        <div class="icon-container clientes">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-title">Total Clientes</div>
+                        <div class="stat-value">{{ total_clientes }}</div>
+                    </div>
+                </div>
+                <div class="card inventario">
+                    <div class="card-body text-center">
+                        <div class="icon-container inventario">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-title">Productos en Inventario</div>
+                        <div class="stat-value">{{ total_productos }}</div>
+                    </div>
+                </div>
+                <div class="card facturas">
+                    <div class="card-body text-center">
+                        <div class="icon-container facturas">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="stat-title">Facturas del Mes</div>
+                        <div class="stat-value">{{ facturas_mes }}</div>
+                    </div>
+                </div>
+                <div class="card tasa-bcv">
+                    <div class="card-body text-center">
+                        <div class="icon-container tasa-bcv">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div id="tasasCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                          <div class="carousel-inner">
+                            <div class="carousel-item active">
+                              <div class="stat-value text-secondary" style="font-size:2.1rem;">
+                                <span id="tasa-bcv-valor">{{ tasa_bcv|default('Cargando...', true)|es_number }}</span> <span class="badge bg-warning text-dark">BCV</span>
+                              </div>
+                        <div class="stat-subtitle">Bs/USD</div>
+                    </div>
+                            <div class="carousel-item">
+                              <div class="stat-value text-secondary" style="font-size:2.1rem;">
+                                <span id="tasa-eur-valor">{{ tasa_bcv_eur|default('Cargando...', true)|es_number }}</span> <span class="badge bg-primary">Euro</span>
+                              </div>
+                              <div class="stat-subtitle">Bs/EUR</div>
+                            </div>
+                          </div>
+                          <button class="carousel-control-prev" type="button" data-bs-target="#tasasCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                          </button>
+                          <button class="carousel-control-next" type="button" data-bs-target="#tasasCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                          </button>
+                        </div>
+                        <small class="d-block text-muted" style="font-size:0.8rem;" id="ultima-actualizacion-dashboard">
+                            <i class="fas fa-sync-alt fa-spin"></i> Actualizando...
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/clientes/nuevo" class="btn btn-primary w-100">
+                                    <i class="fas fa-user-plus"></i>Nuevo Cliente
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/inventario/nuevo" class="btn btn-success w-100">
+                                    <i class="fas fa-box-open"></i>Nuevo Producto
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/facturas/nueva" class="btn btn-warning w-100">
+                                    <i class="fas fa-file-invoice-dollar"></i>Nueva Factura
+                            </a>
+                        </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                            <a href="/cotizaciones/nueva" class="btn btn-info w-100">
+                                    <i class="fas fa-file-alt"></i>Nueva Cotización
+                            </a>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+        <div class="row mt-4 g-4">
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Últimas Facturas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for factura in ultimas_facturas %}
+                        <a href="/facturas/{{ factura.id }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                <h6 class="mb-1">Factura #{{ factura.numero }}</h6>
+                                        <p class="mb-1">{{ factura.cliente }}</p>
+                            </div>
+                                    <div class="text-end">
+                                        <small class="d-block">{{ factura.fecha }}</small>
+                            <small class="text-muted">${{ factura.total }}</small>
+                                    </div>
+                                </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos con Bajo Stock</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for producto in productos_bajo_stock %}
+                        <a href="{{ url_for('ver_producto', id=producto.id if producto.id is defined else loop.index) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                <h6 class="mb-1">{{ producto.nombre }}</h6>
+                                        <p class="mb-1">{{ producto.categoria }}</p>
+                                    </div>
+                                <small class="text-danger">Stock: {{ producto.stock or producto.cantidad }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if advertencia_tasa %}
+    <div class="alert alert-warning mt-3" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>{{ advertencia_tasa }}
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+    function actualizarFechaHora() {
+        const now = new Date();
+        // Fecha: miércoles, 21 de mayo de 2025
+        const fecha = now.toLocaleDateString('es-VE', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Hora manual en 12 horas, con AM/PM en español
+        let horas = now.getHours();
+        const minutos = now.getMinutes().toString().padStart(2, '0');
+        const segundos = now.getSeconds().toString().padStart(2, '0');
+        const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
+        horas = horas % 12;
+        horas = horas ? horas : 12; // el 0 se muestra como 12
+
+        const hora = `${horas.toString().padStart(2, '0')}:${minutos}:${segundos} ${ampm}`;
+
+        document.getElementById('fecha-hora-actual').textContent = `${fecha}, ${hora}`;
+    }
+    actualizarFechaHora();
+    setInterval(actualizarFechaHora, 1000);
+    </script>
+
+    <script>
+    function actualizarTasasDashboard() {
+        const ultimaActualizacion = document.getElementById('ultima-actualizacion-dashboard');
+        if (ultimaActualizacion) {
+            ultimaActualizacion.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Actualizando...';
+        }
+        fetch('/api/tasas-actualizadas')
+            .then(r => r.json())
+            .then(data => {
+                if (!data || typeof data !== 'object') return;
+                const tasa_bcv = parseFloat(data.tasa_bcv);
+                const tasa_bcv_eur = parseFloat(data.tasa_bcv_eur);
+                if (!isNaN(tasa_bcv)) {
+                    const el = document.getElementById('tasa-bcv-valor');
+                    if (el) el.textContent = tasa_bcv.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+                }
+                if (!isNaN(tasa_bcv_eur)) {
+                    const el = document.getElementById('tasa-eur-valor');
+                    if (el) el.textContent = tasa_bcv_eur.toLocaleString('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2});
+                }
+                if (ultimaActualizacion) {
+                    const fecha = data.fecha_actualizacion ? new Date(data.fecha_actualizacion).toLocaleString() : '';
+                    ultimaActualizacion.innerHTML = `<i class='fas fa-check-circle text-success'></i> Actualizado: ${fecha}`;
+                    setTimeout(() => {
+                        ultimaActualizacion.innerHTML = `<i class='fas fa-clock text-muted'></i> Última actualización: ${fecha}`;
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                if (ultimaActualizacion) {
+                    ultimaActualizacion.innerHTML = `<i class='fas fa-exclamation-circle text-danger'></i> Error: ${error.message}`;
+                }
+            });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarTasasDashboard();
+        setInterval(actualizarTasasDashboard, 5 * 60 * 1000);
+    });
+    </script>
+
+    <script>
+    // Animar la rueda de actualización cada 3 minutos
+    function spinHeaderRefresh() {
+        document.getElementById('refresh-cobranza').classList.add('spin');
+        document.getElementById('refresh-pagos').classList.add('spin');
+        setTimeout(() => {
+            document.getElementById('refresh-cobranza').classList.remove('spin');
+            document.getElementById('refresh-pagos').classList.remove('spin');
+        }, 1800);
+    }
+    setInterval(spinHeaderRefresh, 3 * 60 * 1000);
+    // Animación inicial al cargar
+    spinHeaderRefresh();
+    </script>
+    {% endblock %} 

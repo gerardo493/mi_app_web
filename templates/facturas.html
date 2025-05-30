@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Facturas{% endblock %}
+
+{% block content %}
+<style>
+    .facturas-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-group .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn-group .btn i {
+        font-size: 1.1rem;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: #1a237e;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+        color: #2c3e50;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .btn-group .btn-sm {
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #00bcd4, #0097a7);
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e, #0d47a1);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffa000, #f57c00);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c);
+        border: none;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn-group .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+{% if get_flashed_messages() %}
+  <div class="container mt-3">
+    {% for message in get_flashed_messages(with_categories=true) %}
+      <div class="alert alert-{{ message[0] }} alert-dismissible fade show" role="alert">
+        {{ message[1] }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="facturas-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-file-invoice-dollar me-2"></i>Facturas
+            </h2>
+            <div class="btn-group">
+                <a href="{{ url_for('reporte_facturas') }}" class="btn btn-info">
+                    <i class="fas fa-chart-bar me-2"></i>Reporte
+                </a>
+                <a href="{{ url_for('nueva_factura') }}" class="btn btn-primary">
+                    <i class="fas fa-file-invoice me-2"></i>Nueva Factura
+                </a>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Condición</th>
+                                <th>Total (USD)</th>
+                                <th>Total (Bs)</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, factura in facturas.items()|sort(attribute='1.fecha', reverse=true) %}
+                            <tr>
+                                <td>{{ factura.numero }}</td>
+                                <td>{{ factura.fecha }} {{ factura.hora or '' }}</td>
+                                <td>
+                                    {% if factura.cliente_id in clientes %}
+                                        {{ clientes[factura.cliente_id].nombre }}
+                                        <small class="text-muted d-block">{{ factura.cliente_id }}</small>
+                                    {% else %}
+                                        {{ factura.cliente_id }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if factura.condicion_pago == 'credito' %}
+                                        <span class="badge bg-info">Crédito</span>
+                                        {% if factura.fecha_vencimiento %}
+                                            <small class="d-block text-muted">Vence: {{ factura.fecha_vencimiento }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">Contado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">${{ (factura.total_usd or 0)|es_number }}</td>
+                                <td class="text-end">{{ (factura.total_bs or 0)|es_number }} Bs</td>
+                                <td>
+                                    {% if factura.estado == 'pagada' %}
+                                    <span class="badge bg-success">Pagada</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    {% endif %}
+                                    {% if factura.condicion_pago == 'credito' %}
+                                        <div style="font-size:0.95em;">
+                                            Abonado: ${{ (factura.total_abonado or 0)|es_number }}<br>
+                                            Saldo: ${{ (factura.saldo_pendiente or 0)|es_number }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('ver_factura', id=id) }}" class="btn btn-sm btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('editar_factura', id=id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('imprimir_factura', id=id) }}" class="btn btn-sm btn-secondary" title="Imprimir" target="_blank">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-success" title="Registrar pago" data-bs-toggle="modal" data-bs-target="#modalPago" data-factura-id="{{ id }}">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Eliminar"
+                                                onclick="confirmarEliminar('{{ id }}', '{{ factura.numero }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la factura #<span id="facturaNumero"></span>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" action="" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registrar Pago Global -->
+<div class="modal fade" id="modalPago" tabindex="-1" aria-labelledby="modalPagoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="formPago" method="post" enctype="multipart/form-data" onsubmit="return validarMontoPago()">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalPagoLabel">Registrar Pago</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="monto_pago" class="form-label">Monto</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="monto_pago" name="monto_pago" required>
+            <div id="conversion_monto" class="form-text mt-1"></div>
+            <div id="error_monto" class="text-danger mt-1" style="display: none;"></div>
+          </div>
+          <div class="mb-3">
+            <label for="moneda_pago" class="form-label">Moneda</label>
+            <select class="form-select" id="moneda_pago" name="moneda_pago" required>
+              <option value="USD">USD</option>
+              <option value="Bs">Bs</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="metodo_pago" class="form-label">Método</label>
+            <select class="form-select" id="metodo_pago" name="metodo_pago" required>
+              <option value="efectivo_usd">Efectivo USD</option>
+              <option value="efectivo_bs">Efectivo Bs</option>
+              <option value="pago_movil">Pago Móvil</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
+          <div id="banco_container" style="display: none;">
+            <div class="mb-3">
+              <label for="banco" class="form-label">Banco</label>
+              <select class="form-select" id="banco" name="banco">
+                <option value="">Seleccione un banco</option>
+                <option value="0102" data-logo="banco_venezuela.png">Banco de Venezuela</option>
+                <option value="0104" data-logo="venezolano_credito.png">Venezolano de Crédito</option>
+                <option value="0105" data-logo="mercantil.png">Mercantil</option>
+                <option value="0108" data-logo="provincial.png">Provincial</option>
+                <option value="0114" data-logo="bancaribe.png">Bancaribe</option>
+                <option value="0115" data-logo="exterior.png">Exterior</option>
+                <option value="0116" data-logo="occidental.png">Occidental de Descuento</option>
+                <option value="0128" data-logo="caroni.png">Banco Caroní</option>
+                <option value="0134" data-logo="banesco.png">Banesco</option>
+                <option value="0137" data-logo="sofitasa.png">Sofitasa</option>
+                <option value="0138" data-logo="plaza.png">Banco Plaza</option>
+                <option value="0146" data-logo="bge.png">Banco de la Gente Emprendedora</option>
+                <option value="0151" data-logo="bfc.png">BFC Banco Fondo Común</option>
+                <option value="0156" data-logo="100banco.png">100% Banco</option>
+                <option value="0157" data-logo="delsur.png">DelSur</option>
+                <option value="0163" data-logo="tesoro.png">Banco del Tesoro</option>
+                <option value="0166" data-logo="agricola.png">Banco Agrícola de Venezuela</option>
+                <option value="0168" data-logo="bancrecer.png">Bancrecer</option>
+                <option value="0169" data-logo="mibanco.png">Mi Banco</option>
+                <option value="0171" data-logo="activo.png">Banco Activo</option>
+                <option value="0172" data-logo="bancamiga.png">Bancamiga</option>
+                <option value="0173" data-logo="bid.png">Banco Internacional de Desarrollo</option>
+                <option value="0174" data-logo="banplus.png">Banplus</option>
+                <option value="0175" data-logo="bicentenario.png">Bicentenario del Pueblo</option>
+                <option value="0176" data-logo="novo.png">Novo Banco</option>
+                <option value="0177" data-logo="banfanb.png">Banco de la Fuerza Armada Nacional Bolivariana</option>
+                <option value="0191" data-logo="bnc.png">Banco Nacional de Crédito</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="captura_transaccion" class="form-label">Captura de Transacción</label>
+              <input type="file" class="form-control" id="captura_transaccion" name="captura" accept="image/*">
+              <small class="text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</small>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="referencia_pago" class="form-label">Referencia</label>
+            <input type="text" class="form-control" id="referencia_pago" name="referencia_pago">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar Pago</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar pago -->
+<div class="modal fade" id="modalEliminarPago" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación de Pago
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar este pago?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminarPago" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% set tasa_bcv_js = tasa_bcv if tasa_bcv is defined else 0 %}
+<script>
+// Usar solo una variable global para la tasa BCV
+let tasaBCV = parseFloat("{{ tasa_bcv_js|default(0)|string|replace(',', '.') }}") || 94.8556; // Tasa fija de respaldo
+let saldoPendiente = 0;
+
+function actualizarConversion() {
+    const monto = parseFloat(document.getElementById('monto_pago').value) || 0;
+    const moneda = document.getElementById('moneda_pago').value;
+    let conversion = '';
+    if (moneda === 'USD') {
+        const montoBs = monto * tasaBCV;
+        conversion = `Equivalente: <b>${montoBs.toFixed(2)} Bs</b> (Tasa: ${tasaBCV})`;
+    } else if (moneda === 'Bs') {
+        const montoUsd = monto / tasaBCV;
+        conversion = `Equivalente: <b>${montoUsd.toFixed(2)} USD</b> (Tasa: ${tasaBCV})`;
+    }
+    document.getElementById('conversion_monto').innerHTML = conversion;
+}
+
+document.getElementById('monto_pago').addEventListener('input', actualizarConversion);
+document.getElementById('moneda_pago').addEventListener('change', actualizarConversion);
+document.addEventListener('DOMContentLoaded', actualizarConversion);
+
+function validarMontoPago() {
+    const monto = parseFloat(document.getElementById('monto_pago').value) || 0;
+    const moneda = document.getElementById('moneda_pago').value;
+    const errorDiv = document.getElementById('error_monto');
+    let montoEnUSD = monto;
+    if (moneda === 'Bs') {
+        montoEnUSD = monto / tasaBCV;
+    }
+    if (montoEnUSD > saldoPendiente) {
+        errorDiv.textContent = `El monto excede el saldo pendiente ($${saldoPendiente.toFixed(2)} USD)`;
+        errorDiv.style.display = 'block';
+        return false;
+    }
+    errorDiv.style.display = 'none';
+    return true;
+}
+
+var modalPago = document.getElementById('modalPago');
+modalPago.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var facturaId = button.getAttribute('data-factura-id');
+    var form = document.getElementById('formPago');
+    form.action = '/facturas/' + facturaId + '/registrar_pago';
+    fetch('/facturas/' + facturaId + '/saldo')
+        .then(response => response.json())
+        .then(data => {
+            saldoPendiente = parseFloat(data.saldo_pendiente);
+            tasaBCV = parseFloat(data.tasa_bcv) || tasaBCV;
+            document.getElementById('monto_pago').placeholder = `Máximo: $${saldoPendiente.toFixed(2)} USD`;
+            actualizarConversion();
+        });
+    form.reset();
+    document.getElementById('error_monto').style.display = 'none';
+});
+
+document.getElementById('metodo_pago').addEventListener('change', function() {
+    const bancoContainer = document.getElementById('banco_container');
+    const bancoSelect = document.getElementById('banco');
+    const metodo = this.value;
+    if (metodo === 'pago_movil' || metodo === 'transferencia') {
+        bancoContainer.style.display = 'block';
+        bancoSelect.required = true;
+    } else {
+        bancoContainer.style.display = 'none';
+        bancoSelect.required = false;
+    }
+});
+
+// Validar tamaño de archivo antes de enviar
+document.getElementById('captura_transaccion').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+            this.value = '';
+        }
+    }
+});
+
+// Estilizar el selector de banco con logos
+document.addEventListener('DOMContentLoaded', function() {
+    const bancoSelect = document.getElementById('banco');
+    const options = bancoSelect.options;
+    
+    // Crear un div para mostrar el logo seleccionado
+    const logoContainer = document.createElement('div');
+    logoContainer.style.marginTop = '10px';
+    logoContainer.style.textAlign = 'center';
+    bancoSelect.parentNode.insertBefore(logoContainer, bancoSelect.nextSibling);
+    
+    // Función para actualizar el logo
+    function updateLogo() {
+        const selectedOption = options[bancoSelect.selectedIndex];
+        const logoPath = selectedOption.getAttribute('data-logo');
+        if (logoPath) {
+            logoContainer.innerHTML = `<img src="/static/bancos/${logoPath}" alt="Logo del banco" style="max-width: 100px; max-height: 50px;">`;
+        } else {
+            logoContainer.innerHTML = '';
+        }
+    }
+    
+    // Actualizar logo cuando cambie la selección
+    bancoSelect.addEventListener('change', updateLogo);
+    
+    // Estilizar las opciones del select
+    for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        const logoPath = option.getAttribute('data-logo');
+        if (logoPath) {
+            option.innerHTML = `<img src="/static/bancos/${logoPath}" alt="${option.text}" style="height: 20px; margin-right: 10px;"> ${option.text}`;
+        }
+    }
+});
+
+function confirmarEliminarPago(facturaId, pagoId) {
+    document.getElementById('formEliminarPago').action = `/facturas/${facturaId}/eliminar_pago/${pagoId}`;
+    new bootstrap.Modal(document.getElementById('modalEliminarPago')).show();
+}
+
+function confirmarEliminar(id, numero) {
+    document.getElementById('facturaNumero').textContent = numero;
+    document.getElementById('formEliminar').action = "{{ url_for('eliminar_factura', id='__ID__') }}".replace('__ID__', id);
+    new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+}
+</script>
+{% endblock %} 

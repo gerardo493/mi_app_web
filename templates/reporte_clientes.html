@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Clientes{% endblock %}
+
+{% block content %}
+<style>
+    .reporte-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #0a1a4a 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .page-header h2 .badge {
+        font-size: 1.3rem;
+        padding: 0.8rem 1.5rem;
+        margin-left: 1rem;
+        background: #ffd700 !important;
+        color: #000000 !important;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        text-shadow: none;
+        font-weight: 800;
+    }
+
+    .page-header h2 .badge i {
+        color: #000000;
+        margin-right: 0.5rem;
+    }
+
+    .badge {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .badge.bg-info {
+        background: #006064 !important;
+        color: white !important;
+    }
+
+    .badge.bg-primary {
+        background: #0a1a4a !important;
+        color: white !important;
+    }
+
+    .badge.bg-success {
+        background: #1b5e20 !important;
+        color: white !important;
+    }
+
+    .badge.bg-danger {
+        background: #b71c1c !important;
+        color: white !important;
+    }
+
+    .btn-group .btn {
+        padding: 0.9rem 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+    }
+
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn-group .btn i {
+        font-size: 1.1rem;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card .card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card .display-4 {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0;
+    }
+
+    .stats-card.primary {
+        background: linear-gradient(135deg, #0a1a4a 0%, #0d47a1 100%);
+    }
+
+    .stats-card.primary .card-title,
+    .stats-card.primary .display-4 {
+        color: white;
+    }
+
+    .stats-card.success {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    }
+
+    .stats-card.success .card-title,
+    .stats-card.success .display-4 {
+        color: white;
+    }
+
+    .carousel-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+    .carousel-item {
+        padding: 2rem;
+    }
+
+    .carousel-item.facturado {
+        background: linear-gradient(135deg, #0a1a4a 0%, #0d47a1 100%);
+        border-radius: 15px;
+    }
+
+    .carousel-item.abonado {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+        border-radius: 15px;
+    }
+
+    .carousel-item.por-cobrar {
+        background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
+        border-radius: 15px;
+    }
+
+    .carousel-item .badge {
+        font-size: 1.2rem;
+        padding: 0.6rem 1.8rem;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .carousel-item .display-6 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(135deg, #0a1a4a 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .table-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.4rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #e8eaf6;
+        color: #0a1a4a;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+        padding: 1.2rem;
+        border-bottom: 2px solid #0d47a1;
+    }
+
+    .table tbody td {
+        padding: 1.2rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+        color: #1a237e;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .btn-group .btn-sm {
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-group .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #006064, #0097a7);
+        border: none;
+        color: white;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        border: none;
+        color: white;
+    }
+
+    .text-danger {
+        color: #b71c1c !important;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn-group .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stats-card .display-4 {
+            font-size: 2rem;
+        }
+
+        .carousel-item .display-6 {
+            font-size: 1.5rem;
+        }
+
+        .table thead th {
+            font-size: 0.8rem;
+            padding: 0.75rem;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media print {
+        .btn-group, .navbar {
+            display: none !important;
+        }
+        .card {
+            break-inside: avoid;
+        }
+        .reporte-container {
+            background: none;
+            padding: 0;
+        }
+        .page-header {
+            background: none;
+            color: black;
+            box-shadow: none;
+        }
+        .stats-card, .table-card {
+            box-shadow: none;
+            border: 1px solid #dee2e6;
+        }
+    }
+</style>
+
+<div class="reporte-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-chart-bar me-2"></i>Reporte de Clientes
+                <span class="badge">
+                    <i class="fas fa-dollar-sign"></i>Tasa BCV: {{ tasa_bcv|es_number }} Bs/USD
+                </span>
+            </h2>
+            <div class="btn-group">
+                <a href="{{ url_for('mostrar_clientes') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+                </a>
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="fas fa-print me-2"></i>Imprimir Reporte
+                </button>
+            </div>
+        </div>
+
+        {% if advertencia_tasa %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ advertencia_tasa }}
+        </div>
+        {% endif %}
+
+        <div class="search-card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0" name="q" 
+                                   placeholder="Buscar por nombre o RIF" value="{{ q or '' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="orden" class="form-select">
+                            <option value="nombre" {% if filtro_orden == 'nombre' %}selected{% endif %}>Ordenar por Nombre</option>
+                            <option value="rif" {% if filtro_orden == 'rif' %}selected{% endif %}>Ordenar por RIF</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card primary">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Clientes</h5>
+                        <h2 class="display-4">{{ total_clientes }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card success">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Facturas</h5>
+                        <h2 class="display-4">{{ total_facturas }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="carousel-card">
+                    <div id="slider-general" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item facturado active text-center">
+                                <span class="badge">Facturado</span>
+                                <div class="display-6">${{ '%.2f' % total_facturado_general }}</div>
+                            </div>
+                            <div class="carousel-item abonado text-center">
+                                <span class="badge">Abonado</span>
+                                <div class="display-6">${{ '%.2f' % total_abonado_general }}</div>
+                            </div>
+                            <div class="carousel-item por-cobrar text-center">
+                                <span class="badge">Por Cobrar</span>
+                                <div class="display-6">${{ '%.2f' % total_cobrar }}</div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#slider-general" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#slider-general" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Mejores Clientes -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-trophy me-2"></i>Top 10 Mejores Clientes</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Total Facturas</th>
+                                <th>Total Compras</th>
+                                <th>Última Compra</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stats in top_clientes %}
+                            <tr>
+                                <td>{{ stats.nombre }}</td>
+                                <td>{{ stats.total_facturas }}</td>
+                                <td>${{ stats.total_compras|es_number }}</td>
+                                <td>{{ stats.ultima_compra }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('historial_cliente', id=stats.id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                            <i class="fas fa-history"></i>
+                                        </a>
+                                        {% if stats.email %}
+                                        <a href="mailto:{{ stats.email }}" class="btn btn-sm btn-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if stats.telefono %}
+                                        <a href="https://wa.me/{{ stats.telefono }}" target="_blank" class="btn btn-sm btn-success" title="Enviar WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 5 Peores Clientes -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-exclamation-triangle me-2"></i>Top 5 Clientes con Mayor Cuenta por Cobrar</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Facturado</th>
+                                <th>Abonado</th>
+                                <th>Por Cobrar</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stats in peores_clientes %}
+                            <tr>
+                                <td>{{ stats.nombre }}</td>
+                                <td>${{ '%.2f' % stats.total_facturado }}</td>
+                                <td>${{ '%.2f' % stats.total_abonado }}</td>
+                                <td class="text-danger">${{ '%.2f' % stats.total_por_cobrar }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('historial_cliente', id=stats.id) }}" class="btn btn-sm btn-info" title="Ver historial">
+                                            <i class="fas fa-history"></i>
+                                        </a>
+                                        {% if stats.email %}
+                                        <a href="mailto:{{ stats.email }}" class="btn btn-sm btn-success" title="Enviar email">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if stats.telefono %}
+                                        <a href="https://wa.me/{{ stats.telefono }}" target="_blank" class="btn btn-sm btn-success" title="Enviar WhatsApp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Productos Más Comprados -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-box me-2"></i>Top 10 Productos Más Comprados</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad Total</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stats in top_productos %}
+                            <tr>
+                                <td>{{ stats.nombre }}</td>
+                                <td>{{ stats.cantidad }}</td>
+                                <td>${{ "%.2f"|format(stats.valor) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if tasa_bcv is not defined or tasa_bcv == 0 %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>¡Advertencia! No se ha podido obtener la tasa BCV actual.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

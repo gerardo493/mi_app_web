@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Inventario{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        html, body {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+        }
+        body * {
+            visibility: hidden !important;
+        }
+        .reporte-container, .reporte-container * {
+            visibility: visible !important;
+        }
+        .reporte-container {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        .no-print, .sidebar, .navbar, .main-sidebar, .main-header, .footer, .btn, .btn-print {
+            display: none !important;
+        }
+        .page-header {
+            background: none !important;
+            color: #222 !important;
+            box-shadow: none !important;
+            padding: 0.5rem 0 1rem 0 !important;
+            margin-bottom: 1rem !important;
+        }
+        .categoria-section {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            page-break-inside: avoid !important;
+        }
+        .stats-card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+        .table th, .table td {
+            background: white !important;
+            color: #222 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    .reporte-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        margin-left: 250px;
+        margin-top: 70px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e3e6f0;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .card-title {
+        color: #5a5c69;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stats-card .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #4e73df;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .card-subtitle {
+        color: #858796;
+        font-size: 0.9rem;
+    }
+
+    .categoria-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e3e6f0;
+    }
+
+    .categoria-header {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .categoria-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table th {
+        background: #f8f9fc;
+        color: #4e73df;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border-bottom: 2px solid #e3e6f0;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fc;
+    }
+
+    .badge-stock {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .badge-stock.bajo {
+        background: #f6c23e;
+        color: #fff;
+    }
+
+    .badge-stock.critico {
+        background: #e74a3b;
+        color: #fff;
+    }
+
+    .badge-stock.normal {
+        background: #1cc88a;
+        color: #fff;
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-print:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .advertencia-tasa {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f5c6cb;
+    }
+
+    .table tfoot tr {
+        background-color: #f8f9fc;
+    }
+
+    .table tfoot td {
+        font-weight: 600;
+        color: #4e73df;
+    }
+
+    @media (max-width: 768px) {
+        .reporte-container {
+            margin-left: 0;
+            padding: 1rem;
+        }
+        
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .stats-card .card-value {
+            font-size: 1.5rem;
+        }
+        
+        .table th, .table td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<div class="container-fluid reporte-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h2>
+                    <i class="fas fa-boxes me-2"></i>
+                    Reporte de Inventario
+                </h2>
+                <div class="no-print d-flex gap-2">
+                    <button onclick="window.print()" class="btn btn-print">
+                        <i class="fas fa-print me-2"></i>Imprimir Reporte
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Barra de búsqueda y filtro -->
+    <div class="row mb-3 no-print">
+        <div class="col-md-6 mb-2">
+            <input type="text" id="busquedaProducto" class="form-control" placeholder="Buscar producto...">
+        </div>
+        <div class="col-md-6 mb-2">
+            <select id="filtroCategoria" class="form-control">
+                <option value="">Todas las categorías</option>
+                {% for categoria, datos in productos_por_categoria.items() %}
+                <option value="{{ categoria }}">{{ categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    {% if advertencia_tasa %}
+    <div class="row">
+        <div class="col-12">
+            <div class="advertencia-tasa">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ advertencia_tasa }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Total Productos</div>
+                <div class="card-value">{{ total_productos }}</div>
+                <div class="card-subtitle">Productos en inventario</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Total Stock</div>
+                <div class="card-value">{{ total_stock }}</div>
+                <div class="card-subtitle">Unidades disponibles</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Valor Total USD</div>
+                <div class="card-value">${{ "%.2f"|format(valor_total) }}</div>
+                <div class="card-subtitle">Valor del inventario</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="card-title">Valor Total Bs</div>
+                <div class="card-value">Bs. {{ "%.2f"|format(valor_total * tasa_bcv) }}</div>
+                <div class="card-subtitle">Tasa BCV: {{ "%.2f"|format(tasa_bcv) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="categoria-section">
+                <div class="categoria-header">
+                    <h3><i class="fas fa-exclamation-triangle me-2"></i>Productos con Bajo Stock</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Precio</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, producto in productos_bajo_stock.items() %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td>
+                                    <span class="badge-stock {% if producto.cantidad < 5 %}critico{% else %}bajo{% endif %}">
+                                        {{ producto.cantidad }} unidades
+                                    </span>
+                                </td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio * producto.cantidad) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for categoria, datos in productos_por_categoria.items() %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="categoria-section">
+                <div class="categoria-header">
+                    <h3>{{ categoria }}</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in datos.productos %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>
+                                    <span class="badge-stock {% if producto.cantidad < 5 %}critico{% elif producto.cantidad < 10 %}bajo{% else %}normal{% endif %}">
+                                        {{ producto.cantidad }} unidades
+                                    </span>
+                                </td>
+                                <td>${{ "%.2f"|format(producto.precio) }}</td>
+                                <td>${{ "%.2f"|format(producto.precio * producto.cantidad) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td colspan="2"><strong>Total {{ categoria }}</strong></td>
+                                <td><strong>Stock: {{ datos.cantidad }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(datos.valor) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal Ajuste Masivo de Stock -->
+<div class="modal fade" id="modalAjustesMasivos" tabindex="-1" aria-labelledby="modalAjustesMasivosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="modalAjustesMasivosLabel"><i class="fas fa-sliders-h me-2"></i>Historial de Ajustes Masivos de Stock</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-warning">
+              <tr>
+                <th>Fecha</th>
+                <th>Motivo</th>
+                <th>Producto</th>
+                <th>Ingreso</th>
+                <th>Salida</th>
+                <th>Usuario</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if ajustes_masivos and ajustes_masivos|length > 0 %}
+                {% for ajuste in ajustes_masivos %}
+                <tr>
+                  <td>{{ ajuste.fecha }}</td>
+                  <td>{{ ajuste.motivo }}</td>
+                  <td>{{ ajuste.producto }}</td>
+                  <td>{% if ajuste.ingreso %}{{ ajuste.ingreso }}{% else %}0{% endif %}</td>
+                  <td>{% if ajuste.salida %}{{ ajuste.salida }}{% else %}0{% endif %}</td>
+                  <td>{{ ajuste.usuario }}</td>
+                  <td>{{ ajuste.observaciones }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="7" class="text-center">No hay ajustes registrados.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filtrado en tiempo real por producto y categoría
+function normalizarTexto(txt) {
+    return txt.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const inputBusqueda = document.getElementById('busquedaProducto');
+    const selectCategoria = document.getElementById('filtroCategoria');
+    const secciones = document.querySelectorAll('.categoria-section');
+
+    function filtrar() {
+        const texto = normalizarTexto(inputBusqueda.value.trim());
+        const categoria = selectCategoria.value;
+        secciones.forEach(section => {
+            // Filtrar por categoría
+            const header = section.querySelector('.categoria-header h3');
+            const esCategoria = !categoria || (header && header.textContent === categoria);
+            // Filtrar por producto
+            let hayCoincidencia = false;
+            const filas = section.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+                const nombre = normalizarTexto(fila.querySelector('td').textContent);
+                const coincide = nombre.includes(texto);
+                fila.style.display = (coincide && esCategoria) ? '' : 'none';
+                if (coincide && esCategoria) hayCoincidencia = true;
+            });
+            // Mostrar u ocultar la sección según si hay coincidencias
+            section.style.display = hayCoincidencia ? '' : 'none';
+        });
+    }
+    inputBusqueda.addEventListener('input', filtrar);
+    selectCategoria.addEventListener('change', filtrar);
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,9 @@
+{
+  "admin": {
+    "password": "pbkdf2:sha256:260000$Gvh2XOS4Xa1wHJB3$3af45b5d04b7accd6b8e424ae73374e8af76ebb516cc56e0f3fe859e7bd881c0"
+  },
+  "angel": {
+    "password": "pbkdf2:sha256:260000$p1FVDRYFzHBd66CP$d5728eeefa3c60e3eb79bc174ad68eed26731befce76732d253153ad2a5201a5"
+  }
+}
+

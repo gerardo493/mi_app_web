@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Facturas{% endblock %}
+
+{% block content %}
+<style>
+    .reporte-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stats-card .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a237e;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .stats-label {
+        font-size: 1.1rem;
+        color: #455a64;
+        font-weight: 600;
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .filter-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+    .filter-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .filter-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1a237e;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        border: none;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .table-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: #1a237e;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+    }
+
+    .badge-danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    }
+
+    .badge-info {
+        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-value {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-label {
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .table thead th, .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+
+        .reporte-container {
+            background: none;
+            padding: 0;
+        }
+
+        .page-header {
+            background: none !important;
+            color: black !important;
+            box-shadow: none;
+            padding: 1rem 0;
+        }
+
+        .page-header h2 {
+            text-shadow: none;
+        }
+
+        .stats-card, .filter-card, .table-card {
+            box-shadow: none;
+            border: 1px solid #dee2e6;
+        }
+
+        .stats-card:hover, .btn:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .table thead th {
+            background: #f8f9fa !important;
+            color: black !important;
+        }
+
+        .badge {
+            border: 1px solid #dee2e6;
+        }
+    }
+</style>
+
+<div class="reporte-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-chart-line me-2"></i>Reporte de Facturas
+            </h2>
+            <div class="no-print">
+                <a href="{{ url_for('mostrar_facturas') }}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+                <button onclick="window.print()" class="btn btn-primary">
+                    <i class="fas fa-print me-2"></i>Imprimir
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-card">
+            <div class="card-header">
+                <h4><i class="fas fa-filter me-2"></i>Filtros</h4>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="year" class="form-label">Año</label>
+                        <select class="form-select" id="year" name="year">
+                            {% for y in anios_disponibles %}
+                            <option value="{{ y }}" {% if y|string == request.args.get('year', '') %}selected{% endif %}>{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="month" class="form-label">Mes</label>
+                        <select class="form-select" id="month" name="month">
+                            <option value="">Todos</option>
+                            {% for m in range(1, 13) %}
+                            <option value="{{ m }}" {% if m|string == request.args.get('month', '') %}selected{% endif %}>{{ m }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cliente" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente" name="cliente">
+                            <option value="">Todos</option>
+                            {% for id, cliente in clientes.items() %}
+                            <option value="{{ id }}" {% if id|string == request.args.get('cliente', '') %}selected{% endif %}>{{ cliente.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumen General -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="card-body text-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stats-value">{{ total_facturas }}</div>
+                        <div class="stats-label">Total Facturas</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="card-body text-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stats-value">${{ "%.2f"|format(total_usd) }}</div>
+                        <div class="stats-label">Total USD</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="card-body text-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-bs"></i>
+                        </div>
+                        <div class="stats-value">Bs {{ "%.2f"|format(total_bs) }}</div>
+                        <div class="stats-label">Total Bs</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="card-body text-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="stats-value">${{ "%.2f"|format(promedio_usd) }}</div>
+                        <div class="stats-label">Promedio por Factura</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Clientes -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-trophy me-2"></i>Top 10 Clientes</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Total Facturas</th>
+                                <th>Total USD</th>
+                                <th>Total Bs</th>
+                                <th>Promedio por Factura</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in top_clientes %}
+                            <tr>
+                                <td>{{ cliente.nombre }}</td>
+                                <td>{{ cliente.total_facturas }}</td>
+                                <td>${{ "%.2f"|format(cliente.total_usd) }}</td>
+                                <td>Bs {{ "%.2f"|format(cliente.total_bs) }}</td>
+                                <td>${{ "%.2f"|format(cliente.promedio_usd) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Facturas -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-list me-2"></i>Lista de Facturas</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Condición</th>
+                                <th>Total USD</th>
+                                <th>Total Bs</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for factura in facturas %}
+                            <tr>
+                                <td>{{ factura.numero }}</td>
+                                <td>{{ factura.fecha }}</td>
+                                <td>{{ clientes[factura.cliente_id].nombre }}</td>
+                                <td>
+                                    <span class="badge {% if factura.condicion_pago == 'contado' %}badge-success{% else %}badge-warning{% endif %}">
+                                        {{ factura.condicion_pago|title }}
+                                    </span>
+                                </td>
+                                <td>${{ "%.2f"|format(factura.total_usd) }}</td>
+                                <td>Bs {{ "%.2f"|format(factura.total_bs) }}</td>
+                                <td>
+                                    <span class="badge {% if factura.estado == 'pagada' %}badge-success{% elif factura.estado == 'pendiente' %}badge-warning{% else %}badge-danger{% endif %}">
+                                        {{ factura.estado|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

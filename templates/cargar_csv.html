@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Cargar {{ tipo|title }} desde CSV{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Cargar {{ tipo|title }} desde CSV</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ csrf_token() }}
+                        <div class="mb-3">
+                            <label for="archivo" class="form-label">Seleccione el archivo CSV</label>
+                            <input type="file" class="form-control" id="archivo" name="archivo" accept=".csv" required>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h5>Formato del archivo CSV:</h5>
+                            {% if tipo == 'clientes' %}
+                            <p>El archivo debe contener las siguientes columnas:</p>
+                            <ul>
+                                <li><strong>tipo_id</strong>: Tipo de identificación (V, E, J, P)</li>
+                                <li><strong>numero_id</strong>: Número de identificación</li>
+                                <li><strong>nombre</strong>: Nombre completo</li>
+                                <li><strong>email</strong>: Correo electrónico (opcional)</li>
+                                <li><strong>telefono</strong>: Número de teléfono (opcional)</li>
+                                <li><strong>direccion</strong>: Dirección (opcional)</li>
+                            </ul>
+                            {% else %}
+                            <p>El archivo debe contener las siguientes columnas:</p>
+                            <ul>
+                                <li><strong>nombre</strong>: Nombre del producto</li>
+                                <li><strong>precio</strong>: Precio en USD</li>
+                                <li><strong>cantidad</strong>: Cantidad en stock</li>
+                                <li><strong>categoria</strong>: Categoría del producto</li>
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            {% if tipo == 'productos' %}
+                                <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-secondary">Volver al inventario</a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i>Cargar Archivo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,884 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar Factura' if editar else 'Nueva Factura' }}{% endblock %}
+
+{% block content %}
+<style>
+    .factura-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+    .form-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .form-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1a237e;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 71, 161, 0.25);
+        border-color: #0d47a1;
+    }
+
+    .input-group .btn {
+        border-radius: 0 10px 10px 0;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .input-group .form-control {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        border: none;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+        border: none;
+    }
+
+    .productos-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .productos-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        border-bottom: none;
+    }
+
+    .productos-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .productos-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .producto-row {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .producto-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .totales-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .totales-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #1a237e;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: none;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        color: #e65100;
+    }
+
+    #cliente_suggestions {
+        max-height: 200px;
+        overflow-y: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    #cliente_suggestions .list-group-item {
+        border: none;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    #cliente_suggestions .list-group-item:hover {
+        background: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .producto-row {
+            padding: 0.75rem;
+        }
+
+        .input-group-text {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+</style>
+
+<div class="factura-container">
+    <div class="container-fluid">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <h2>
+                <i class="fas fa-file-invoice-dollar me-2"></i>{{ 'Editar Factura' if editar else 'Nueva Factura' }}
+            </h2>
+            </div>
+
+                <form method="POST" action="{% if editar %}{{ url_for('editar_factura', id=factura.id) }}{% else %}{{ url_for('nueva_factura') }}{% endif %}" id="facturaForm" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Información Básica -->
+            <div class="form-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-info-circle me-2"></i>Información Básica</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="numero" class="form-label">Número de Factura</label>
+                            <input type="text" class="form-control" id="numero" name="numero" value="{{ factura.numero if editar else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" value="{{ factura.fecha if editar else '' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="hora" name="hora" value="{{ factura.hora if editar and factura.hora else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="condicion_pago" class="form-label">Condición de Pago</label>
+                            <select class="form-select" id="condicion_pago" name="condicion_pago" required>
+                                <option value="contado" {% if editar and factura.condicion_pago == 'contado' %}selected{% endif %}>Contado</option>
+                                <option value="credito" {% if editar and factura.condicion_pago == 'credito' %}selected{% endif %}>Crédito</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4" id="dias_credito_group" style="display:none;">
+                            <label for="dias_credito" class="form-label">Días de Crédito</label>
+                            <input type="number" class="form-control" id="dias_credito" name="dias_credito" min="1" value="{{ factura.dias_credito if editar and factura.dias_credito else '30' }}">
+                        </div>
+                        <div class="col-md-4" id="vencimiento_group" style="display:none;">
+                            <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+                            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" value="{{ factura.fecha_vencimiento if editar and factura.fecha_vencimiento else '' }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="tasa_bcv" class="form-label">Tasa BCV (Bs/USD)</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" class="form-control" id="tasa_bcv" name="tasa_bcv" value="{{ factura.tasa_bcv if editar and factura.tasa_bcv else '' }}" required>
+                                <button type="button" class="btn btn-outline-secondary" id="obtenerTasa">
+                                    <i class="fas fa-sync-alt me-2"></i>Obtener BCV
+                                </button>
+                            </div>
+                            <div id="advertencia-tasa" class="alert alert-warning mt-2" style="display:none; font-size:0.95em;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="mensaje-tasa">No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la factura.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="form-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-user me-2"></i>Cliente</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="cliente_autocomplete" class="form-label">Buscar Cliente</label>
+                        <input type="text" class="form-control" id="cliente_autocomplete" placeholder="Buscar cliente por nombre o RIF" autocomplete="off" required>
+                        <input type="hidden" name="cliente_id" id="cliente_id" value="{{ factura.cliente_id if editar else '' }}">
+                        <div id="cliente_suggestions" class="list-group position-absolute w-100" style="z-index: 10;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos -->
+            <div class="productos-card">
+                        <div class="card-header">
+                    <h5><i class="fas fa-box me-2"></i>Productos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Producto</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Cantidad</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Precio (USD)</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Total (USD)</label>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label fw-bold">Acción</label>
+                                </div>
+                            </div>
+                            <div id="productos-container">
+                        {% if editar %}
+                                    {% for prod_id, cantidad in zip(factura.productos, factura.cantidades) %}
+                            <div class="producto-row producto-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <select class="form-select producto-select" name="productos[]" required>
+                                            {% for id, prod in inventario.items() %}
+                                            <option value="{{ id }}" {% if id == prod_id %}selected{% endif %}>{{ prod.nombre }}</option>
+                                    {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control cantidad-input" name="cantidades[]" value="{{ cantidad }}" min="1" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" step="0.01" class="form-control precio-input" name="precios[]" value="{{ factura.precios[loop.index0] }}" min="0" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control subtotal" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-danger btn-sm eliminar-producto">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                                {% endif %}
+                            </div>
+                    <button type="button" class="btn btn-success" id="agregar-producto">
+                        <i class="fas fa-plus me-2"></i>Agregar Producto
+                    </button>
+                        </div>
+                    </div>
+
+            <!-- Totales -->
+            <div class="totales-card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="descuento" class="form-label">Descuento (%)</label>
+                            <input type="number" class="form-control" id="descuento" name="descuento" min="0" step="0.01" value="{{ factura.descuento if editar and factura.descuento else '0' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="iva" class="form-label">IVA (%)</label>
+                            <input type="number" class="form-control" id="iva" name="iva" min="0" max="100" value="{{ factura.iva if editar and factura.iva is not none else '0' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Totales</label>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Subtotal USD</span>
+                                <input type="text" class="form-control" id="subtotal_usd" name="subtotal_usd" readonly>
+                                <span class="input-group-text">Subtotal Bs</span>
+                                <input type="text" class="form-control" id="subtotal_bs" name="subtotal_bs" readonly>
+                            </div>
+                            <div class="input-group mb-1">
+                                <span class="input-group-text">Descuento</span>
+                                <input type="text" class="form-control" id="descuento_total" name="descuento_total" readonly>
+                                <span class="input-group-text">IVA</span>
+                                <input type="text" class="form-control" id="iva_total" name="iva_total" readonly>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">Total USD</span>
+                                <input type="text" class="form-control" id="total_usd" name="total_usd" readonly>
+                                <span class="input-group-text">Total Bs</span>
+                                <input type="text" class="form-control" id="total_bs" name="total_bs" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Pagos -->
+            <div class="form-card">
+                <div class="card-header">
+                    <h4><i class="fas fa-money-bill-wave me-2"></i>Historial de Pagos</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Método</th>
+                                    <th>Referencia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pago in factura.pagos %}
+                                <tr>
+                                    <td>{{ pago.fecha }} {{ pago.hora or '' }}</td>
+                                    <td>
+                                        {% if pago.moneda == 'USD' %}
+                                            ${{ pago.monto|es_number }}
+                                        {% else %}
+                                            {{ pago.monto|es_number }} Bs
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if pago.metodo == 'efectivo_usd' %}
+                                            Efectivo USD
+                                        {% elif pago.metodo == 'efectivo_bs' %}
+                                            Efectivo Bs
+                                        {% elif pago.metodo == 'pago_movil' %}
+                                            Pago Móvil
+                                        {% elif pago.metodo == 'transferencia' %}
+                                            Transferencia
+                                        {% endif %}
+                                        {% if pago.banco %}
+                                            <br><small class="text-muted">{{ pago.banco }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ pago.referencia or '-' }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="confirmarEliminarPago('{{ factura.id }}', '{{ pago.id }}')"
+                                                title="Eliminar pago">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ 'Actualizar Factura' if editar else 'Guardar Factura' }}
+                        </button>
+                        <a href="{{ url_for('mostrar_facturas') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar pago -->
+<div class="modal fade" id="modalEliminarPago" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación de Pago
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar este pago?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminarPago" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Eliminar Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% set clientes_json = clientes|tojson|default('{}', true) %}
+{% set factura_json = factura|tojson|default('null', true) %}
+<script>
+var listaClientes = {{ clientes_json|safe }};
+var facturaData = {{ factura_json|safe }};
+var listaClientesArr = Object.entries(listaClientes).map(function(entry) {
+    return { id: entry[0], nombre: entry[1].nombre, rif: entry[0] };
+});
+
+// --- Autocompletado y selección de clientes ---
+const clienteInput = document.getElementById('cliente_autocomplete');
+const clienteIdInput = document.getElementById('cliente_id');
+const clienteSuggestions = document.getElementById('cliente_suggestions');
+
+// Estilo para el dropdown
+clienteSuggestions.style.maxHeight = '200px';
+clienteSuggestions.style.overflowY = 'auto';
+clienteSuggestions.style.display = 'none';
+clienteSuggestions.style.position = 'absolute';
+clienteSuggestions.style.zIndex = '1000';
+clienteSuggestions.style.width = '100%';
+clienteSuggestions.style.backgroundColor = 'white';
+clienteSuggestions.style.border = '1px solid #ddd';
+clienteSuggestions.style.borderRadius = '4px';
+clienteSuggestions.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+
+function mostrarSugerenciasClientes(valor) {
+    clienteSuggestions.innerHTML = '';
+    clienteSuggestions.style.display = 'block';
+    
+    const matches = valor.length < 2 ? 
+        listaClientesArr : 
+        listaClientesArr.filter(c => 
+            c.nombre.toLowerCase().includes(valor.toLowerCase()) || 
+            c.rif.toLowerCase().includes(valor.toLowerCase())
+        );
+    
+    matches.forEach(c => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = `${c.nombre} (${c.rif})`;
+        item.onclick = () => {
+            clienteInput.value = `${c.nombre} (${c.rif})`;
+            clienteIdInput.value = c.id;
+            clienteSuggestions.style.display = 'none';
+        };
+        clienteSuggestions.appendChild(item);
+    });
+}
+
+// Eventos para el autocompletado de clientes
+clienteInput.addEventListener('click', function() {
+    mostrarSugerenciasClientes(this.value);
+});
+
+clienteInput.addEventListener('input', function() {
+    mostrarSugerenciasClientes(this.value);
+});
+
+// Cerrar el dropdown al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (!clienteSuggestions.contains(e.target) && e.target !== clienteInput) {
+        clienteSuggestions.style.display = 'none';
+    }
+});
+
+// Si ya hay un cliente seleccionado (edición), mostrarlo
+if (facturaData && facturaData.cliente_id) {
+    var clienteSel = listaClientesArr.find(function(c) { return c.id === facturaData.cliente_id; });
+    if (clienteSel) {
+        clienteInput.value = clienteSel.nombre + ' (' + clienteSel.rif + ')';
+        clienteIdInput.value = clienteSel.id;
+    }
+}
+
+// --- Condición de pago y fecha de vencimiento ---
+    const condicionPago = document.getElementById('condicion_pago');
+const diasCreditoGroup = document.getElementById('dias_credito_group');
+    const vencimientoGroup = document.getElementById('vencimiento_group');
+const diasCredito = document.getElementById('dias_credito');
+const fechaVencimiento = document.getElementById('fecha_vencimiento');
+
+function actualizarFechaVencimiento() {
+    const fecha = new Date(document.getElementById('fecha').value);
+    const dias = parseInt(diasCredito.value) || 30;
+    fecha.setDate(fecha.getDate() + dias);
+    const yyyy = fecha.getFullYear();
+    const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dd = String(fecha.getDate()).padStart(2, '0');
+    fechaVencimiento.value = `${yyyy}-${mm}-${dd}`;
+}
+
+    function toggleVencimiento() {
+        if (condicionPago.value === 'credito') {
+        diasCreditoGroup.style.display = '';
+            vencimientoGroup.style.display = '';
+        actualizarFechaVencimiento();
+        } else {
+        diasCreditoGroup.style.display = 'none';
+            vencimientoGroup.style.display = 'none';
+        fechaVencimiento.value = '';
+        }
+    }
+
+    condicionPago.addEventListener('change', toggleVencimiento);
+diasCredito.addEventListener('change', actualizarFechaVencimiento);
+    toggleVencimiento();
+
+// --- Fecha y hora automáticas ---
+const fechaInput = document.getElementById('fecha');
+const horaInput = document.getElementById('hora');
+
+if (!fechaInput.value) {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    fechaInput.value = `${yyyy}-${mm}-${dd}`;
+}
+
+if (!horaInput.value) {
+    const now = new Date();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    horaInput.value = `${horas}:${minutos}`;
+}
+
+// --- Tasa BCV automática ---
+function obtenerTasaBCV() {
+    const button = document.getElementById('obtenerTasa');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo...';
+    
+        fetch('/api/tasa-bcv')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al obtener la tasa BCV');
+            }
+            return response.json();
+        })
+            .then(data => {
+                if (data.tasa) {
+                    const tasa = parseFloat(data.tasa).toFixed(2);
+                    document.getElementById('tasa_bcv').value = tasa;
+                    calcularTotales();
+                    mostrarAdvertenciaTasa(data.advertencia, 'No se pudo obtener la tasa BCV del día. Se está usando la última tasa guardada. Verifica que sea correcta antes de guardar la factura.');
+                } else {
+                throw new Error('No se pudo obtener la tasa BCV');
+                }
+            })
+        .catch(error => {
+            console.error('Error:', error);
+                document.getElementById('tasa_bcv').value = '';
+            mostrarAdvertenciaTasa(true, 'No se pudo obtener la tasa BCV. Por favor, ingrésala manualmente.');
+            alert('No se pudo obtener la tasa BCV automáticamente. Por favor, ingrésala manualmente.');
+            })
+            .finally(() => {
+                button.disabled = false;
+            button.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Obtener BCV';
+        });
+}
+
+function mostrarAdvertenciaTasa(mostrar, mensaje) {
+    const adv = document.getElementById('advertencia-tasa');
+    const msg = document.getElementById('mensaje-tasa');
+    adv.style.display = mostrar ? '' : 'none';
+    if (mensaje) msg.textContent = mensaje;
+}
+
+document.getElementById('obtenerTasa').addEventListener('click', obtenerTasaBCV);
+
+// Obtener tasa BCV automáticamente al cargar la página
+    if (!document.getElementById('tasa_bcv').value) {
+    obtenerTasaBCV();
+}
+
+// --- Productos y totales ---
+const productosContainer = document.getElementById('productos-container');
+const agregarProductoBtn = document.getElementById('agregar-producto');
+
+// Función para crear una nueva fila de producto
+function crearFilaProducto() {
+    const div = document.createElement('div');
+    div.className = 'row mb-3 producto-item';
+    div.innerHTML = `
+        <div class="col-md-4">
+            <select class="form-select producto-select" name="productos[]" required>
+                <option value="">Seleccione un producto</option>
+                {% for id, producto in inventario.items() %}
+                <option value="{{ id }}" data-precio="{{ producto.precio }}">
+                    {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.cantidad }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="number" class="form-control cantidad-input" name="cantidades[]" min="1" value="1" required>
+        </div>
+        <div class="col-md-2">
+            <input type="number" step="0.01" class="form-control precio-input" name="precios[]" min="0" required>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control subtotal" readonly>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger btn-sm eliminar-producto">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    return div;
+}
+
+// Función para calcular el subtotal de un producto
+function calcularSubtotal(item) {
+    const cantidad = parseFloat(item.querySelector('.cantidad-input').value) || 0;
+    const precio = parseFloat(item.querySelector('.precio-input').value) || 0;
+    const subtotal = cantidad * precio;
+    item.querySelector('.subtotal').value = subtotal.toFixed(2);
+    calcularTotales();
+}
+
+// Función para calcular todos los totales
+function calcularTotales() {
+    let subtotal = 0;
+    document.querySelectorAll('.producto-item').forEach(item => {
+        subtotal += parseFloat(item.querySelector('.subtotal').value) || 0;
+    });
+    const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+    const iva = parseFloat(document.getElementById('iva').value) || 0;
+    const tasaBcv = parseFloat(document.getElementById('tasa_bcv').value) || 0;
+    let descuentoTotal = subtotal * (descuento / 100);
+    const subtotalConDescuento = subtotal - descuentoTotal;
+    const ivaTotal = subtotalConDescuento * (iva / 100);
+    const total = subtotalConDescuento + ivaTotal;
+    document.getElementById('subtotal_usd').value = subtotal.toFixed(2);
+    document.getElementById('subtotal_bs').value = (subtotal * tasaBcv).toFixed(2);
+    document.getElementById('descuento_total').value = descuentoTotal.toFixed(2);
+    document.getElementById('iva_total').value = ivaTotal.toFixed(2);
+    document.getElementById('total_usd').value = total.toFixed(2);
+    document.getElementById('total_bs').value = (total * tasaBcv).toFixed(2);
+}
+
+// Función para configurar los event listeners de un producto
+    function setupEventListeners(item) {
+        const select = item.querySelector('.producto-select');
+        const cantidadInput = item.querySelector('.cantidad-input');
+        const precioInput = item.querySelector('.precio-input');
+    const removeButton = item.querySelector('.eliminar-producto');
+        
+        select.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        const precio = parseFloat(option.dataset.precio) || 0;
+                precioInput.value = precio.toFixed(2);
+                calcularSubtotal(item);
+        });
+        
+    cantidadInput.addEventListener('input', () => calcularSubtotal(item));
+    precioInput.addEventListener('input', () => calcularSubtotal(item));
+        
+        removeButton.addEventListener('click', function() {
+            if (document.querySelectorAll('.producto-item').length > 1) {
+                item.remove();
+                calcularTotales();
+            } else {
+                alert('Debe haber al menos un producto en la factura');
+            }
+        });
+    }
+
+    // Configurar eventos para productos existentes
+document.querySelectorAll('.producto-item').forEach(item => {
+    setupEventListeners(item);
+    calcularSubtotal(item);
+});
+calcularTotales();
+
+// Evento para agregar nuevo producto
+    agregarProductoBtn.addEventListener('click', function() {
+    const nuevaFila = crearFilaProducto();
+    productosContainer.appendChild(nuevaFila);
+    setupEventListeners(nuevaFila);
+    calcularSubtotal(nuevaFila);
+    calcularTotales();
+});
+
+// --- Pagos ---
+// El bloque de pagos ha sido eliminado para unificar el registro de pagos solo mediante el modal.
+// ... existing code ...
+function confirmarEliminarPago(facturaId, pagoId) {
+    const form = document.getElementById('formEliminarPago');
+    form.action = `/facturas/${facturaId}/eliminar_pago/${pagoId}`;
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminarPago'));
+    modal.show();
+}
+</script>
+{% if editar and factura.estado == 'pagada' %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('pago_monto').disabled = true;
+    document.getElementById('pago_metodo').disabled = true;
+    document.getElementById('pago_referencia').disabled = true;
+    document.getElementById('agregar_pago').disabled = true;
+});
+</script>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-header {
+        background: #154360;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+    .btn-primary {
+        background: #27ae60;
+        border-color: #27ae60;
+    }
+    .btn-primary:hover {
+        background: #219150;
+        border-color: #219150;
+    }
+    .table th {
+        background: #dff6ff;
+        color: #154360;
+        font-size: 1em;
+    }
+    .producto-item {
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e1e1e1;
+    }
+    .form-label {
+        color: #154360;
+        font-weight: 500;
+    }
+    .input-group-text {
+        background: #27ae60;
+        color: #fff;
+        border: none;
+    }
+    .card {
+        box-shadow: 0 2px 8px rgba(21,67,96,0.07);
+        border-radius: 12px;
+        border: 1px solid #e1e1e1;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        font-size: 1.05em;
+        min-height: 2.2em;
+    }
+    .input-group {
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %} 

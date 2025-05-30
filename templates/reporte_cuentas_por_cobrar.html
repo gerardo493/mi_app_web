@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Cuentas por Cobrar{% endblock %}
+
+{% block content %}
+<style>
+    .reporte-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    .page-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-card.primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+    }
+
+    .stats-card.info {
+        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+        color: white;
+    }
+
+    .stats-card.success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        color: white;
+    }
+
+    .stats-card.warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        color: white;
+    }
+
+    .stats-card.secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        color: white;
+    }
+
+    .stats-card .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .stats-card .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .stats-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: none;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .table-card .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .table-card .card-header.danger {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    }
+
+    .table-card .card-header h4, .table-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: #1a237e;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+    }
+
+    .badge-secondary {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .btn i {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+    }
+
+    .btn-outline-primary {
+        border: 2px solid #1a237e;
+        color: #1a237e;
+    }
+
+    .btn-outline-primary:hover, .btn-outline-primary.active {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border-color: transparent;
+    }
+
+    .btn-outline-success {
+        border: 2px solid #2e7d32;
+        color: #2e7d32;
+    }
+
+    .btn-outline-success:hover, .btn-outline-success.active {
+        background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        border-color: transparent;
+        color: white;
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #455a64;
+        color: #455a64;
+    }
+
+    .btn-outline-secondary:hover, .btn-outline-secondary.active {
+        background: linear-gradient(135deg, #455a64 0%, #263238 100%);
+        border-color: transparent;
+        color: white;
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+        border: none;
+    }
+
+    .btn-sm {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-value {
+            font-size: 1.5rem;
+        }
+
+        .stats-card .stats-label {
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table thead th, .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media print {
+        .btn-group, .navbar {
+            display: none !important;
+        }
+        .card {
+            break-inside: avoid;
+            border: none !important;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+        .table {
+            font-size: 12px;
+        }
+        .table th {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+        }
+        .badge {
+            border: 1px solid #000;
+        }
+        .container-fluid {
+            width: 100% !important;
+            padding: 0 !important;
+        }
+        .row {
+            margin: 0 !important;
+        }
+        .col-md-3, .col-md-2 {
+            padding: 0 10px !important;
+        }
+        .stats-value {
+            font-size: 2rem !important;
+        }
+    }
+
+    .btn-outline-success.active,
+    .btn-outline-success:active {
+        color: #fff !important;
+    }
+    .btn-outline-secondary.active,
+    .btn-outline-secondary:active {
+        color: #fff !important;
+    }
+</style>
+
+<div class="reporte-container">
+    <div class="container">
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-money-bill-wave me-2"></i>Reporte de Cuentas por Cobrar</h2>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group">
+                        <a href="{{ url_for('mostrar_cuentas_por_cobrar', estado='por_cobrar') }}" class="btn btn-outline-primary {% if filtro == 'por_cobrar' %}active{% endif %}">Por Cobrar</a>
+                        <a href="{{ url_for('mostrar_cuentas_por_cobrar', estado='cobrado') }}" class="btn btn-outline-success {% if filtro == 'cobrado' %}active{% endif %}">Cobradas</a>
+                        <a href="{{ url_for('mostrar_cuentas_por_cobrar', estado='todas') }}" class="btn btn-outline-secondary {% if filtro == 'todas' %}active{% endif %}">Todas</a>
+                        <button onclick="window.print()" class="btn btn-primary">
+                            <i class="fas fa-print me-2"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card primary">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stats-value">${{ total_por_cobrar_usd|es_number }}</div>
+                        <div class="stats-label">Total por Cobrar (USD)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card info">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-bolivar-sign"></i>
+                        </div>
+                        <div class="stats-value">{{ total_por_cobrar_bs|es_number }}</div>
+                        <div class="stats-label">Total por Cobrar (Bs)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stats-card success">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stats-value">{{ cantidad_facturas }}</div>
+                        <div class="stats-label">Facturas Pendientes</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stats-card warning">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-value">{{ cantidad_clientes }}</div>
+                        <div class="stats-label">Clientes Deudores</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stats-card secondary">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stats-value">${{ promedio_por_factura|es_number }}</div>
+                        <div class="stats-label">Promedio por Factura</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Deudores y Tasa BCV -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="table-card">
+                    <div class="card-header danger">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Top 5 Clientes Deudores</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th class="text-end">Monto Pendiente (USD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in top_deudores %}
+                                    <tr>
+                                        <td>{{ d.cliente }}</td>
+                                        <td class="text-end">${{ d.monto|es_number }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="stats-card">
+                    <div class="card-body">
+                        <div class="stats-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stats-value">{{ tasa_bcv|default('Cargando...', true)|es_number }}</div>
+                        <div class="stats-label">Tasa BCV (Bs/USD)</div>
+                        <small class="text-muted">Última actualización: {{ ultima_actualizacion_bcv|default('', true) }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Cuentas -->
+        <div class="table-card">
+            <div class="card-header">
+                <h4><i class="fas fa-list me-2"></i>Lista de Cuentas por Cobrar</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Número Factura</th>
+                                <th>Cliente</th>
+                                <th>Total (USD)</th>
+                                <th>Abonado (USD)</th>
+                                <th>Saldo Pendiente (USD)</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, cuenta in cuentas.items() %}
+                            <tr>
+                                <td>{{ id }}</td>
+                                <td>{{ cuenta.numero }}</td>
+                                <td>{{ cuenta.cliente_nombre }}</td>
+                                <td>${{ cuenta.total_usd|es_number }}</td>
+                                <td>${{ cuenta.abonado_usd|es_number }}</td>
+                                <td>${{ cuenta.saldo_pendiente|es_number }}</td>
+                                <td>
+                                    {% if cuenta.estado == 'por_cobrar' %}
+                                        <span class="badge badge-warning">Por Cobrar</span>
+                                    {% elif cuenta.estado == 'cobrado' %}
+                                        <span class="badge badge-success">Cobrada</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">{{ cuenta.estado }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ cuenta.fecha }}</td>
+                                <td>
+                                    <a href="{{ url_for('ver_factura', id=cuenta.factura_id) }}" class="btn btn-sm btn-info" title="Ver Factura">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

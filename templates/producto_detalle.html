@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(120deg, #e9f2fb 0%, #f8fbff 100%);
+    }
+    .producto-card {
+        border: 2px solid #1976d2;
+        border-radius: 1.2rem;
+        box-shadow: 0 4px 24px 0 rgba(25, 118, 210, 0.08), 0 1.5px 4px 0 rgba(25, 118, 210, 0.10);
+        background: #fff;
+        overflow: hidden;
+    }
+    .producto-img-box {
+        background: linear-gradient(135deg, #e3f0fc 60%, #b3d1f7 100%);
+        border-left: 2px solid #1976d2;
+        min-height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .producto-img-box img {
+        max-height: 260px;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 1rem;
+        border: 2.5px solid #1976d2;
+        background: #fff;
+        padding: 10px;
+        transition: transform 0.25s, box-shadow 0.25s;
+        box-shadow: 0 2px 12px 0 rgba(25, 118, 210, 0.10);
+    }
+    .producto-img-box img:hover {
+        transform: scale(1.04) rotate(-2deg);
+        box-shadow: 0 8px 32px 0 rgba(25, 118, 210, 0.18);
+    }
+    .producto-info dt {
+        color: #1976d2;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .producto-info dd {
+        margin-bottom: 1rem;
+        font-size: 1.08rem;
+    }
+    .producto-info .icon {
+        width: 1.2em;
+        text-align: center;
+    }
+    @media (max-width: 767px) {
+        .producto-img-box {
+            border-left: none;
+            border-top: 2px solid #1976d2;
+            min-height: 180px;
+        }
+        .producto-card {
+            border-radius: 0.7rem;
+        }
+    }
+</style>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="text-primary fw-bold"><i class="fas fa-box me-2"></i>Detalle del Producto</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('mostrar_inventario') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al inventario
+        </a>
+    </div>
+</div>
+
+<div class="card producto-card mb-4">
+    <div class="row g-0 align-items-stretch">
+        <div class="col-md-8 p-4 d-flex flex-column justify-content-center">
+            <dl class="row producto-info mb-0">
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-hashtag"></i></span>ID:</dt>
+                <dd class="col-sm-7">{{ id }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-cube"></i></span>Nombre:</dt>
+                <dd class="col-sm-7">{{ producto.nombre }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-tags"></i></span>Categoría:</dt>
+                <dd class="col-sm-7">{{ producto.categoria }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-dollar-sign"></i></span>Precio:</dt>
+                <dd class="col-sm-7">${{ producto.precio }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-warehouse"></i></span>Stock:</dt>
+                <dd class="col-sm-7">{{ producto.cantidad }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-arrow-down"></i></span>Última Entrada:</dt>
+                <dd class="col-sm-7">{{ producto.ultima_entrada|datetimeformat if producto.ultima_entrada else 'N/A' }}</dd>
+                <dt class="col-sm-5"><span class="icon"><i class="fas fa-arrow-up"></i></span>Última Salida:</dt>
+                <dd class="col-sm-7">{{ producto.ultima_salida|datetimeformat if producto.ultima_salida else 'N/A' }}</dd>
+            </dl>
+            <div class="mt-4">
+                <a href="{{ url_for('editar_producto', id=id) }}" class="btn btn-primary px-4 py-2 shadow-sm">
+                    <i class="fas fa-edit me-2"></i>Editar Producto
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 producto-img-box">
+            {% if producto.ruta_imagen %}
+                <img src="{{ url_for('static', filename=producto.ruta_imagen) }}" alt="{{ producto.nombre }}">
+            {% else %}
+                <div class="text-muted py-5">
+                    <i class="fas fa-image fa-3x mb-3"></i>
+                    <p>No hay imagen disponible</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
