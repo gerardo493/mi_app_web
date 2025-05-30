@@ -2,10 +2,7 @@ services:
   - type: web
     name: sistema-facturacion
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      mkdir -p /data
-      chmod 777 /data
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app --workers 2 --threads 2 --timeout 120
     envVars:
       - key: PYTHON_VERSION
@@ -15,8 +12,4 @@ services:
       - key: FLASK_APP
         value: app.py
     healthCheckPath: /
-    autoDeploy: true
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 1 
+    autoDeploy: true 

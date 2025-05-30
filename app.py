@@ -3306,7 +3306,7 @@ if IS_RENDER:
     CAPTURAS_FOLDER = '/data/uploads/capturas'
     CAPTURAS_URL = '/uploads/capturas'
 else:
-    CAPTURAS_FOLDER = os.path.join('static', 'uploads', 'capturas')
+    CAPTURAS_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads', 'capturas')
     CAPTURAS_URL = '/static/uploads/capturas'
 os.makedirs(CAPTURAS_FOLDER, exist_ok=True)
 
